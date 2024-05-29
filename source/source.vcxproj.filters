@@ -40,9 +40,6 @@
     <Filter Include="2_source\Wrapper">
       <UniqueIdentifier>{dc85f45e-31b2-4f2d-b4fe-51acd9a31c76}</UniqueIdentifier>
     </Filter>
-    <Filter Include="2_source\ImGui">
-      <UniqueIdentifier>{e1cbaf2f-2942-4ceb-a4e0-400d380b9602}</UniqueIdentifier>
-    </Filter>
     <Filter Include="2_source\Package">
       <UniqueIdentifier>{fb46cef4-fe6c-4465-bdcd-e52ff79f6202}</UniqueIdentifier>
     </Filter>
@@ -172,27 +169,6 @@
     </ClCompile>
     <ClCompile Include="2_source\Wrapper\SphericalCoordinates.cpp">
       <Filter>2_source\Wrapper</Filter>
-    </ClCompile>
-    <ClCompile Include="2_source\ImGui\imgui.cpp">
-      <Filter>2_source\ImGui</Filter>
-    </ClCompile>
-    <ClCompile Include="2_source\ImGui\imgui_demo.cpp">
-      <Filter>2_source\ImGui</Filter>
-    </ClCompile>
-    <ClCompile Include="2_source\ImGui\imgui_draw.cpp">
-      <Filter>2_source\ImGui</Filter>
-    </ClCompile>
-    <ClCompile Include="2_source\ImGui\imgui_impl_dx12.cpp">
-      <Filter>2_source\ImGui</Filter>
-    </ClCompile>
-    <ClCompile Include="2_source\ImGui\imgui_impl_win32.cpp">
-      <Filter>2_source\ImGui</Filter>
-    </ClCompile>
-    <ClCompile Include="2_source\ImGui\imgui_tables.cpp">
-      <Filter>2_source\ImGui</Filter>
-    </ClCompile>
-    <ClCompile Include="2_source\ImGui\imgui_widgets.cpp">
-      <Filter>2_source\ImGui</Filter>
     </ClCompile>
     <ClCompile Include="2_source\Package\MemoryMappedFile.cpp">
       <Filter>2_source\Package</Filter>

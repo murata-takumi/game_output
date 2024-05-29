@@ -22,7 +22,8 @@ LRESULT CALLBACK WindowProcedure(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lpar
 	switch (msg)
 	{
 	case WM_DESTROY:
-		PostQuitMessage(0);											//OSにアプリの終了を伝える
+		//OSにアプリの終了を伝える
+		PostQuitMessage(0);											
 		return 0;
 
 	case WM_ACTIVATEAPP:
@@ -30,7 +31,7 @@ LRESULT CALLBACK WindowProcedure(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lpar
 		Mouse::ProcessMessage(msg, wparam, lparam);
 		break;
 
-	case WM_INPUT:													//マウスの入力を伝える
+	case WM_INPUT:													
 	case WM_MOUSEMOVE:
 	case WM_LBUTTONDOWN:
 	case WM_LBUTTONUP:
@@ -42,13 +43,15 @@ LRESULT CALLBACK WindowProcedure(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lpar
 	case WM_XBUTTONDOWN:
 	case WM_XBUTTONUP:
 	case WM_MOUSEHOVER:
+		//マウスの入力を伝える
 		Mouse::ProcessMessage(msg, wparam, lparam);
 		break;
 
-	case WM_SYSKEYDOWN:												//キーボードの入力を伝える
+	case WM_SYSKEYDOWN:												
 	case WM_KEYDOWN:
 	case WM_KEYUP:
 	case WM_SYSKEYUP:
+		//キーボードの入力を伝える
 		Keyboard::ProcessMessage(msg, wparam, lparam);
 		break;
 
@@ -56,8 +59,11 @@ LRESULT CALLBACK WindowProcedure(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lpar
 		return MAKELRESULT(0, MNC_CLOSE);
 	}
 
-	ImGui_ImplWin32_WndProcHandler(hwnd, msg, wparam, lparam);		//imguiのウィンドウを動かすために必要
-	return DefWindowProc(hwnd, msg, wparam, lparam);				//既定の処理を行う
+	//imguiのウィンドウを動かすために必要
+	ImGui_ImplWin32_WndProcHandler(hwnd, msg, wparam, lparam);		
+
+	//既定の処理を行う
+	return DefWindowProc(hwnd, msg, wparam, lparam);				
 }
 
 /// <summary>
@@ -83,17 +89,21 @@ OnExit()
 void 
 Application::CreateGameWindow(HWND& hwnd, WNDCLASSEX& windowClass)
 {
-	windowClass.cbSize = sizeof(WNDCLASSEX);							//構造体のメモリサイズ指定
-	windowClass.lpfnWndProc = (WNDPROC)WindowProcedure;					//コールバック関数の指定
-	windowClass.lpszClassName = _T("DX12Application");					//アプリケーションクラス名
-	windowClass.hInstance = GetModuleHandle(nullptr);					//インスタンス(アプリケーション)ハンドルの取得
+	//ウィンドウ作成用データの設定
+	windowClass.cbSize = sizeof(WNDCLASSEX);
+	windowClass.lpfnWndProc = (WNDPROC)WindowProcedure;
+	windowClass.lpszClassName = _T("DX12Application");
+	windowClass.hInstance = GetModuleHandle(nullptr);
 
-	RegisterClassEx(&windowClass);										//アプリケーションクラスの指定をOSに伝える
+	//アプリケーションクラスの指定をOSに伝える
+	RegisterClassEx(&windowClass);										
 
-	RECT wrc = { 0,0,(LONG)WINDOW_WIDTH,(LONG)WINDOW_HEIGHT };			//ウィンドウサイズの決定
-	AdjustWindowRect(&wrc, WS_OVERLAPPEDWINDOW, false);					//ウィンドウサイズを計算
+	//ウィンドウサイズの決定
+	RECT wrc = { 0,0,(LONG)WINDOW_WIDTH,(LONG)WINDOW_HEIGHT };			
+	AdjustWindowRect(&wrc, WS_OVERLAPPEDWINDOW, false);
 
-	hwnd = CreateWindow(windowClass.lpszClassName,						//ウィンドウハンドルの登録
+	//ウィンドウハンドルの登録
+	hwnd = CreateWindow(windowClass.lpszClassName,						
 		_T("Program"),
 		WS_OVERLAPPEDWINDOW & ~WS_THICKFRAME & ~WS_MAXIMIZEBOX ,
 		(DISPLAY_WIDTH/2) - (WINDOW_WIDTH/2),
@@ -106,13 +116,16 @@ Application::CreateGameWindow(HWND& hwnd, WNDCLASSEX& windowClass)
 		nullptr
 	);
 
-	auto hdc = GetDC(_hwnd);											//リフレッシュレートの取得
+	//リフレッシュレートの取得
+	auto hdc = GetDC(_hwnd);											
 	_rate = GetDeviceCaps(hdc, VREFRESH);
 
-	if (_rate <= 60) { _interval = 1; }									//レートに応じてレンダーターゲットのフリップ間隔を設定
+	//レートに応じてレンダーターゲットのフリップ間隔を設定
+	if (_rate <= 60) { _interval = 1; }									
 	else if (_rate >= 120) { _interval = 2; }
 
-	_deltaTime = (float)1 / (float)_rate;								//1フレーム毎の経過秒数を計算
+	//1フレーム毎の経過秒数を計算
+	_deltaTime = (float)1 / (float)_rate;								
 }
 
 /// <summary>
@@ -141,36 +154,44 @@ Application::Instance()
 /// <returns>初期化が成功したかどうか</returns>
 bool 
 Application::Init()
-{
-	auto result = CoInitializeEx(0, COINIT_MULTITHREADED);						//スレッド処理を行うためCOMライブラリを初期化
-	CreateGameWindow(_hwnd, _windowClass);										//ゲーム用ウィンドウ作成
+{	
+	//スレッド処理を行うためCOMライブラリを初期化
+	auto result = CoInitializeEx(0, COINIT_MULTITHREADED);		
 
-	ShowCursor(true);															//マウスカーソルを表示する
+	//ゲーム用ウィンドウ作成
+	CreateGameWindow(_hwnd, _windowClass);										
 
-	atexit(OnExit);																//終了ハンドラーに関数を登録
+	//マウスカーソルを表示する
+	ShowCursor(true);															
 
-	_package.reset(new Package());												//Packageインスタンスを初期化
+	//終了ハンドラーに関数を登録
+	atexit(OnExit);																
 
-	//_package->CreateDirectoryAndFile(_T("Asset/font.pak"));					//.pakファイルからデータを読み込む
+	//.pakファイルからデータを読み込み、素材ファイル作成
+	_package.reset(new Package());
+	//_package->CreateDirectoryAndFile(_T("Asset/font.pak"));
 	//_package->CreateDirectoryAndFile(_T("Asset/image.pak"));
 	//_package->CreateDirectoryAndFile(_T("Asset/model.pak"));
 	//_package->CreateDirectoryAndFile(_T("Asset/sound.pak"));
-
-	//_package->CreatePackage(_T("Asset/font"), _T("font.pak"));				//.pakファイル作成処理
+	//_package->CreatePackage(_T("Asset/font"), _T("font.pak"));				
 	//_package->CreatePackage(_T("Asset/image"), _T("image.pak"));
 	//_package->CreatePackage(_T("Asset/model"), _T("model.pak"));
 	//_package->CreatePackage(_T("Asset/sound"), _T("sound.pak"));
 
-	_dx12.reset(new Dx12Wrapper(_hwnd,_deltaTime));								//Dx12Wrapperインスタンスを初期化
+	//Dx12Wrapperインスタンスを初期化
+	_dx12.reset(new Dx12Wrapper(_hwnd,_deltaTime));								
 	
-	_input.reset(new InputManager());											//InputManagerインスタンスを初期化
+	//InputManagerインスタンスを初期化
+	_input.reset(new InputManager());											
 
-	_sound.reset(new SoundManager());											//SoundManagerインスタンスを初期化
+	//SoundManagerインスタンスを初期化
+	_sound.reset(new SoundManager());
 
-	_play.reset(new PlayScene(*_dx12, *_input, *_sound));						//ゲームシーンの初期化
+	//ウィンドウハンドルに対応するウィンドウを表示
+	ShowWindow(_hwnd, SW_SHOW);													
 
-	ShowWindow(_hwnd, SW_SHOW);													//ウィンドウハンドルに対応するウィンドウを表示
-
+	//ゲームシーンの初期化
+	_play.reset(new PlayScene(*_dx12, *_input, *_sound));
 	_play->SceneStart();
 
 	return true;
@@ -186,19 +207,22 @@ Application::Run()
 	while (true)
 	{
  		//スレッド関係の処理
-		if (PeekMessage(&_msg, nullptr, 0, 0, PM_REMOVE))		//メッセージを調べる
+		if (PeekMessage(&_msg, nullptr, 0, 0, PM_REMOVE))		
 		{
-			TranslateMessage(&_msg);							//メッセージを翻訳
-			DispatchMessage(&_msg);								//ウィンドウプロシージャへメッセージを送る
+			//メッセージを調べ、プロシージャへメッセージを送る
+			TranslateMessage(&_msg);
+			DispatchMessage(&_msg);
 
-			if (_msg.message == WM_QUIT)						//アプリが終了したらループを終了させる
+			//アプリが終了したらループを終了させる
+			if (_msg.message == WM_QUIT)						
 			{
 				break;
 			}
 		}
+		//シーンの更新処理
 		else
-		{
-			_play->Update();									//各シーンの更新処理
+		{			
+			_play->Update();									
 		}
 	}
 }
@@ -209,7 +233,8 @@ Application::Run()
 void 
 Application::Terminate()
 {
-	UnregisterClass(_windowClass.lpszClassName, _windowClass.hInstance);	//構造体の設定を解除
+	//構造体の設定を解除
+	UnregisterClass(_windowClass.lpszClassName, _windowClass.hInstance);	
 }
 
 /// <summary>
@@ -219,11 +244,12 @@ Application::Terminate()
 SIZE
 Application::GetWindowSize()const
 {
-	SIZE ret;					//構造体を宣言し、幅と高さを設定
+	//構造体を宣言し、幅と高さを設定
+	SIZE ret;					
 	ret.cx = WINDOW_WIDTH;
 	ret.cy = WINDOW_HEIGHT;
 
-	return ret;					//構造体を返す
+	return ret;
 }
 
 /// <summary>
@@ -232,7 +258,8 @@ Application::GetWindowSize()const
 void
 Application::ExitApp()
 {
-	SendMessage(_hwnd,WM_DESTROY,0,0);	//終了用メッセージを送る
+	//終了用メッセージを送る
+	SendMessage(_hwnd,WM_DESTROY,0,0);	
 }
 
 /// <summary>

@@ -45,6 +45,7 @@ using namespace Microsoft::WRL;
 #pragma comment(lib,"dxgi.lib")
 #pragma comment(lib,"d3dcompiler.lib")
 #pragma comment(lib,"winmm.lib")
+#pragma comment(lib,"Imgui.lib")
 
 const float PI = 3.141592653f;		//円周率
 
@@ -83,46 +84,69 @@ class SoundManager;
 class Application
 {
 private:
-	WNDCLASSEX _windowClass;										//ウィンドウ作成時に必要な情報を格納
-	HWND _hwnd;														//ウィンドウの識別に必要な値
+	//ウィンドウ作成時に必要な情報を格納
+	WNDCLASSEX _windowClass;								
+	//ウィンドウの識別に必要な値
+	HWND _hwnd;														
 
-	shared_ptr<Dx12Wrapper> _dx12;									//Dx12Wrapperインスタンス
-	shared_ptr<InputManager> _input;								//InputManagerインスタンス	
-	shared_ptr<SoundManager> _sound;								//SoundManagerインスタンス
-	shared_ptr<EffectManager> _effect;								//EffectManagerインスタンス
+	//Dx12Wrapperインスタンス
+	shared_ptr<Dx12Wrapper> _dx12;									
+	//InputManagerインスタンス	
+	shared_ptr<InputManager> _input;								
+	//SoundManagerインスタンス
+	shared_ptr<SoundManager> _sound;								
+	//EffectManagerインスタンス
+	shared_ptr<EffectManager> _effect;								
 	
-	shared_ptr<PlayScene> _play;									//PlaySceneインスタンス
+	//PlaySceneインスタンス
+	shared_ptr<PlayScene> _play;									
 
-	shared_ptr<Package> _package;									//ゲーム内で使用する各種データを管理するインスタンス
+	//ゲーム内で使用する各種データを管理するインスタンス
+	shared_ptr<Package> _package;									
 
-	float _deltaTime;												//フレーム間の経過時間
+	//フレーム間の経過時間
+	float _deltaTime;				
+	//1秒あたりのフレーム数
+	int _rate;														
+	//フリップ間隔
+	int _interval;													
 
-	int _rate;														//1秒あたりのフレーム数
-	int _interval;													//フリップ間隔
+	//ゲーム用ウィンドウを作成する関数
+	void CreateGameWindow(HWND& hwnd, WNDCLASSEX& windowClass);		
 
-	void CreateGameWindow(HWND& hwnd, WNDCLASSEX& windowClass);		//ゲーム用ウィンドウを作成する関数
-
-	Application();													//コンストラクタ
-	Application(const Application&) = delete;						//コンストラクタを外部から呼び出されないよう設定
+	//コンストラクタ
+	Application();													
+	//コンストラクタを外部から呼び出されないよう設定
+	Application(const Application&) = delete;						
 
 public:
 
-	MSG _msg = {};									//メッセージ用構造体
+	//メッセージ用構造体
+	MSG _msg = {};									
 
-	static Application& Instance();					//インスタンスの参照を返す？
+	//インスタンスの参照を返す？
+	static Application& Instance();					
 
-	bool Init();									//初期化
+	//初期化
+	bool Init();									
 
-	void Run();										//ゲーム画面の描画
+	//ゲーム画面の描画
+	void Run();										
 
-	void Terminate();								//ゲーム終了時の後始末
+	//ゲーム終了時の後始末
+	void Terminate();								
 
-	SIZE GetWindowSize()const;						//ウィンドウサイズを返す
+	//ウィンドウサイズを返す
+	SIZE GetWindowSize()const;						
 
-	void ExitApp();									//アプリケーションを終了する
+	//アプリケーションを終了する
+	void ExitApp();									
 
-	int GetInterval()const;							//レンダーターゲットのフリップ間隔を返す関数
-	int GetRate()const;								//1秒間のフレームレートを返す関数
+	//レンダーターゲットのフリップ間隔を返す関数
+	int GetInterval()const;							
+	//1秒間のフレームレートを返す関数
+	int GetRate()const;								
 
-	~Application();									//デストラクタ
+	//デストラクタ
+	~Application();									
 };
