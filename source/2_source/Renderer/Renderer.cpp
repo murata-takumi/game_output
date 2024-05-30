@@ -92,33 +92,39 @@ Renderer::CreateGraphicsPipelineForPMD()
 
 	auto result = S_OK;
 
-	D3D12_INPUT_ELEMENT_DESC inputLayout[] =											//GPUに頂点データをどう解釈するか教える
+	//GPUに頂点データをどう解釈するか教える
+	D3D12_INPUT_ELEMENT_DESC inputLayout[] =
 	{
+		//座標
 		{"POSITION",0,DXGI_FORMAT_R32G32B32_FLOAT,0,
 		D3D12_APPEND_ALIGNED_ELEMENT,D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,0},
-
+		//法線
 		{"NORMAL",0,DXGI_FORMAT_R32G32B32_FLOAT,0,
 		D3D12_APPEND_ALIGNED_ELEMENT,D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,0},
-
+		//テクスチャUI値
 		{"TEXCOORD",0,DXGI_FORMAT_R32G32_FLOAT,0,
 		D3D12_APPEND_ALIGNED_ELEMENT,D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,0},
+		//正接
 		{"TANGENT",0,DXGI_FORMAT_R32G32B32_FLOAT,0,
 		D3D12_APPEND_ALIGNED_ELEMENT,D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,0},
-
+		//マテリアル
 		{"COLOR",0,DXGI_FORMAT_R32G32B32A32_FLOAT,0,
 		D3D12_APPEND_ALIGNED_ELEMENT,D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,0},
-
+		//ボーンID
 		{"IDs",0,DXGI_FORMAT_R32G32B32A32_UINT,0,
 		D3D12_APPEND_ALIGNED_ELEMENT,D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,0},
-
+		//ボーン重み
 		{"WEIGHT",0,DXGI_FORMAT_R32G32B32A32_FLOAT,0,
+		D3D12_APPEND_ALIGNED_ELEMENT,D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,0},
+		//カメラ座標からの距離（2乗）
+		{"DISFROMEYE",0,DXGI_FORMAT_R32G32B32_FLOAT,0,
 		D3D12_APPEND_ALIGNED_ELEMENT,D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,0},
 	};
 
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC gPipeline = {};									//パイプラインステート設定用構造体
 	gPipeline.pRootSignature = _rootSignature.Get();									//ルートシグネチャセット
 
-#ifdef _DEBUG
+//#ifdef _DEBUG
 
 	ID3DBlob* vsBlob = nullptr;															//頂点シェーダーオブジェクト
 	ID3DBlob* psBlob = nullptr;															//ピクセルシェーダーオブジェクト
@@ -154,18 +160,22 @@ Renderer::CreateGraphicsPipelineForPMD()
 	gPipeline.VS = CD3DX12_SHADER_BYTECODE(vsBlob);										//頂点シェーダーセット
 	gPipeline.PS = CD3DX12_SHADER_BYTECODE(psBlob);										//ピクセルシェーダーセット
 
-#else
-
-	gPipeline.VS.pShaderBytecode = g_FBXVS;												//頂点シェーダーのバイナリとメモリサイズ
-	gPipeline.VS.BytecodeLength = sizeof(g_FBXVS);
-	gPipeline.PS.pShaderBytecode = g_FBXPS;												//ピクセルシェーダー
-	gPipeline.PS.BytecodeLength = sizeof(g_FBXPS);
-
-#endif
+//#else
+//
+//	gPipeline.VS.pShaderBytecode = g_FBXVS;												//頂点シェーダーのバイナリとメモリサイズ
+//	gPipeline.VS.BytecodeLength = sizeof(g_FBXVS);
+//	gPipeline.PS.pShaderBytecode = g_FBXPS;												//ピクセルシェーダー
+//	gPipeline.PS.BytecodeLength = sizeof(g_FBXPS);
+//
+//#endif
 
 	gPipeline.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;									//サンプルマスク
 
-	gPipeline.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);							//ブレンドステート
+	//ブレンドステート
+	gPipeline.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
+	gPipeline.BlendState.RenderTarget[0].BlendEnable = true;
+	gPipeline.BlendState.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;
+	gPipeline.BlendState.RenderTarget[0].DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
 	
 	gPipeline.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);					//ポリゴンをピクセルに変換する仕組みを設定
 	gPipeline.RasterizerState.CullMode = D3D12_CULL_MODE_NONE;							//描画不要なポリゴンを描画しないよう設定

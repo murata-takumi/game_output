@@ -176,7 +176,8 @@ PlayScene::Update()
 		}
 	}
 
-	DrawUpdate();												//描画処理
+	//描画処理
+	DrawUpdate();
 }
 
 /// <summary>
@@ -185,57 +186,71 @@ PlayScene::Update()
 void
 PlayScene::SceneStart()
 {
-	_dx12.ResetCoordinates(0,0);								//カメラ位置をリセット
+	//カメラ位置をリセット
+	_dx12.ResetCoordinates(0,0);								
 
-	_direction = XMVectorZero();										//移動ベクトルを初期化
+	//プレイヤーの移動ベクトルを初期化
+	_direction = XMVectorZero();										
 
 	//モデル読み込み処理
 	auto f = [&]()
 	{
-		_isInLoad = true;												//ロード中だと示す
+		//ロード中だと示す
+		_isInLoad = true;												
 
-		vector<thread> ths;												//並列処理したいスレッドのベクトル
+		//並列処理したいスレッドのベクトル
+		vector<thread> ths;												
 		shared_ptr<FBXObject> ground;
 
+		//スレッドにアクターの作成処理を追加
 		ths.emplace_back
 		(	
 			[&](){
 				lock_guard lock(_mtx);
 
-				_actor = make_shared<FBXActor>(_dx12, ACTOR_PATH);		//アクターを作成
+				_actor = make_shared<FBXActor>(_dx12, ACTOR_PATH);		
 			}
 		);
+		//フィールドの作成処理を追加
 		ths.emplace_back
 		(
 			[&]() {
 				lock_guard lock(_mtx);
 
-				ground = make_shared<FBXObject>(_dx12, GROUND_PATH);	//地面を作成
+				ground = make_shared<FBXObject>(_dx12, GROUND_PATH);
 			}
 		);
 
-		for (auto& th : ths)											//スレッドの実行完了待ち
+		//スレッドが全て完了するまでここで待機
+		for (auto& th : ths)											
 		{
 			th.join();
 		}
 
+		//描画予定のオブジェクトにアクター、フィールドを追加
 		_actorAndObjs.emplace_back(ground);
 		_actorAndObjs.emplace_back(_actor);
 
-		_dx12.ImGui()->SetActor(_actorAndObjs);							//アクターをImGuiManager側に渡す
-		_dx12.Sprite()->SetActors(_actorAndObjs);						//アクターをSpriteManager側に渡す
+		//アクターをImGuiManager側に渡す
+		_dx12.ImGui()->SetActor(_actorAndObjs);							
+		//アクターをSpriteManager側に渡す
+		_dx12.Sprite()->SetActors(_actorAndObjs);						
 
-		_isInLoad = false;												//ロード完了
+		//ロード完了
+		_isInLoad = false;		
 
+		//フェードイン処理を並列処理
 		auto startFunc = [&]()
 		{
-			_dx12.Fade(1.0f, 0.0f);										//フェードイン処理
+			_dx12.Fade(1.0f, 0.0f);										
 		};
-		ParallelProcess(startFunc);										//上記の処理を並列処理する
+		ParallelProcess(startFunc);
 
-		//_dx12.Effect()->CallEffect();									//エフェクト実行
+		//エフェクト実行
+		//_dx12.Effect()->CallEffect();									
 	};
-	ParallelProcess(f);													//モデル読み込み処理を通常の描画処理と並行して行う
+	//上記の読み込み処理を通常の描画処理と並行して行う
+	ParallelProcess(f);													
 }
 
 /// <summary>
@@ -244,10 +259,13 @@ PlayScene::SceneStart()
 void
 PlayScene::SceneEnd()
 {
-	_actorAndObjs.clear();				//オブジェクトをまとめて削除
-	_actor = nullptr;					//アクターも初期化
+	//オブジェクトをまとめて削除
+	_actorAndObjs.clear();
+	//アクターも初期化
+	_actor = nullptr;					
 
-	_dx12.ImGui()->ResetAnimStr();		//ImGuiで表示されているアニメーション名を初期化
+	//ImGuiで表示されているアニメーション名を初期化
+	_dx12.ImGui()->ResetAnimStr();		
 }
 
 /// <summary>
@@ -256,7 +274,7 @@ PlayScene::SceneEnd()
 void
 PlayScene::InputUpdate()
 {
-	_input.UpdateInput();									//入力を更新
+	_input.UpdateInput();
 }
 
 /// <summary>
@@ -265,12 +283,16 @@ PlayScene::InputUpdate()
 void
 PlayScene::UpdateFPS()
 {
-	QueryPerformanceCounter(&_currentTime);							//現在フレームの時間を取得
+	//現在フレームの時間を取得
+	QueryPerformanceCounter(&_currentTime);							
 
-	auto diff = GetLIntDiff(_currentTime, _updatedTime);			//前回FPS更新時との差分
-	auto frameTime = GetLIntDiff(_currentTime, _beforeTime);		//前フレームとの差分
+	//前回FPS更新時との時間の差分
+	auto diff = GetLIntDiff(_currentTime, _updatedTime);			
+	//前フレームとの時間の差分
+	auto frameTime = GetLIntDiff(_currentTime, _beforeTime);		
 
-	if (frameTime < FRAME_TIME)										//処理時間に余裕がある場合、待ち合わせを行う
+	//処理時間に余裕がある場合、処理を待ち合わせる
+	if (frameTime < FRAME_TIME)										
 	{
 		DWORD sleepTime =
 			static_cast<DWORD>((FRAME_TIME - frameTime) * 1000);
@@ -281,14 +303,16 @@ PlayScene::UpdateFPS()
 		timeEndPeriod(1);
 	}
 
-	if (diff >= 1)													//差分が1秒以上だった場合
+	//前回FPS更新から1秒以上たった時
+	if (diff >= 1)													
 	{
-		_fps = 1 / frameTime;										//1秒を差分で割り、FPSを取得
-
-		_updatedTime = _currentTime;								//FPS更新時間を更新
+		//1秒を前フレームとの時間の差分で割り、FPSを取得
+		_fps = 1 / frameTime;
+		_updatedTime = _currentTime;
 	}
 
-	_beforeTime = _currentTime;										//前フレームの時間を更新
+	//前フレームの時間を更新
+	_beforeTime = _currentTime;										
 }
 
 /// <summary>
@@ -297,11 +321,14 @@ PlayScene::UpdateFPS()
 void
 PlayScene::DrawUpdate()
 {
-	UpdateFPS();			//FPSを更新
+	//FPSを更新
+	UpdateFPS();			
 
-	PeraDraw();				//ペラポリゴン描画処理
+	//ペラポリゴン描画処理
+	PeraDraw();				
 
-	GameDraw();				//ゲーム画面描画処理
+	//ゲーム画面描画処理
+	GameDraw();				
 }
 
 /// <summary>
@@ -310,19 +337,24 @@ PlayScene::DrawUpdate()
 void
 PlayScene::PeraDraw()
 {
-	_pera->BeginPeraDraw();						//ペラポリゴン描画準備
+	//ペラポリゴン描画準備
+	_pera->BeginPeraDraw();						
 
-	_dx12.SetPipelines(							//ペラポリゴン用パイプラインをセット
+	//ペラポリゴン用パイプラインをセット
+	_dx12.SetPipelines(							
 		_renderer->GetRootSignature(),
 		_renderer->GetPipelineState(),
 		D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST
 	);
 
-	_dx12.SetScene();							//ビュー・プロジェクション行列を適用
+	//ビュー・プロジェクション行列を適用
+	_dx12.SetScene();							
 
-	ModelDraw();								//モデル描画処理
+	//モデル描画処理
+	ModelDraw();								
 
-	_pera->EndPeraDraw();						//ペラポリゴン描画後始末
+	//ペラポリゴン描画後始末
+	_pera->EndPeraDraw();						
 }
 
 /// <summary>
@@ -331,9 +363,11 @@ PlayScene::PeraDraw()
 void
 PlayScene::GameDraw()
 {
-	_dx12.BeginGameDraw();															//ゲーム画面描画準備
+	//ゲーム画面描画準備
+	_dx12.BeginGameDraw();															
 
-	_pera->SetPeraPipelines();														//以下ペラポリゴン用コマンドリスト処理
+	//以下ゲーム画面用パイプラインをセット
+	_pera->SetPeraPipelines();														
 
 	_dx12.CommandList()->IASetVertexBuffers(0, 1, _pera->PeraVBView());				//ペラポリゴン用VBVをセット
 	_dx12.CommandList()->DrawInstanced(4, 1, 0, 0);									//ペラポリゴンを構成する頂点を描画

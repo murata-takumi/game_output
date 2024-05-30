@@ -4,5 +4,11 @@
 //UV座標を基に頂点にテクスチャを付与する
 float4 FBXPS(Output input) : SV_TARGET
 {
-	return tex.Sample(smp,input.uv);
+	float4 ret = tex.Sample(smp,input.uv);
+
+	float len = length(input.dis);
+	
+	ret.a = 0.0f;
+
+	return ret;
 }
