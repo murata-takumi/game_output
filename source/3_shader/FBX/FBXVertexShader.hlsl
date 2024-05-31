@@ -51,9 +51,7 @@ Output FBXVS
 	//ビュー行列を反映
 	float4 viewPos = mul(view, worldPos);							
 	//プロジェクション行列を反映
-	float4 projPos = mul(proj, viewPos);							
-	//カメラからの距離
-	float dis = pos - eye;																				
+	float4 projPos = mul(proj, viewPos);
 
 	//頂点座標
 	output.pos = viewPos;										
@@ -63,7 +61,7 @@ Output FBXVS
 	output.color = color;											
 	//UV座標
 	output.uv = uv;
-	output.dis = dis;												
+	output.dis = worldPos - eye;
 
 	return output;
 }
