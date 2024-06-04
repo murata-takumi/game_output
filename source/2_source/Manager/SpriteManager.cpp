@@ -15,15 +15,21 @@ const int LOADING_HEIGHT = 270;		//ロード画面で表示するアイコンの高さ
 /// <param name="height">画面高さ</param>
 SpriteManager::SpriteManager(Dx12Wrapper& dx12, LONG width, LONG height):_dx12(dx12),_width(width),_height(height)
 {
-	CreateSpriteRS();																				//Sprite用ルートシグネチャを作成
-	InitSpriteDevices();																			//Sprite用オブジェクトを初期化
+	//Sprite用ルートシグネチャを作成
+	CreateSpriteRS();	
 
+	//Sprite用オブジェクトを初期化
+	InitSpriteDevices();																			
+
+	//ロード画面用矩形を調整
 	AdjustSpriteRect();
 
-	_incrementSize =																				//差分のサイズを取得
+	//ヒープハンドルの差分のサイズを取得
+	_incrementSize =																				
 		_dx12.Device()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
-	CreateUIBufferView(L"Asset/image/loading/1.png", "load_1");										//ロード画面に回転するアイコン
+	//ロード画面に回転するアイコン
+	CreateUIBufferView(L"Asset/image/loading/1.png", "load_1");										
 	CreateUIBufferView(L"Asset/image/loading/2.png", "load_2");
 	CreateUIBufferView(L"Asset/image/loading/3.png", "load_3");					
 	CreateUIBufferView(L"Asset/image/loading/4.png", "load_4");					
@@ -31,6 +37,8 @@ SpriteManager::SpriteManager(Dx12Wrapper& dx12, LONG width, LONG height):_dx12(d
 	CreateUIBufferView(L"Asset/image/loading/6.png", "load_6");					
 	CreateUIBufferView(L"Asset/image/loading/7.png", "load_7");					
 	CreateUIBufferView(L"Asset/image/loading/8.png", "load_8");
+
+	CreateUIBufferView(L"Asset/image/background.png", "background");
 }
 
 /// <summary>
@@ -40,28 +48,28 @@ SpriteManager::SpriteManager(Dx12Wrapper& dx12, LONG width, LONG height):_dx12(d
 HRESULT
 SpriteManager::CreateSpriteRS()
 {
-	CD3DX12_DESCRIPTOR_RANGE spriteTblRange[2] = {};					//ディスクリプタレンジ(SRV用)
+	//ディスクリプタレンジ(SRV用)
+	CD3DX12_DESCRIPTOR_RANGE spriteTblRange[2] = {};					
 	spriteTblRange[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0);
 	spriteTblRange[1].Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 1);
 
 	
-	CD3DX12_ROOT_PARAMETER spriteRootParam[3] = {};						//ルートパラメータ(SRV,CBV用)
-	spriteRootParam[0].InitAsDescriptorTable(
-		1, &spriteTblRange[0], D3D12_SHADER_VISIBILITY_PIXEL);
-	spriteRootParam[1].InitAsConstantBufferView(						//[1]はConstantBufferViewとして初期化
-		0, 0, D3D12_SHADER_VISIBILITY_ALL);
-	spriteRootParam[2].InitAsDescriptorTable(
-		1, &spriteTblRange[1], D3D12_SHADER_VISIBILITY_ALL);
+	//ルートパラメータ(SRV,CBV用)
+	CD3DX12_ROOT_PARAMETER spriteRootParam[3] = {};						
+	spriteRootParam[0].InitAsDescriptorTable(1, &spriteTblRange[0], D3D12_SHADER_VISIBILITY_PIXEL);
+	spriteRootParam[1].InitAsConstantBufferView(0, 0, D3D12_SHADER_VISIBILITY_ALL);
+	spriteRootParam[2].InitAsDescriptorTable(1, &spriteTblRange[1], D3D12_SHADER_VISIBILITY_ALL);
 
-	CD3DX12_STATIC_SAMPLER_DESC samplerDesc = {};						//サンプラー
-	samplerDesc.Init(0);												//初期化
-	samplerDesc.ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;		//ピクセルシェーダーから見えるよう設定
+	//サンプラー
+	CD3DX12_STATIC_SAMPLER_DESC samplerDesc = {};						
+	samplerDesc.Init(0);
+	samplerDesc.ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
 
-	CD3DX12_ROOT_SIGNATURE_DESC rsDesc = {};							//ルートシグネチャ作成用構造体
+	//ルートシグネチャの初期化
+	CD3DX12_ROOT_SIGNATURE_DESC rsDesc = {};							
 	rsDesc.Init(3,spriteRootParam,1,&samplerDesc,
 		D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
-
-	ID3DBlob* rsBlob = nullptr;											//ルートシグネチャの初期化
+	ID3DBlob* rsBlob = nullptr;											
 	ID3DBlob* errorBlob = nullptr;
 	auto result = D3D12SerializeRootSignature(
 		&rsDesc,
@@ -73,10 +81,11 @@ SpriteManager::CreateSpriteRS()
 		assert(0);
 		return result;
 	}
+	//使わないデータを開放
+	rsBlob->Release();							
 
-	rsBlob->Release();													//使わないデータを開放
-
-	result = _dx12.Device()->CreateRootSignature(						//ルートシグネチャ作成
+	//ルートシグネチャ作成
+	result = _dx12.Device()->CreateRootSignature(						
 		0,
 		rsBlob->GetBufferPointer(),
 		rsBlob->GetBufferSize(),
@@ -97,19 +106,26 @@ SpriteManager::CreateSpriteRS()
 void
 SpriteManager::InitSpriteDevices()
 {
-	_gmemory = make_unique<GraphicsMemory>(_dx12.Device());								//グラフィックスメモリの初期化
+	//グラフィックスメモリの初期化
+	_gmemory = make_unique<GraphicsMemory>(_dx12.Device());								
 
-	ResourceUploadBatch resUploadBatch(_dx12.Device());									//スプライト表示用オブジェクトの初期化
+	//スプライト表示用オブジェクトの初期化
+	ResourceUploadBatch resUploadBatch(_dx12.Device());									
 	resUploadBatch.Begin();
 
-	RenderTargetState rtState(DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_D32_FLOAT);		//レンダーターゲットステート
+	//レンダーターゲットステート
+	RenderTargetState rtState(DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_D32_FLOAT);		
 
-	unique_ptr<CommonStates> _states = make_unique<CommonStates>(_dx12.Device());		//サンプラーを取得するためStateオブジェクトを初期化
-	D3D12_GPU_DESCRIPTOR_HANDLE wrap = _states->AnisotropicWrap();						//GPUハンドル
+	//サンプラーを取得するためStateオブジェクトを初期化
+	unique_ptr<CommonStates> _states = make_unique<CommonStates>(_dx12.Device());		
+
+	//GPUハンドル
+	D3D12_GPU_DESCRIPTOR_HANDLE wrap = _states->AnisotropicWrap();						
 
 	SpriteBatchPipelineStateDescription psd(rtState, &CommonStates::NonPremultiplied);
 
-	_spriteBatch = make_unique<SpriteBatch>(_dx12.Device(), resUploadBatch, psd);		//スプライト表示用オブジェクト
+	//スプライト表示用オブジェクト
+	_spriteBatch = make_unique<SpriteBatch>(_dx12.Device(), resUploadBatch, psd);		
 
 	_batch = make_unique<PrimitiveBatch<VertexPositionColor>>(_dx12.Device());
 
@@ -138,18 +154,21 @@ SpriteManager::InitSpriteDevices()
 	_effect->SetProjection(_proj);
 
 	//フォント表示用オブジェクトの初期化		
-	_dx12.CreateDescriptorHeap(_heapForSpriteFont,										//フォント・画像表示用ヒープ
+	_dx12.CreateDescriptorHeap(_heapForSpriteFont,
 		D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV,1,256, 
 		D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE);
-	_tmpCPUHandle = _heapForSpriteFont->GetCPUDescriptorHandleForHeapStart();			//ヒープハンドル(CPU)
-	_tmpGPUHandle = _heapForSpriteFont->GetGPUDescriptorHandleForHeapStart();			//ヒープハンドル(GPU)
+	_tmpCPUHandle = _heapForSpriteFont->GetCPUDescriptorHandleForHeapStart();
+	_tmpGPUHandle = _heapForSpriteFont->GetGPUDescriptorHandleForHeapStart();
 
-	auto future = resUploadBatch.End(_dx12.CommandQueue());								//GPU側へ転送
+	//描画命令をGPU側へ転送
+	auto future = resUploadBatch.End(_dx12.CommandQueue());								
 
-	_dx12.WaitForCommandQueue();														//GPUが使用可能になるまで待機
+	//GPUが使用可能になるまで待機
+	_dx12.WaitForCommandQueue();														
 	future.wait();
 
-	_spriteBatch->SetViewport(*_dx12.ViewPort());										//スプライト表示用オブジェクトをビューポートへ登録
+	//スプライト表示用オブジェクトをビューポートへ登録
+	_spriteBatch->SetViewport(*_dx12.ViewPort());										
 
 	return;
 }
@@ -199,39 +218,41 @@ SpriteManager::ColliderDraw(const shared_ptr<BoxCollider> collider)
 HRESULT
 SpriteManager::CreateUIBufferView(const wchar_t* path,string key)
 {
-	TexMetadata meta = {};															//UI画像読み込み用データ
+	//UI画像読み込み用データ
+	TexMetadata meta = {};															
 	ScratchImage scratch = {};
 
-	auto ext = FileExtension(path);													//拡張子を取得
-
-	auto result = _dx12._loadLambdaTable[ToString(ext)](path, &meta, scratch);		//画像データの読み込み
+	//画像データの読み込み
+	auto ext = FileExtension(path);			
+	auto result = _dx12._loadLambdaTable[ToString(ext)](path, &meta, scratch);		
 	if (FAILED(result))
 	{
 		assert(0);
 		return result;
 	}
 
-	auto img = scratch.GetImage(0, 0, 0);											//生データを取得
-
-	DXGI_FORMAT format = meta.format;												//フォーマット
-	size_t width = meta.width;														//幅
-	size_t height = meta.height;													//高さ
-	UINT16 arraySize = static_cast<UINT16>(meta.arraySize);							//テクスチャサイズ
+	//データを取得
+	auto img = scratch.GetImage(0, 0, 0);	
+	DXGI_FORMAT format = meta.format;
+	size_t width = meta.width;
+	size_t height = meta.height;
+	UINT16 arraySize = static_cast<UINT16>(meta.arraySize);
 	UINT16 mipLevels = static_cast<UINT16>(meta.mipLevels);		
 	void* pixels = img->pixels;
 	UINT rowPitch = static_cast<UINT>(img->rowPitch);
 	UINT slicePitch = static_cast<UINT>(img->slicePitch);
 
-	ID3D12Resource* tmpUIBuff = nullptr;											//画像データ書き込み用バッファ
+	//画像データ書き込み用バッファ
+	ID3D12Resource* tmpUIBuff = nullptr;											
 
-	auto uiResDesc = CD3DX12_RESOURCE_DESC::Tex2D(									//リソース作成用データ
+	//リソース作成
+	auto uiResDesc = CD3DX12_RESOURCE_DESC::Tex2D(									
 		format,
 		(UINT)width,
 		(UINT)height,
 		arraySize,
 		(UINT)mipLevels);
-
-	result = _dx12.Device()->CreateCommittedResource(								//リソース作成
+	result = _dx12.Device()->CreateCommittedResource(								
 		&_writeHeapProp,
 		D3D12_HEAP_FLAG_NONE,
 		&uiResDesc,
@@ -244,7 +265,8 @@ SpriteManager::CreateUIBufferView(const wchar_t* path,string key)
 		return result;;
 	}
 
-	result = tmpUIBuff->WriteToSubresource(0,										//画像情報を書き込み
+	//画像情報を書き込み
+	result = tmpUIBuff->WriteToSubresource(0,										
 		nullptr,
 		pixels,
 		rowPitch,
@@ -254,19 +276,20 @@ SpriteManager::CreateUIBufferView(const wchar_t* path,string key)
 		assert(0);
 		return result;
 	}
+	//CPU･GPUハンドルをズラす
+	_tmpCPUHandle.ptr += _incrementSize;											
+	_tmpGPUHandle.ptr += _incrementSize;
 
-	_tmpCPUHandle.ptr += _incrementSize;											//CPUハンドルをズラす
-	_tmpGPUHandle.ptr += _incrementSize;											//GPUハンドルをズラす
-
-	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};									//UIビュー用構造体の作成
+	//UIビューの作成
+	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};									
 	srvDesc.Format = tmpUIBuff->GetDesc().Format;
 	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
 	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
 	srvDesc.Texture2D.MipLevels = 1;
+	_dx12.Device()->CreateShaderResourceView(tmpUIBuff, &srvDesc, _tmpCPUHandle);
 
-	_dx12.Device()->CreateShaderResourceView(tmpUIBuff, &srvDesc, _tmpCPUHandle);	//ビュー作成
-
-	_GPUHandles[key] = _tmpGPUHandle;												//GPUハンドルを連想配列に格納
+	//GPUハンドルを連想配列に格納
+	_GPUHandles[key] = _tmpGPUHandle;												
 
 	return result;
 }
@@ -277,9 +300,13 @@ SpriteManager::CreateUIBufferView(const wchar_t* path,string key)
 void
 SpriteManager::AdjustSpriteRect()
 {
-	_loadingRect = { LOADING_WIDTH,LOADING_HEIGHT,_width - LOADING_WIDTH,_height - LOADING_HEIGHT };	//ロード画面の設定
+	//ロード画面の設定
+	_loadingRect = { LOADING_WIDTH,LOADING_HEIGHT,_width - LOADING_WIDTH,_height - LOADING_HEIGHT };	
+	//背景用矩形の設定
+	_BGRect = *_dx12.Rect();
 
 	AdjustWindowRect(&_loadingRect, WS_OVERLAPPEDWINDOW, false);		
+	AdjustWindowRect(&_BGRect, WS_OVERLAPPEDWINDOW, false);		
 }
 
 /// <summary>
@@ -288,16 +315,41 @@ SpriteManager::AdjustSpriteRect()
 void
 SpriteManager::LoadingDraw()
 {
-	ID3D12DescriptorHeap* heap[] = { _heapForSpriteFont.Get() };					//ヒープをコマンドリストにセット
+	//ヒープをコマンドリストにセット
+	ID3D12DescriptorHeap* heap[] = { _heapForSpriteFont.Get() };					
 	_dx12.CommandList()->SetDescriptorHeaps(1, heap);
 
-	_spriteBatch->Begin(_dx12.CommandList());										//バッチをセット
+	//バッチをセット
+	_spriteBatch->Begin(_dx12.CommandList());										
 
-	int count = ((clock() / static_cast<int>(60 * 1.4)) % 8) + 1;					//現在の時間に応じて表示する画像を変え、ロードアイコンのアニメーションを表現
+	//現在の時間に応じて表示する画像を変え、ロードアイコンのアニメーションを表現
+	int count = ((clock() / static_cast<int>(60 * 1.4)) % 8) + 1;					
 	_spriteBatch->Draw(_GPUHandles["load_" + to_string(count)], XMUINT2(1, 1),
 		_loadingRect, Colors::White);
 
-	_spriteBatch->End();															//バッチを解除
+	//バッチを解除
+	_spriteBatch->End();															
+}
+
+/// <summary>
+/// 背景を描画する関数
+/// </summary>
+void
+SpriteManager::BackGroundDraw()
+{
+	//ヒープをコマンドリストにセット
+	ID3D12DescriptorHeap* heap[] = { _heapForSpriteFont.Get() };
+	_dx12.CommandList()->SetDescriptorHeaps(1, heap);
+
+	//バッチをセット
+	_spriteBatch->Begin(_dx12.CommandList());
+
+	//背景用画像ビューをセット
+	_spriteBatch->Draw(_GPUHandles["background"], XMUINT2(1, 1),
+		_BGRect, Colors::White);
+
+	//バッチを解除
+	_spriteBatch->End();
 }
 
 /// <summary>
@@ -306,34 +358,43 @@ SpriteManager::LoadingDraw()
 void
 SpriteManager::GridDraw()
 {
-	_view = _dx12.ViewMatrix();											//ビュー行列を取得
-	_proj = _dx12.ProjMatrix();											//プロジェクション行列を取得
+	//ビュー･プロジェクション行列を取得
+	_view = _dx12.ViewMatrix();											
+	_proj = _dx12.ProjMatrix();
 
-	_effect->SetWorld(_world);											//ワールド・ビュー・プロジェクション行列をセット
+	//ワールド・ビュー・プロジェクション行列をセット
+	_effect->SetWorld(_world);											
 	_effect->SetView(_view);
 	_effect->SetProjection(_proj);
 
-	_effect->Apply(_dx12.CommandList());								//コマンドリストにグリッドを登録
+	//コマンドリストにグリッドを登録
+	_effect->Apply(_dx12.CommandList());								
 
+	//描画開始
 	_batch->Begin(_dx12.CommandList());
 
-	VertexPositionColor v1(_origin - _XAxis, { 0.75f,0.0f,0.0f,.10f });		//X軸のグリッドの描画
+	//X軸のグリッドの描画
+	VertexPositionColor v1(_origin - _XAxis, { 0.75f,0.0f,0.0f,.10f });		
 	VertexPositionColor v2(_origin + _XAxis, { 0.75f,0.0f,0.0f,.10f });
 	_batch->DrawLine(v1, v2);
 
-	v1 = VertexPositionColor(_origin - _YAxis, { 0.f,0.75f,0.0f,.10f });	//Y軸のグリッドの描画
+	//Y軸のグリッドの描画
+	v1 = VertexPositionColor(_origin - _YAxis, { 0.f,0.75f,0.0f,.10f });	
 	v2 = VertexPositionColor(_origin + _YAxis, { 0.f,0.75f,0.0f,.10f });
 	_batch->DrawLine(v1, v2);
 
-	v1 = VertexPositionColor(_origin - _ZAxis, { 0.0f,0.0f,0.75f,.10f });	//X軸のグリッドの描画
+	//X軸のグリッドの描画
+	v1 = VertexPositionColor(_origin - _ZAxis, { 0.0f,0.0f,0.75f,.10f });	
 	v2 = VertexPositionColor(_origin + _ZAxis, { 0.0f,0.0f,0.75f,.10f });
 	_batch->DrawLine(v1, v2);
 
+	//当たり判定を持つオブジェクトが存在したら当たり判定の描画
 	for (const auto& actor : _actorAndObjs)
 	{
 		if (actor != nullptr)ColliderDraw(actor->Collider());
 	}
 
+	//描画終了
 	_batch->End();
 }
 

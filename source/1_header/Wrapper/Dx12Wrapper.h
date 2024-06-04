@@ -34,50 +34,74 @@ class Dx12Wrapper
 	using ComPtr = ComPtr<T>;
 
 private:
-	SIZE _winSize;												//ウィンドウサイズ
+	//ウィンドウサイズ
+	SIZE _winSize;												
 
-	shared_ptr<EffectManager> _effect;							//エフェクト管理用インスタンス
-	shared_ptr<SpriteManager> _sprite;							//スプライト管理インスタンス
-	shared_ptr<PeraRenderer> _pera;								//UI管理インスタンス
-	shared_ptr<ImGuiManager> _imgui;							//デバッグ用ウィンドウ管理インスタンス
-	shared_ptr<SphericalCoordinates> _coordinates;				//カメラ座標用インスタンス
+	//エフェクト管理用インスタンス
+	shared_ptr<EffectManager> _effect;							
+	//スプライト管理インスタンス
+	shared_ptr<SpriteManager> _sprite;							
+	//UI管理インスタンス
+	shared_ptr<PeraRenderer> _pera;								
+	//デバッグ用ウィンドウ管理インスタンス
+	shared_ptr<ImGuiManager> _imgui;							
+	//カメラ座標用インスタンス
+	shared_ptr<SphericalCoordinates> _coordinates;				
 
 	//DXGI周り
-	ComPtr<IDXGIFactory6> _dxgiFactory;							//ファクトリー
-	ComPtr<ID3D12Device> _dev;									//デバイス
+	//ファクトリー
+	ComPtr<IDXGIFactory6> _dxgiFactory;							
+	//デバイス
+	ComPtr<ID3D12Device> _dev;									
 
 	//DX12(コマンド)周り
-	ComPtr<ID3D12CommandAllocator> _cmdAllocator;				//コマンドアロケータ
-	ComPtr<ID3D12GraphicsCommandList> _cmdList;					//コマンドリスト
-	ComPtr<ID3D12CommandQueue> _cmdQueue;						//コマンドキュー
-	ComPtr<IDXGISwapChain4> _swapchain;							//スワップチェーン
+	//コマンドアロケータ
+	ComPtr<ID3D12CommandAllocator> _cmdAllocator;				
+	//コマンドリスト
+	ComPtr<ID3D12GraphicsCommandList> _cmdList;					
+	//コマンドキュー
+	ComPtr<ID3D12CommandQueue> _cmdQueue;						
+	//スワップチェーン
+	ComPtr<IDXGISwapChain4> _swapchain;							
 
 	//表示関連のバッファ回り
-	vector<ID3D12Resource*> _backBuffers;						//レンダーターゲット用バッファー
-	ComPtr<ID3D12DescriptorHeap> _rtvHeap;						//レンダーターゲットビュー用ヒープ
-	ComPtr<ID3D12Resource> _depthBuffer;						//深度ステンシル用バッファー
-	ComPtr<ID3D12DescriptorHeap> _dsvHeap;						//深度ステンシルビュー用ヒープ
+	//レンダーターゲット用バッファー
+	vector<ID3D12Resource*> _backBuffers;						
+	//レンダーターゲットビュー用ヒープ
+	ComPtr<ID3D12DescriptorHeap> _rtvHeap;						
+	//深度ステンシル用バッファー
+	ComPtr<ID3D12Resource> _depthBuffer;						
+	//深度ステンシルビュー用ヒープ
+	ComPtr<ID3D12DescriptorHeap> _dsvHeap;						
 
-	unique_ptr<D3D12_VIEWPORT> _viewPort = {};					//ビューポート
-	unique_ptr<D3D12_RECT> _rect = {};							//シザー矩形
+	//ビューポート
+	unique_ptr<D3D12_VIEWPORT> _viewPort = {};					
+	//シザー矩形
+	unique_ptr<D3D12_RECT> _rect = {};							
 
 	//ビュープロジェクション用定数バッファ周り
-	ComPtr<ID3D12Resource> _sceneConstBuff;						//ビュー・プロジェクション用バッファー
-	ComPtr<ID3D12DescriptorHeap> _sceneDescHeap;				//ビュー・プロジェクション用ディスクリプタヒープ
+	//ビュー・プロジェクション用バッファー
+	ComPtr<ID3D12Resource> _sceneConstBuff;						
+	//ビュー・プロジェクション用ディスクリプタヒープ
+	ComPtr<ID3D12DescriptorHeap> _sceneDescHeap;				
 
-	ComPtr<ID3D12DescriptorHeap> _factorCBVHeap;				//歪みデータ用ヒープ
-	ComPtr<ID3D12Resource> _factorConstBuff;					//歪みデータ用バッファー
+	//歪みデータ用バッファー
+	ComPtr<ID3D12Resource> _factorConstBuff;
+	//歪みデータ用ヒープ
+	ComPtr<ID3D12DescriptorHeap> _factorCBVHeap;					
 
-	ComPtr<ID3D12DescriptorHeap> _heapForImgui;					//imguiで使用するヒープ
+	//imguiで使用するヒープ
+	ComPtr<ID3D12DescriptorHeap> _heapForImgui;					
 
 	/// <summary>
 	/// シェーダーにフェードイン／アウトデータを渡すための構造体及びインスタンス
 	/// </summary>
 	struct Factor
 	{
-		float fade;												//フェードイン／アウトデータ
+		float fade;
 	};
-	Factor* _mappedFactor = nullptr;							//マップ用ポインタ
+	//マップ用ポインタ
+	Factor* _mappedFactor = nullptr;							
 
 	/// <summary>
 	/// スロットに流し込むデータの構造体及びインスタンス
@@ -89,100 +113,145 @@ private:
 		XMMATRIX proj;
 		XMFLOAT3 eye;
 	};
-	SceneData* _mappedScene;									//マップ用ポインタ
+	//マップ用ポインタ
+	SceneData* _mappedScene;									
 
-	ComPtr<ID3D12Fence> _fence;									//フェンス
-	UINT64 _fenceVal;											//初期化値
+	//フェンス
+	ComPtr<ID3D12Fence> _fence;									
+	//初期化値
+	UINT64 _fenceVal;											
 
-	CD3DX12_RESOURCE_BARRIER _barrier;							//リソースバリア用変数
+	//リソースバリア用変数
+	CD3DX12_RESOURCE_BARRIER _barrier;							
 
-	XMFLOAT3 _eye;												//視点座標
-	XMFLOAT3 _target;											//注視点座標
-	XMFLOAT3 _up;												//上座標
+	//視点（カメラ）座標
+	XMFLOAT3 _eye;												
+	//注視点座標
+	XMFLOAT3 _target;											
+	//上座標
+	XMFLOAT3 _up;												
 
-	XMFLOAT3 _initEye;											//視点の初期座標
-	XMFLOAT3 _initTarget;										//注視点の初期座標
+	//視点の初期座標
+	XMFLOAT3 _initEye;											
+	//注視点の初期座標
+	XMFLOAT3 _initTarget;										
 
-	mutex _mtx;													//排他制御用オブジェクト
+	//排他制御用オブジェクト
+	mutex _mtx;													
 
-	bool _perspective;											//透視投影かどうか決める真理値
+	//透視投影かどうか決める真理値
+	bool _perspective;											
 
-	float _initRad;												//半径の初期値
+	//半径の初期値
+	float _initRad;										
+	//現在の半径
 	float _currentRad;
-	float _deltaTime;											//フレーム間の時間
-	float _fade;												//フェードイン／アウトするかどうかを決めるデータ
-	float _start, _end;											//フェードイン／アウトで線形補完する際の初期値、最終値
+	//フレーム間の時間
+	float _deltaTime;											
+	//フェードイン・アウトに用いる変数
+	float _fade;												
+	//フェードイン・アウトで線形補完する際の初期値、最終値
+	float _start, _end;											
 
-	int _rate;													//フレームレート
+	//フレームレート
+	int _rate;													
 		
-	using LoadLambda_t =										//テクスチャロード用ラムダ式を格納する型の定義
+	//テクスチャロード用ラムダ式を格納する型の定義
+	using LoadLambda_t =										
 		function<HRESULT(
 			const wstring& path, TexMetadata*, ScratchImage&
 		)>;
 
-	map<string, ID3D12Resource*> _resourceTable;				//stringをkey,リソースをvalueとした連想配列
+	//stringをkey,リソースをvalueとした連想配列
+	map<string, ID3D12Resource*> _resourceTable;				
 
-	HRESULT InitializeDXGIDevice();								//デバイス関連を初期化する関数
+	//デバイス関連を初期化する関数
+	HRESULT InitializeDXGIDevice();								
 
-	HRESULT InitializeCommand();								//コマンド関連を初期化する関数
+	//コマンド関連を初期化する関数
+	HRESULT InitializeCommand();								
 
-	HRESULT CreateSwapChain(const HWND& hwnd);					//スワップチェーンを作成する関数
+	//スワップチェーンを作成する関数
+	HRESULT CreateSwapChain(const HWND& hwnd);					
 
-	HRESULT CreateRenderTargetsView();							//レンダーターゲットを作成する関数
+	//レンダーターゲットを作成する関数
+	HRESULT CreateRenderTargetsView();							
 
-	HRESULT CreateSceneView();									//ビュープロジェクション用ビューを作成する関数
+	//ビュープロジェクション用ビューを作成する関数
+	HRESULT CreateSceneView();									
 
-	HRESULT CreateDepthStencilView();							//深度ステンシルビューを作成する関数
+	//深度ステンシルビューを作成する関数
+	HRESULT CreateDepthStencilView();							
 
-	HRESULT CreateFactorBufferAndView();						//エフェクト適用を決めるデータ用のヒープ・バッファーを作成する関数
+	//エフェクト適用を決めるデータ用のヒープ・バッファーを作成する関数
+	HRESULT CreateFactorBufferAndView();						
 
-	void CreateTextureLoaderTable();							//テクスチャロート用テーブルを作成する関数
+	//テクスチャロート用テーブルを作成する関数
+	void CreateTextureLoaderTable();							
 
-	void InitVector();											//視点、注視点のベクトルを初期化する関数
+	//視点、注視点のベクトルを初期化する関数
+	void InitVector();											
 
 public:
-	map<string, LoadLambda_t> _loadLambdaTable;							//stringをkey,LoadLambda_tをvalueとした連想配列
+	//stringをkey,LoadLambda_tをvalueとした連想配列
+	map<string, LoadLambda_t> _loadLambdaTable;							
 
-	Dx12Wrapper(HWND hwnd, float deltatime);							//コンストラクタ
+	//コンストラクタ
+	Dx12Wrapper(HWND hwnd, float deltatime);							
 
-	void BarrierTransition(												//リソースを遷移させる関数
+	//リソースを遷移させる関数
+	void BarrierTransition(												
 		ID3D12Resource* resource,
 		D3D12_RESOURCE_STATES before, 
 		D3D12_RESOURCE_STATES after);
 
-	XMVECTOR GetXZVecEyeToTarget()const;								//視点座標（カメラ座標）から注視点座標へのベクトルを取得する関数
-	XMVECTOR GetRightVector()const;										//注視点へのベクトルの右方向のベクトルを取得する関数
+	//視点座標（カメラ座標）から注視点座標へのベクトルを取得する関数
+	XMVECTOR GetXZVecEyeToTarget()const;								
+	//注視点へのベクトルの右方向のベクトルを取得する関数
+	XMVECTOR GetRightVector()const;										
 
+	//前フレームと現フレームの時間の差分を取得する関数
 	float GetDeltaTime()const;
 
-	void ScalingCoordinates(int x);										//カメラを近付ける・遠ざける関数
-	void TranslateCoordinates(XMVECTOR vec);							//カメラを移動させる関数
-	void RotateCoordinates(Degree deg, float value);					//カメラを回転させる関数
-	void ResetCoordinates(float azimth,float elevation);				//カメラの位置を初期化する関数
+	//カメラを近付ける・遠ざける関数
+	void ScalingCoordinates(int x);								
+	//カメラを移動させる関数
+	void TranslateCoordinates(XMVECTOR vec);							
+	//カメラを回転させる関数
+	void RotateCoordinates(Degree deg, float value);					
+	//カメラの位置を初期化する関数
+	void ResetCoordinates(float azimth,float elevation);				
 
-	void SetScene();													//ビュープロジェクション用ビューをコマンドリストにセットする関数
+	//ビュープロジェクション用ビューをコマンドリストにセットする関数
+	void SetScene();													
 
-	void BeginGameDraw();												//リソースの遷移(STATE_PRESENT→RENDER_TARGET)・RTVのセットを実行する関数
-	void EndGameDraw();													//リソースの遷移(RENDER_TARGET→STATE_PRESENT)を実行する関数
+	//リソースの遷移(STATE_PRESENT→RENDER_TARGET)・RTVのセットを実行する関数
+	void BeginGameDraw();												
+	//リソースの遷移(RENDER_TARGET→STATE_PRESENT)を実行する関数
+	void EndGameDraw();													
 
-	void WaitForCommandQueue();											//処理の同期待ちを行う関数
+	//処理の同期待ちを行う関数
+	void WaitForCommandQueue();											
 
-	void SetPipelines(ID3D12RootSignature* rootSignature,				//ルートシグネチャ・パイプライン・描画方法をセットする関数
+	//ルートシグネチャ・パイプライン・描画方法をセットする関数
+	void SetPipelines(ID3D12RootSignature* rootSignature,				
 		ID3D12PipelineState* pipeline, 
 		D3D12_PRIMITIVE_TOPOLOGY topology);
 
-	void UpdateFade();													//フェードイン／アウトデータをシェーダーに反映する関数
+	//フェードイン・アウトデータをシェーダーに反映する関数
+	void UpdateFade();													
+	//フェードイン・アウトを実行する関数
+	void Fade(float start,float end);									
 
-	void Fade(float start,float end);									//フェードイン／アウトを実行する関数
-
-	HRESULT CreateResource(												//バッファーを作成する関数
+	//バッファーを作成する関数
+	HRESULT CreateResource(												
 		ComPtr<ID3D12Resource>& buff,
 		CD3DX12_HEAP_PROPERTIES heapProp,
 		CD3DX12_RESOURCE_DESC resDesc,
 		D3D12_RESOURCE_STATES resState
 	);
-
-	HRESULT CreateDescriptorHeap(										//ディスクリプタヒープを作成する関数
+	//ディスクリプタヒープを作成する関数
+	HRESULT CreateDescriptorHeap(										
 		ComPtr<ID3D12DescriptorHeap>& heap,
 		D3D12_DESCRIPTOR_HEAP_TYPE type,
 		UINT nodeMask,
@@ -190,27 +259,42 @@ public:
 		D3D12_DESCRIPTOR_HEAP_FLAGS flag
 	);
 
-	XMMATRIX ViewMatrix()const;											//ビュー行列を返す関数
-	XMMATRIX ProjMatrix()const;											//プロジェクション行列を返す関数
+	//ビュー行列を返す関数
+	XMMATRIX ViewMatrix()const;					
+	//プロジェクション行列を返す関数
+	XMMATRIX ProjMatrix()const;											
 
-	EffectManager* Effect() const;										//EffectManagerインスタンスを返す関数
-	SpriteManager* Sprite() const;										//SpriteManagerインスタンスを返す関数
-	PeraRenderer* Pera() const;											//PeraRendererインスタンスを返す関数
-	ImGuiManager* ImGui() const;										//ImGuiManagerインスタンスを返す関数
+	//EffectManagerインスタンスを返す関数
+	EffectManager* Effect() const;		
+	//SpriteManagerインスタンスを返す関数
+	SpriteManager* Sprite() const;									
+	//ImGuiManagerインスタンスを返す関数
+	ImGuiManager* ImGui() const;										
 
-	ID3D12Device* Device() const;										//デバイスを返す関数
-	IDXGISwapChain4* Swapchain() const;									//スワップチェーンを返す関数
-	ID3D12GraphicsCommandList* CommandList() const;						//コマンドリストを返す関数
-	ID3D12CommandQueue* CommandQueue() const;							//コマンドキューを返す関数
-	ID3D12Resource* BackBuffer() const;									//バックバッファー（1枚目）を返す関数
-	ID3D12DescriptorHeap* RTVHeap() const;								//RTVヒープを返す関数
-	ID3D12DescriptorHeap* DSVHeap() const;								//深度ステンシルヒープを返す関数
-	ID3D12DescriptorHeap* FactorCBVHeap() const;						//因数用ヒープを返す関数
-	D3D12_VIEWPORT* ViewPort() const;									//ビューポートを返す関数
-	D3D12_RECT* Rect() const;											//シザー矩形を返す関数
+	//デバイスを返す関数
+	ID3D12Device* Device() const;										
+	//スワップチェーンを返す関数
+	IDXGISwapChain4* Swapchain() const;		
+	//コマンドリストを返す関数
+	ID3D12GraphicsCommandList* CommandList() const;				
+	//コマンドキューを返す関数
+	ID3D12CommandQueue* CommandQueue() const;							
+	//バックバッファー（1枚目）を返す関数
+	ID3D12Resource* BackBuffer() const;									
+	//RTVヒープを返す関数
+	ID3D12DescriptorHeap* RTVHeap() const;								
+	//深度ステンシルヒープを返す関数
+	ID3D12DescriptorHeap* DSVHeap() const;								
+	//因数用ヒープを返す関数
+	ID3D12DescriptorHeap* FactorCBVHeap() const;						
+	//ビューポートを返す関数
+	D3D12_VIEWPORT* ViewPort() const;									
+	//シザー矩形を返す関数
+	D3D12_RECT* Rect() const;											
 
-	bool Perspective();													//透視投影かどうか返す関数
-
-	void SetPersOrOrtho(bool isPers);									//平行投影か透視投影か決める関数
+	//透視投影かどうか返す関数
+	bool Perspective()const;
+	//平行投影か透視投影か決める関数
+	void SetPersOrOrtho(bool isPers);									
 };
 

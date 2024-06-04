@@ -949,9 +949,9 @@ Dx12Wrapper::Rect() const
 /// <summary>
 /// “§‹“Š‰e‚©‚Ç‚¤‚©•Ô‚·ŠÖ”
 /// </summary>
-/// <returns></returns>
+/// <returns>^—’l</returns>
 bool
-Dx12Wrapper::Perspective()
+Dx12Wrapper::Perspective()const
 {
 	return _perspective;
 }

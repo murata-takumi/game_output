@@ -25,58 +25,96 @@ class SpriteManager
 	using ComPtr = ComPtr<T>;
 
 private:
-	Dx12Wrapper& _dx12;														//Dx12Wrapperインスタンス
+	//Dx12Wrapperインスタンス
+	Dx12Wrapper& _dx12;														
 
-	unique_ptr<GraphicsMemory> _gmemory;									//グラフィックスメモリ
-	unique_ptr<SpriteBatch> _spriteBatch;									//スプライト（画像）表示用オブジェクト
+	//グラフィックスメモリ
+	unique_ptr<GraphicsMemory> _gmemory;									
+	//スプライト（画像）表示用オブジェクト
+	unique_ptr<SpriteBatch> _spriteBatch;									
 
-	vector<shared_ptr<FBXBase>> _actorAndObjs;								//FBXBase及び派生オブジェクトのベクトル
+	//FBXBase及び派生オブジェクトを格納したベクトル
+	vector<shared_ptr<FBXBase>> _actorAndObjs;								
 
-	ID3DBlob* _psBlob = nullptr;											//ピクセルシェーダー用データ
+	//ピクセルシェーダー用データ
+	ID3DBlob* _psBlob = nullptr;											
 
-	SIZE _winSize;															//ウィンドウサイズ
-	LONG _width;															//画面の幅
-	LONG _height;															//画面の高さ
+	//ウィンドウサイズ
+	SIZE _winSize;															
+	//画面の幅
+	LONG _width;															
+	//画面の高さ
+	LONG _height;															
 
 	unique_ptr<BasicEffect> _effect;
 
 	unique_ptr<PrimitiveBatch<VertexPositionColor>> _batch;
 
-	SimpleMath::Matrix _world;												//ワールド行列
-	SimpleMath::Matrix _view;												//ビュー行列
-	SimpleMath::Matrix _proj;												//プロジェクション行列
+	//ワールド行列
+	SimpleMath::Matrix _world;												
+	//ビュー行列
+	SimpleMath::Matrix _view;												
+	//プロジェクション行列
+	SimpleMath::Matrix _proj;												
 
-	ComPtr<ID3D12DescriptorHeap> _heapForSpriteFont = nullptr;				//フォント・画像用ヒープ
-	D3D12_CPU_DESCRIPTOR_HANDLE _tmpCPUHandle;								//ヒープハンドル(CPU)
-	D3D12_GPU_DESCRIPTOR_HANDLE _tmpGPUHandle;								//ヒープハンドル(GPU)
-	UINT _incrementSize;													//ハンドルのアドレスの差分
+	//フォント・画像用ヒープ
+	ComPtr<ID3D12DescriptorHeap> _heapForSpriteFont = nullptr;				
+	//ヒープハンドル(CPU)
+	D3D12_CPU_DESCRIPTOR_HANDLE _tmpCPUHandle;								
+	//ヒープハンドル(GPU)
+	D3D12_GPU_DESCRIPTOR_HANDLE _tmpGPUHandle;								
+	//ハンドルのアドレスの差分
+	UINT _incrementSize;													
 
-	map<string,D3D12_GPU_DESCRIPTOR_HANDLE> _GPUHandles;					//ハンドル(GPU)のベクトル
+	//ハンドル(GPU)のベクトル
+	map<string,D3D12_GPU_DESCRIPTOR_HANDLE> _GPUHandles;					
 
-	RECT _loadingRect;														//ロード中アイコン用矩形
+	//ロード中アイコン用矩形
+	RECT _loadingRect;
+	//背景用矩形
+	RECT _BGRect;														
 
-	ComPtr<ID3D12RootSignature> _spriteRS;									//スプライト描画用ルートシグネチャ
+	//スプライト描画用ルートシグネチャ
+	ComPtr<ID3D12RootSignature> _spriteRS;									
 
-	SimpleMath::Vector3 _XAxis = SimpleMath::Vector3(1000.f, 0.f, 0.0f);	//X軸のグリッドの幅
-	SimpleMath::Vector3 _YAxis = SimpleMath::Vector3(0.0f, 1000.f, 0.0f);	//Y軸のグリッドの幅
-	SimpleMath::Vector3 _ZAxis = SimpleMath::Vector3(0.0f, 0.0f, 1000.f);	//Z軸のグリッドの幅
-	SimpleMath::Vector3 _origin = SimpleMath::Vector3::Zero;				//
+	//X軸のグリッドの幅
+	SimpleMath::Vector3 _XAxis = SimpleMath::Vector3(1000.f, 0.f, 0.0f);	
+	//Y軸のグリッドの幅
+	SimpleMath::Vector3 _YAxis = SimpleMath::Vector3(0.0f, 1000.f, 0.0f);	
+	//Z軸のグリッドの幅
+	SimpleMath::Vector3 _ZAxis = SimpleMath::Vector3(0.0f, 0.0f, 1000.f);	
+	//座標の中心
+	SimpleMath::Vector3 _origin = SimpleMath::Vector3::Zero;				
 
-	HRESULT CreateSpriteRS();												//SpriteBatch用ルートシグネチャを作成する関数
-	HRESULT CreateUIBufferView(const wchar_t* path, string key);			//UI用の画像のバッファー・ビューを作成する関数
+	//SpriteBatch用ルートシグネチャを作成する関数
+	HRESULT CreateSpriteRS();												
+	//UI用の画像のバッファー・ビューを作成する関数
+	HRESULT CreateUIBufferView(const wchar_t* path, string key);			
 
-	void InitSpriteDevices();												//スプライト・文字列表示用オブジェクトを初期化する関数
+	//スプライト・文字列表示用オブジェクトを初期化する関数
+	void InitSpriteDevices();												
 
+	//当たり判定を描画する関数
 	void ColliderDraw(const shared_ptr<BoxCollider> collider);
 public:
-	SpriteManager(Dx12Wrapper& dx12,LONG width,LONG height);		//コンストラクタ
+	//コンストラクタ
+	SpriteManager(Dx12Wrapper& dx12,LONG width,LONG height);		
 
-	void AdjustSpriteRect();										//画面サイズの変更を感知して矩形を調整する
+	//画面サイズの変更を感知して矩形を調整する
+	void AdjustSpriteRect();										
 
-	void LoadingDraw();												//ロード画面での描画
-	void GridDraw();												//マウスカーソルを描画
+	//ロード画面での描画
+	void LoadingDraw();		
 
-	void Commit();													//グラフィックスメモリをコマンドリストにセット
+	//背景の描画
+	void BackGroundDraw();
 
-	void SetActors(vector<shared_ptr<FBXBase>> actorAndObjects);	//アクターを設定する関数
+	//マウスカーソルを描画
+	void GridDraw();							
+
+	//グラフィックスメモリをコマンドリストにセット
+	void Commit();													
+
+	//アクターを設定する関数
+	void SetActors(vector<shared_ptr<FBXBase>> actorAndObjects);	
 };

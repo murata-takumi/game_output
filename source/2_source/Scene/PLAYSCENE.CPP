@@ -338,7 +338,10 @@ void
 PlayScene::PeraDraw()
 {
 	//ペラポリゴン描画準備
-	_pera->BeginPeraDraw();						
+	_pera->BeginPeraDraw();
+
+	//背景を描画
+	_dx12.Sprite()->BackGroundDraw();
 
 	//ペラポリゴン用パイプラインをセット
 	_dx12.SetPipelines(							
@@ -348,7 +351,7 @@ PlayScene::PeraDraw()
 	);
 
 	//ビュー・プロジェクション行列を適用
-	_dx12.SetScene();							
+	_dx12.SetScene();
 
 	//モデル描画処理
 	ModelDraw();								
@@ -369,18 +372,25 @@ PlayScene::GameDraw()
 	//以下ゲーム画面用パイプラインをセット
 	_pera->SetPeraPipelines();														
 
-	_dx12.CommandList()->IASetVertexBuffers(0, 1, _pera->PeraVBView());				//ペラポリゴン用VBVをセット
-	_dx12.CommandList()->DrawInstanced(4, 1, 0, 0);									//ペラポリゴンを構成する頂点を描画
+	//ペラポリゴン用VBVをセット
+	_dx12.CommandList()->IASetVertexBuffers(0, 1, _pera->PeraVBView());				
+	//ペラポリゴンを構成する頂点を描画
+	_dx12.CommandList()->DrawInstanced(4, 1, 0, 0);									
 
-	if (_dx12.ImGui()->IsWriteGrid() && !_isInLoad)_dx12.Sprite()->GridDraw();		//グリッドを描画
+	//グリッドを描画
+	if (_dx12.ImGui()->IsWriteGrid() && !_isInLoad)_dx12.Sprite()->GridDraw();		
 
-	EffectAndUIDraw();																//ここにエフェクト上の描画処理
+	//ここにエフェクト上の描画処理
+	EffectAndUIDraw();																
 
-	_dx12.EndGameDraw();															//ゲーム画面描画後始末
+	//ゲーム画面描画後始末
+	_dx12.EndGameDraw();															
 
-	_dx12.Swapchain()->Present(_interval, 0);										//スワップチェーンのフリップ処理
+	//スワップチェーンのフリップ処理
+	_dx12.Swapchain()->Present(_interval, 0);										
 
-	_dx12.Sprite()->Commit();														//グラフィックスメモリを設定
+	//グラフィックスメモリを設定
+	_dx12.Sprite()->Commit();														
 }
 
 /// <summary>
@@ -408,9 +418,10 @@ PlayScene::CheckIntersect(map<string, float> col0, map<string, float> col1)
 void
 PlayScene::ModelDraw()
 {
-	if (!_isInLoad)									//プレイヤーが読み込み完了している場合描画処理
+	//プレイヤーが読み込み完了している場合FBXBaseクラスを基盤とするオブジェクト全般に対し描画・更新処理を行う
+	if (!_isInLoad)									
 	{
-		for (const auto& item : _actorAndObjs)		//FBXBaseクラスを基盤とするオブジェクト全般に対し描画・更新処理を行う
+		for (const auto& item : _actorAndObjs)
 		{
 			if (item != nullptr)
 			{
@@ -427,13 +438,17 @@ PlayScene::ModelDraw()
 void
 PlayScene::EffectAndUIDraw()
 {
-	if (_isInLoad)						//ロード中の場合
+	//ロード中の場合
+	if (_isInLoad)						
 	{
-		_dx12.Sprite()->LoadingDraw();	//ロード画面を描画
+		//ロード画面を描画
+		_dx12.Sprite()->LoadingDraw();	
 	}
-	else								//操作可能な場合
+	else								
 	{
-		_dx12.ImGui()->SetFPS(_fps);	//SceneからImGuiにデータを渡す
-		_dx12.ImGui()->ImGuiDraw();		//ImGuiのウィンドウを描画
+		//SceneからImGuiにFPSを渡す
+		_dx12.ImGui()->SetFPS(_fps);	
+		//ImGuiのウィンドウを描画
+		_dx12.ImGui()->ImGuiDraw();		
 	}
 }
