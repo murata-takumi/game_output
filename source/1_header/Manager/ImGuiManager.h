@@ -1,12 +1,9 @@
 #pragma once
-#include "Application.h"
+#include "Includes.h"
 
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_dx12.h"
 #include "imgui/imgui_impl_win32.h"
-
-const int DIFF = 15;				//画面端と各ウィンドウの間の距離
-const int ANIMATION_HEIGHT = 200;	//アニメーション用ウィンドウの高さ
 
 class Dx12Wrapper;
 class FBXBase;
@@ -22,6 +19,8 @@ public:
 	void ImGuiDraw();												//各ウィンドウの描画処理
 
 	void SetFPS(float fps);											//PlaySceneから受け取ったデータを反映する関数
+	//アクターと地面の座標ごとの真理値の当たり判定を受け取る
+	void SetActorColBool(bool intersects[]);
 	void SetActor(vector<shared_ptr<FBXBase>> actorAndObjects);		//アクターを受け取る関数
 	void ResetAnimStr();											//アニメーション名の配列を初期化する関数
 
@@ -42,10 +41,15 @@ private:
 	LARGE_INTEGER _beforeFrameTime;					//前フレームの時間
 	LARGE_INTEGER _crrntFrameTime;					//現フレームの時間
 
+	//アクターと地面の座標ごとの当たり判定を表示する真理値
+	bool _intersects[6];
+
 	bool _canActorControll = false;					//操作可能かどうかを決める真理値
 	bool _comboSelect = false;						//アニメーションのコンボボックスの内どれが選択されているかを決める真理値
 	bool _canCallAnim = false;						//アニメーションを実行するかどうかを決める真理値
 	bool _isWriteGrid = true;						//グリッドを描画するかどうか決める真理値
+
+	float _groundXMax;
 
 	float _windowWidth;								//ウィンドウ幅
 	float _windowHeight;							//ウィンドウ高さ

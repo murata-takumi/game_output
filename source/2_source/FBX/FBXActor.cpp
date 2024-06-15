@@ -67,9 +67,9 @@ FBXActor::InitAnimation()
 			XMMatrixInverse(nullptr, _boneInfo[i]._boneOffset));
 
 		auto q1 = XMQuaternionRotationAxis(							
-			XMVectorSet(1.0f, 0.0f, 0.0f, 0.0f), PI / -2);
+			XMVectorSet(1.0f, 0.0f, 0.0f, 0.0f), XM_PI / -2);
 		auto q2 = XMQuaternionRotationAxis(
-			XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f), PI / 2);
+			XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f), XM_PI / 2);
 		skew = XMQuaternionMultiply(skew, q1);
 		skew = XMQuaternionMultiply(skew, q2);
 
@@ -562,9 +562,7 @@ FBXActor::Update()
 		//アニメーションノードの更新
 		_crntNode->Update(_animTime);												
 
-		if (!_isOnGround && !IsAnimationEqual(JUMP00))
-			_pos.m128_f32[1] -= _dx12.GetDeltaTime() * 45.0f * 9.8f;
-		//if(_isOnGround)_pos.m128_f32[1] += _dx12.GetDeltaTime() * 45.0f * 9.8f;
+		if (!_isOnGround && !IsAnimationEqual(JUMP00))_pos.m128_f32[1] -= _dx12.GetDeltaTime() * 45.0f * 9.8f;
 
 		//回転、平行移動
 		_mappedMats[0] = XMMatrixRotationY(_rotY);									
@@ -579,7 +577,7 @@ FBXActor::Update()
 	XMMATRIX newWorldMat = XMMatrixScalingFromVector(scale) * XMMatrixRotationQuaternion(skew) * XMMatrixTranslationFromVector(trans);
 
 	//当たり判定を更新
-	_collider->Update(newWorldMat *	_mappedMats[0]);	
+	_collider->Update(newWorldMat *	_mappedMats[0],_zToFrontAngle);
 
 	//経過時間を渡し、ボーン行列を取得
 	BoneTransform(_animTime);														
@@ -602,10 +600,9 @@ FBXActor::Translate(const XMVECTOR& input)
 	//座標に入力に応じたベクトルを加算
 	_pos += input * _dx12.GetDeltaTime() * 300.0f;
 
-	//入力ベクトルと正面ベクトルの角度の差を取得し、差がある場合
+	//入力ベクトルと正面ベクトルの角度差を取得
 	auto diff = XMVector3AngleBetweenVectors(input, _frontVec).m128_f32[0];			
 	diff = XMVector3Cross(input, _frontVec).m128_f32[1] > 0 ? diff * -1 : diff;
-	
 	//角度の差がある場合目的角度を更新
 	if (FLT_EPSILON <= fabs(diff))													
 	{
@@ -614,6 +611,10 @@ FBXActor::Translate(const XMVECTOR& input)
 
 	//目的角度に向け線形補間
 	_rotY = lerp(_rotY, _destRad, 0.2f);											
+
+	//Z軸から正面ベクトルの角度差を取得
+	_zToFrontAngle = XMVector3AngleBetweenVectors(Z_VECTOR, _frontVec).m128_f32[0];
+	_zToFrontAngle = XMVector3Cross(Z_VECTOR, _frontVec).m128_f32[1] > 0 ? _zToFrontAngle * -1 : _zToFrontAngle;
 
 	//正面ベクトルを取得・正規化
 	_frontVec = XMVectorSet(														

@@ -1,8 +1,8 @@
+#pragma once
 #include "Functions.h"
 #include "Scene/PlayScene.h"
-#include "Constant.h"
+#include "Includes.h"
 
-const XMVECTOR Y_VECTOR = XMVectorSet(0.0f,90.0f,0.0f,0.0f);	//Y軸ベクトル
 const wchar_t* ACTOR_PATH = L"Asset/model/Unitychan.fbx";		//モデルデータが格納されているファイルパス
 const wchar_t* GROUND_PATH = L"Asset/model/G.fbx";				//地面データが格納されているファイルパス
 const float FRAME_TIME = 1.0f / 60.0f;							//更新回数を60FPSに固定する際の1フレームの秒数
@@ -45,7 +45,7 @@ PlayScene::Update()
 	if (!_isInLoad)													//操作可能な場合入力を反映する
 	{
 		auto cols0 = _actorAndObjs[0]->Collider()->BoundValues();
-		auto cols1 = _actorAndObjs[1]->Collider()->BoundValues();
+		auto cols1 = _actor->Collider()->BoundValues();
 
 		_actor->SetOnGround(CheckIntersect(cols0, cols1));
 
@@ -146,10 +146,6 @@ PlayScene::Update()
 			{
 				_actor->SetAnimationNode(JUMP00);
 			}
-		}
-		else
-		{
-
 		}
 
 		//キーパッドの入力に応じてカメラを正面・側面・上面に配置
@@ -402,12 +398,24 @@ PlayScene::GameDraw()
 bool 
 PlayScene::CheckIntersect(map<string, float> col0, map<string, float> col1)
 {
-	if ((col0[Constant::BOX_COL_X_MIN] - col1[Constant::BOX_COL_X_MAX]) > FLT_EPSILON)return false;
-	if ((col1[Constant::BOX_COL_X_MIN] - col0[Constant::BOX_COL_X_MAX]) > FLT_EPSILON)return false;
-	if ((col0[Constant::BOX_COL_Y_MAX] - col1[Constant::BOX_COL_Y_MIN]) > FLT_EPSILON)return false;
-	if ((col1[Constant::BOX_COL_Y_MAX] - col0[Constant::BOX_COL_Y_MIN]) > FLT_EPSILON)return false;
-	if ((col0[Constant::BOX_COL_Z_MAX] - col1[Constant::BOX_COL_Z_MIN]) > FLT_EPSILON)return false;
-	if ((col1[Constant::BOX_COL_Z_MAX] - col0[Constant::BOX_COL_Z_MIN]) > FLT_EPSILON)return false;
+	bool intersects[6] =
+	{
+		(col0[BOX_COL_X_MIN] - col1[BOX_COL_X_MAX]) > FLT_EPSILON,
+		(col1[BOX_COL_X_MIN] - col0[BOX_COL_X_MAX]) > FLT_EPSILON,
+		(col0[BOX_COL_Y_MAX] - col1[BOX_COL_Y_MIN]) > FLT_EPSILON,
+		(col1[BOX_COL_Y_MAX] - col0[BOX_COL_Y_MIN]) > FLT_EPSILON,
+		(col0[BOX_COL_Z_MAX] - col1[BOX_COL_Z_MIN]) > FLT_EPSILON,
+		(col1[BOX_COL_Z_MAX] - col0[BOX_COL_Z_MIN]) > FLT_EPSILON
+	};
+
+	_dx12.ImGui()->SetActorColBool(intersects);
+
+	if ((col0[BOX_COL_X_MIN] - col1[BOX_COL_X_MAX]) > FLT_EPSILON)return false;
+	if ((col1[BOX_COL_X_MIN] - col0[BOX_COL_X_MAX]) > FLT_EPSILON)return false;
+	if ((col0[BOX_COL_Y_MAX] - col1[BOX_COL_Y_MIN]) > FLT_EPSILON)return false;
+	if ((col1[BOX_COL_Y_MAX] - col0[BOX_COL_Y_MIN]) > FLT_EPSILON)return false;
+	if ((col0[BOX_COL_Z_MAX] - col1[BOX_COL_Z_MIN]) > FLT_EPSILON)return false;
+	if ((col1[BOX_COL_Z_MAX] - col0[BOX_COL_Z_MIN]) > FLT_EPSILON)return false;
 
 	return true;
 }

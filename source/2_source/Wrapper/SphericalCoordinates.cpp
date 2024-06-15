@@ -56,7 +56,7 @@ SphericalCoordinates::GetRadius()const
 float
 SphericalCoordinates::GetElevation()const
 {
-	return clamp(_elevation, (-89.9f + FLT_EPSILON) * (PI / 180.0f), (89.9f - FLT_EPSILON) * (PI / 180.0f));
+	return clamp(_elevation, (-89.9f + FLT_EPSILON) * (XM_PI / 180.0f), (89.9f - FLT_EPSILON) * (XM_PI / 180.0f));
 }
 
 /// <summary>
@@ -68,8 +68,8 @@ SphericalCoordinates::GetElevation()const
 SphericalCoordinates
 SphericalCoordinates::Rotate(float newAzimuth, float newElevation)
 {
-	newAzimuth = newAzimuth * (PI / 180.0f);		//度数法から弧度法に変換
-	newElevation = newElevation * (PI / 180.0f);
+	newAzimuth = newAzimuth * (XM_PI / 180.0f);		//度数法から弧度法に変換
+	newElevation = newElevation * (XM_PI / 180.0f);
 
 	_azimuth += newAzimuth;							//角度を加算
 	_elevation = GetElevation() + newElevation;

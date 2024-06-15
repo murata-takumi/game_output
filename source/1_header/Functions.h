@@ -1,8 +1,5 @@
 #pragma once
-#include "Application.h"
-
-#include <filesystem>
-#include <string>
+#include "Includes.h"
 
 namespace fs = std::filesystem;
 
@@ -11,7 +8,7 @@ namespace fs = std::filesystem;
 /// </summary>
 namespace
 {
-	std::mutex _mtx;
+	mutex _mtx;
 
 	const unsigned char _constSize = 0xff;	//定数バッファーのサイズを256の倍数に調整するためのデータ
 

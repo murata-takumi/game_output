@@ -1,12 +1,15 @@
-#include "Application.h"
+#pragma once
+#include "Includes.h"
 
 /// <summary>
 /// ƒJƒƒ‰‚ğ‚Ç‚¿‚ç‚Ì•û‚É‰ñ“]‚³‚¹‚é‚©Œˆ’è‚·‚é—ñ‹“‘Ì
 /// </summary>
 enum Degree
 {
-	Azimth,			//•ûˆÊŠp
-	Elevation,		//‹ÂŠp
+	//•ûˆÊŠp
+	Azimth,
+	//‹ÂŠp
+	Elevation,		
 };
 
 /// <summary>
@@ -14,9 +17,12 @@ enum Degree
 /// </summary>
 enum Direction
 {
-	Horizontal,	//…•½•ûŒü
-	Vertical,	//‚’¼•ûŒü
-	Depth,		//‰œs•ûŒü
+	//…•½•ûŒü
+	Horizontal,	
+	//‚’¼•ûŒü
+	Vertical,	
+	//‰œs•ûŒü
+	Depth,		
 };
 
 /// <summary>

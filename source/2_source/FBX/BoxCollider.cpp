@@ -1,5 +1,6 @@
+#pragma once
 #include "FBX/BoxCollider.h"
-#include "Constant.h"
+#include "Includes.h"
 
 /// <summary>
 /// コンストラクタ
@@ -52,14 +53,34 @@ void
 BoxCollider::SetBoundValues()
 {
 	//X座標の境界値
-	_boundValues[Constant::BOX_COL_X_MIN] = _verts[0].m128_f32[0];
-	_boundValues[Constant::BOX_COL_X_MAX] = _verts[2].m128_f32[0];
+	//現在のオブジェクトの角度に応じて場合分けする
+	if (_angle <= 0.0f)
+	{
+		_boundValues[BOX_COL_X_MIN] = _verts[0].m128_f32[0];
+		_boundValues[BOX_COL_X_MAX] = _verts[2].m128_f32[0];
+	}
+	else
+	{
+		_boundValues[BOX_COL_X_MIN] = _verts[1].m128_f32[0];
+		_boundValues[BOX_COL_X_MAX] = _verts[3].m128_f32[0];
+	}
+
 	//Y座標の境界値
-	_boundValues[Constant::BOX_COL_Y_MIN] = _verts[0].m128_f32[1];
-	_boundValues[Constant::BOX_COL_Y_MAX] = _verts[4].m128_f32[1];
+	_boundValues[BOX_COL_Y_MIN] = _verts[0].m128_f32[1];
+	_boundValues[BOX_COL_Y_MAX] = _verts[4].m128_f32[1];
+
 	//Z座標の境界値
-	_boundValues[Constant::BOX_COL_Z_MIN] = _verts[0].m128_f32[2];
-	_boundValues[Constant::BOX_COL_Z_MAX] = _verts[1].m128_f32[2];
+	//こちらもX軸同様角度に応じて場合分けする
+	if (_angle <= 0.0f)
+	{
+		_boundValues[BOX_COL_Z_MIN] = _verts[0].m128_f32[2];
+		_boundValues[BOX_COL_Z_MAX] = _verts[1].m128_f32[2];
+	}
+	else
+	{
+		_boundValues[BOX_COL_Z_MIN] = _verts[1].m128_f32[2];
+		_boundValues[BOX_COL_Z_MAX] = _verts[3].m128_f32[2];
+	}
 }
 
 /// <summary>
@@ -67,8 +88,9 @@ BoxCollider::SetBoundValues()
 /// 座標変換を行う
 /// </summary>
 /// <param name="mat">座標変換に用いる行列</param>
+/// <param name="angle">オブジェクトの角度</param>
 void
-BoxCollider::Update(const XMMATRIX& mat)
+BoxCollider::Update(const XMMATRIX& mat, float angle)
 {
 	//スケーリング、回転、平行移動成分を行列から取得
 	XMVECTOR scale, trans, skew;
@@ -76,12 +98,23 @@ BoxCollider::Update(const XMMATRIX& mat)
 
 	//X軸周りの回転を反転
 	auto q = XMQuaternionRotationAxis(XMVectorSet(1.0f, 0.0f, 0.0f, 1.0f), XM_PI);
-	skew = XMQuaternionMultiply(skew, q);									
+	skew = XMQuaternionMultiply(skew, q);						
 
 	//スケーリング、回転、平行移動成分から新規ワールド行列を作成し、平行移動のX要素を反転
 	XMMATRIX newWorldMat = XMMatrixScalingFromVector(scale) *						
 		XMMatrixRotationQuaternion(skew) * XMMatrixTranslationFromVector(trans);
 	newWorldMat.r[3].m128_f32[0] *= -1.0f;
+
+	auto inputVec = XMVectorSet(
+		mat.r[2].m128_f32[0],
+		mat.r[2].m128_f32[1],
+		mat.r[2].m128_f32[2],
+		0.0f
+	);
+	inputVec = XMVector3Normalize(inputVec);
+
+	//オブジェクトの角度を保存
+	_angle = angle;
 
 	//各初期座標に対し座標変換を行い、実際に表示する座標に代入
 	for (int i = 0; i < _initVerts.size(); i++)	

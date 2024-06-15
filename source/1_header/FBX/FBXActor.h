@@ -74,7 +74,9 @@ private:
 	//アニメーションの第2フレーム（Tポーズでないポーズの最初のフレーム）の秒数
 	float _secFrameTime;			
 	//アクターの向き（Y軸）
-	float _rotY;															
+	float _rotY;
+	//Z軸からプレイヤーの向きまでの角度
+	float _zToFrontAngle;
 
 	//前フレームの時間
 	LARGE_INTEGER _befFrameTime;									

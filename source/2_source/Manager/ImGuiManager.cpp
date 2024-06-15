@@ -229,13 +229,29 @@ ImGuiManager::SetFPS(float fps)
 }
 
 /// <summary>
+/// アクターと地面の座標ごとの真理値の当たり判定を受け取る関数
+/// </summary>
+/// <param name="intersects">真理値ベクトル</param>
+void
+ImGuiManager::SetActorColBool(bool intersects[])
+{
+	for(int i = 0; i < 6; i++)
+	{
+		_intersects[i] = intersects[i];
+	}
+}
+
+/// <summary>
 /// アクターを受け取る関数
 /// </summary>
-/// <param name="actor">アクター</param>
+/// <param name="actor">アクターのベクトル</param>
 void
 ImGuiManager::SetActor(vector<shared_ptr<FBXBase>> actorAndObjects)
 {
-	for (const auto& object : actorAndObjects)						//ベクトルの中からアクターを探して取得
+	_groundXMax = actorAndObjects[0]->Collider()->BoundValues()[BOX_COL_X_MAX];
+
+	//ベクトルの中からアクターを探して取得
+	for (const auto& object : actorAndObjects)						
 	{
 		if (_actor = dynamic_pointer_cast<FBXActor>(object))
 		{

@@ -132,7 +132,7 @@
     <ClInclude Include="1_header\FBX\AnimNodes\WAIT00Node.h">
       <Filter>1_header\FBX\AnimNodes</Filter>
     </ClInclude>
-    <ClInclude Include="1_header\Constant.h">
+    <ClInclude Include="1_header\Includes.h">
       <Filter>1_header</Filter>
     </ClInclude>
   </ItemGroup>
@@ -205,9 +205,6 @@
     </ClCompile>
     <ClCompile Include="2_source\FBX\AnimNodes\JUMP00Node.cpp">
       <Filter>2_source\FBX\AnimNodes</Filter>
-    </ClCompile>
-    <ClCompile Include="2_source\Constant.cpp">
-      <Filter>2_source</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -1,26 +1,5 @@
 #pragma once
-#include <DirectXTex-master/DirectXTex/d3dx12.h>
-#include <DirectXTex-master/DirectXTex/DirectXTex.h>
-#include <DirectXTK12-master/Inc/SimpleMath.h>
-
-#include <d3dcompiler.h>
-#include <array>
-#include <cstdlib>
-#include <map>
-#include <tchar.h>
-#include <dxgi1_6.h>
-#include <vector>
-#include <thread>
-#include <mutex>
-#include <functional>
-#include <chrono>
-#include <iostream>
-#include <fstream>
-#include <filesystem>
-
-using namespace std;
-using namespace DirectX;
-using namespace Microsoft::WRL;
+#include "Includes.h"
 
 #if _DEBUG
 
@@ -46,8 +25,6 @@ using namespace Microsoft::WRL;
 #pragma comment(lib,"d3dcompiler.lib")
 #pragma comment(lib,"winmm.lib")
 #pragma comment(lib,"Imgui.lib")
-
-const float PI = 3.141592653f;		//‰~ü—¦
 
 /// <summary>
 /// “Ç‚İ‚ŞSceneƒNƒ‰ƒX‚ğ¯•Ê‚·‚é‚½‚ß‚Ì—ñ‹“Œ^
