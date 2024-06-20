@@ -398,6 +398,7 @@ PlayScene::GameDraw()
 bool 
 PlayScene::CheckIntersect(map<string, float> col0, map<string, float> col1)
 {
+	//col0‚ªGroundAcol1‚ªActor
 	bool intersects[6] =
 	{
 		(col0[BOX_COL_X_MIN] - col1[BOX_COL_X_MAX]) > FLT_EPSILON,
@@ -414,8 +415,8 @@ PlayScene::CheckIntersect(map<string, float> col0, map<string, float> col1)
 	if ((col1[BOX_COL_X_MIN] - col0[BOX_COL_X_MAX]) > FLT_EPSILON)return false;
 	if ((col0[BOX_COL_Y_MAX] - col1[BOX_COL_Y_MIN]) > FLT_EPSILON)return false;
 	if ((col1[BOX_COL_Y_MAX] - col0[BOX_COL_Y_MIN]) > FLT_EPSILON)return false;
-	if ((col0[BOX_COL_Z_MAX] - col1[BOX_COL_Z_MIN]) > FLT_EPSILON)return false;
-	if ((col1[BOX_COL_Z_MAX] - col0[BOX_COL_Z_MIN]) > FLT_EPSILON)return false;
+	if ((col0[BOX_COL_Z_MIN] - col1[BOX_COL_Z_MAX]) > FLT_EPSILON)return false;
+	if ((col1[BOX_COL_Z_MIN] - col0[BOX_COL_Z_MAX]) > FLT_EPSILON)return false;
 
 	return true;
 }

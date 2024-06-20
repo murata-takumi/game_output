@@ -248,7 +248,7 @@ ImGuiManager::SetActorColBool(bool intersects[])
 void
 ImGuiManager::SetActor(vector<shared_ptr<FBXBase>> actorAndObjects)
 {
-	_groundXMax = actorAndObjects[0]->Collider()->BoundValues()[BOX_COL_X_MAX];
+	_ground = actorAndObjects[0];
 
 	//ベクトルの中からアクターを探して取得
 	for (const auto& object : actorAndObjects)						

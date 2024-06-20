@@ -29,6 +29,7 @@ private:
 	Dx12Wrapper& _dx12;								//Dx12Wrapperインスタンス
 
 	shared_ptr<FBXActor> _actor;					//アクター
+	shared_ptr<FBXBase> _ground;					//地面
 
 	ComPtr<ID3D12DescriptorHeap> _heapForImgui;		//ImGui用ヒープ
 
@@ -48,8 +49,6 @@ private:
 	bool _comboSelect = false;						//アニメーションのコンボボックスの内どれが選択されているかを決める真理値
 	bool _canCallAnim = false;						//アニメーションを実行するかどうかを決める真理値
 	bool _isWriteGrid = true;						//グリッドを描画するかどうか決める真理値
-
-	float _groundXMax;
 
 	float _windowWidth;								//ウィンドウ幅
 	float _windowHeight;							//ウィンドウ高さ

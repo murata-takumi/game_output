@@ -613,8 +613,10 @@ FBXActor::Translate(const XMVECTOR& input)
 	_rotY = lerp(_rotY, _destRad, 0.2f);											
 
 	//Z軸から正面ベクトルの角度差を取得
+	//0～360の範囲にする
 	_zToFrontAngle = XMVector3AngleBetweenVectors(Z_VECTOR, _frontVec).m128_f32[0];
-	_zToFrontAngle = XMVector3Cross(Z_VECTOR, _frontVec).m128_f32[1] > 0 ? _zToFrontAngle * -1 : _zToFrontAngle;
+	_zToFrontAngle = XMVector3Cross(Z_VECTOR, _frontVec).m128_f32[1] > 0 ? (2 * XM_PI) - _zToFrontAngle : _zToFrontAngle;
+	_zToFrontAngle = _zToFrontAngle / XM_PI * 180.0f;
 
 	//正面ベクトルを取得・正規化
 	_frontVec = XMVectorSet(														

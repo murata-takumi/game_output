@@ -7,8 +7,6 @@
 class BoxCollider
 {
 private:
-	//オブジェクトの角度
-	float _angle;
 
 	//頂点の初期値
 	vector<XMVECTOR> _initVerts;
@@ -16,6 +14,8 @@ private:
 	vector<XMVECTOR> _verts;
 	//境界値
 	map<string,float> _boundValues;
+	//オブジェクトの角度
+	float _angle;
 
 	//境界値を設定する関数
 	void SetBoundValues();								
