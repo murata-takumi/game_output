@@ -5,6 +5,7 @@
 
 const wchar_t* ACTOR_PATH = L"Asset/model/Unitychan.fbx";		//モデルデータが格納されているファイルパス
 const wchar_t* GROUND_PATH = L"Asset/model/G.fbx";				//地面データが格納されているファイルパス
+const wchar_t* BALL_PATH = L"Asset/model/Ball BLEND.fbx";		//サッカーボールのデータが格納されているファイルパス
 const float FRAME_TIME = 1.0f / 60.0f;							//更新回数を60FPSに固定する際の1フレームの秒数
 
 /// <summary>
@@ -192,40 +193,26 @@ PlayScene::SceneStart()
 	auto f = [&]()
 	{
 		//ロード中だと示す
-		_isInLoad = true;												
-
-		//並列処理したいスレッドのベクトル
-		vector<thread> ths;												
-		shared_ptr<FBXObject> ground;
+		_isInLoad = true;
 
 		//スレッドにアクターの作成処理を追加
-		ths.emplace_back
-		(	
-			[&](){
-				lock_guard lock(_mtx);
-
-				_actor = make_shared<FBXActor>(_dx12, ACTOR_PATH);		
-			}
-		);
-		//フィールドの作成処理を追加
-		ths.emplace_back
-		(
-			[&]() {
-				lock_guard lock(_mtx);
-
-				ground = make_shared<FBXObject>(_dx12, GROUND_PATH);
-			}
-		);
+		InstantiateObject<FBXActor>(ACTOR_PATH);
+		InstantiateObject<FBXObject>(GROUND_PATH);
+		InstantiateObject<FBXObject>(BALL_PATH);
 
 		//スレッドが全て完了するまでここで待機
-		for (auto& th : ths)											
+		for (auto& th : _ths)											
 		{
 			th.join();
 		}
 
-		//描画予定のオブジェクトにアクター、フィールドを追加
-		_actorAndObjs.emplace_back(ground);
-		_actorAndObjs.emplace_back(_actor);
+		for (const auto& object : _actorAndObjs)
+		{
+			if (_actor = dynamic_pointer_cast<FBXActor>(object))
+			{
+				break;
+			}
+		}
 
 		//アクターをImGuiManager側に渡す
 		_dx12.ImGui()->SetActor(_actorAndObjs);							
@@ -265,6 +252,29 @@ PlayScene::SceneEnd()
 }
 
 /// <summary>
+/// オブジェクトを生成する関数
+/// </summary>
+/// <typeparam name="className">オブジェクトのクラス</typeparam>
+/// <param name="path">オブジェクトデータを格納しているパス</param>
+template<class className>
+void
+PlayScene::InstantiateObject(const wchar_t* path)
+{
+	auto f = [=]() {
+		shared_ptr<className> object;
+
+		lock_guard lock(_mtx);
+
+		object = make_shared<className>(_dx12, path);
+
+		_actorAndObjs.emplace_back(object);
+	};
+
+	//スレッドにアクターの作成処理を追加
+	_ths.emplace_back(f);
+}
+
+/// <summary>
 /// 入力を更新する関数
 /// </summary>
 void
@@ -277,7 +287,7 @@ PlayScene::InputUpdate()
 /// 現在のフレームレートを更新する関数
 /// </summary>
 void
-PlayScene::UpdateFPS()
+PlayScene::FPSUpdate()
 {
 	//現在フレームの時間を取得
 	QueryPerformanceCounter(&_currentTime);							
@@ -318,7 +328,7 @@ void
 PlayScene::DrawUpdate()
 {
 	//FPSを更新
-	UpdateFPS();			
+	FPSUpdate();			
 
 	//ペラポリゴン描画処理
 	PeraDraw();				

@@ -248,7 +248,7 @@ ImGuiManager::SetActorColBool(bool intersects[])
 void
 ImGuiManager::SetActor(vector<shared_ptr<FBXBase>> actorAndObjects)
 {
-	_ground = actorAndObjects[0];
+	_ground = actorAndObjects[1];
 
 	//ベクトルの中からアクターを探して取得
 	for (const auto& object : actorAndObjects)						
@@ -259,18 +259,22 @@ ImGuiManager::SetActor(vector<shared_ptr<FBXBase>> actorAndObjects)
 		}
 	}
 
-	for (auto str : _actor->GetAnimstr())							//アクターのアニメーション名をこちら側に格納する
+	//アクターのアニメーション名をこちら側に格納する
+	for (auto str : _actor->GetAnimstr())							
 	{
 		_animStr.push_back(str);
 	}
 
-	_currentImGuiAnim = _animStr[0];								//初期アニメーションを設定
+	//初期アニメーションを設定
+	_currentImGuiAnim = _animStr[0];								
 
-	_maxDur = _actor->GetAnimDuration(_currentImGuiAnim)			//アニメーションの総時間を取得
+	//アニメーションの総時間を取得
+	_maxDur = _actor->GetAnimDuration(_currentImGuiAnim)			
 				- _actor->GetSecondFrame();
-	_tick = _actor->GetAnimTickPerSpeed(_currentImGuiAnim);			//アニメーションの処理回数を取得
-
-	_animSliderValue = 0.0f;										//2個目のフレームを取得
+	//アニメーションの処理回数を取得
+	_tick = _actor->GetAnimTickPerSpeed(_currentImGuiAnim);			
+	//2個目のフレームを取得
+	_animSliderValue = 0.0f;										
 }
 
 /// <summary>

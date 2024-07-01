@@ -168,7 +168,7 @@ Application::Init()
 	atexit(OnExit);																
 
 	//.pakファイルからデータを読み込み、素材ファイル作成
-	_package.reset(new Package());
+	//_package.reset(new Package());
 	//_package->CreateDirectoryAndFile(_T("Asset/font.pak"));
 	//_package->CreateDirectoryAndFile(_T("Asset/image.pak"));
 	//_package->CreateDirectoryAndFile(_T("Asset/model.pak"));

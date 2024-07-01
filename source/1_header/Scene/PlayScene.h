@@ -47,6 +47,9 @@ private:
 	shared_ptr<Renderer> _renderer;									//Rendererインスタンス
 	shared_ptr<PeraRenderer> _pera;									//PeraRendererインスタンス
 
+	//並列処理したいスレッドのベクトル
+	vector<thread> _ths;
+
 	XMVECTOR _direction;											//プレイヤー、カメラの進行ベクトル
 
 	bool _isInLoad;													//ロード中であることを示す真理値
@@ -59,19 +62,26 @@ private:
 
 	int _interval;													//フリップ間隔
 
-	void PeraDraw();												//ペラポリゴンの描画処理をまとめた関数
+	//オブジェクトを生成する関数
+	template<class className> void InstantiateObject(const wchar_t* path);
 
-	void GameDraw();												//ゲーム画面ポリゴンの描画処理をまとめた関数
+	//ペラポリゴンの描画処理をまとめた関数
+	void PeraDraw();	
+	//ゲーム画面ポリゴンの描画処理をまとめた関数
+	void GameDraw();												
 
 	//二つの当たり判定が衝突しているか確認する関数
-	bool CheckIntersect(map<string, float> col0, map<string, float> col1);		
+	bool CheckIntersect(map<string, float> col0, map<string, float> col1);
 
-	void DrawUpdate();												//描画関数
+	//描画関数
+	void DrawUpdate();		
+	//入力更新関数
+	void InputUpdate();
+	//FPSを更新する関数
+	void FPSUpdate();
 
-	void InputUpdate();												//入力更新関数
-
-	void ModelDraw();												//モデル描画処理
-	void EffectAndUIDraw();											//画面エフェクト描画処理
-
-	void UpdateFPS();												//FPSを更新する関数
+	//モデル描画処理
+	void ModelDraw();												
+	//画面エフェクト描画処理
+	void EffectAndUIDraw();											
 };
