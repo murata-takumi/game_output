@@ -58,11 +58,12 @@ FBXBase::InitModel(const wchar_t* filePath)
 	};
 
 	//モデル情報が格納されているシーンを読み込む
-	_scene = _loader.LoadScene(filePath);
+	auto& loader = AssimpLoader::Instance();
+	_scene = loader.LoadScene(filePath);
 	//シーンを元にモデルを読み込む
 	if (_scene != nullptr)
 	{
-		_loader.LoadModel(_scene, filePath, settings);					
+		loader.LoadModel(_scene, filePath, settings);
 	}
 	else
 	{

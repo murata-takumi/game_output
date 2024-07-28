@@ -20,10 +20,7 @@ protected:
 	HRESULT result;
 
 	//Dx12Wrapperインスタンス
-	Dx12Wrapper& _dx12;							
-
-	//AssimpLoaderインスタンス
-	AssimpLoader _loader;											
+	Dx12Wrapper& _dx12;									
 
 	//モデルデータを保持するポインタ
 	const aiScene* _scene;													

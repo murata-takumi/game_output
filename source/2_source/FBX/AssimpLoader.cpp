@@ -42,6 +42,17 @@ AssimpLoader::~AssimpLoader()
 }
 
 /// <summary>
+/// 静的なAssimpLoaderインスタンスを取得
+/// </summary>
+/// <returns>静的インスタンス</returns>
+AssimpLoader&
+AssimpLoader::Instance()
+{
+	static AssimpLoader instance;
+	return instance;
+}
+
+/// <summary>
 /// モデル情報を持っているインスタンスを取得する関数
 /// </summary>
 /// <param name="filePath">モデルのパス</param>
