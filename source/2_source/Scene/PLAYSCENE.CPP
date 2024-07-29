@@ -16,12 +16,12 @@ const float FRAME_TIME = 1.0f / 60.0f;							//XV‰ñ”‚ğ60FPS‚ÉŒÅ’è‚·‚éÛ‚Ì1ƒtƒ
 /// <param name="sound">SoundManagerƒCƒ“ƒXƒ^ƒ“ƒX</param>
 PlayScene::PlayScene(
 	Dx12Wrapper& dx12,
-	InputManager& input,
 	SoundManager& sound
 )
-	:_dx12(dx12), _input(input), _sound(sound), _app(Application::Instance()), _fps(0.0f)
+	:_dx12(dx12),_sound(sound), _fps(0.0f)
 {
-	_interval = _app.GetInterval();															//ƒtƒŠƒbƒvŠÔŠu‚ğæ“¾
+	//ƒtƒŠƒbƒvŠÔŠu‚ğæ“¾
+	_interval = Application::Instance().GetInterval();															
 
 	_renderer.reset(new Renderer(_dx12));
 	_pera.reset(new PeraRenderer(_dx12));
@@ -52,28 +52,28 @@ PlayScene::Update()
 
 		//WASDƒL[‚Ì“ü—Í‚É‰‚¶‚Ä‹“_‚ğˆÚ“®‚³‚¹‚é
 		//’‹“_‚ğ’†S‚É‹“_‚ğ‰ñ“]
-		if (_input.KeyState().A)
+		if (InputManager::Instance().KeyState().A)
 		{
 			_dx12.RotateCoordinates(Degree::Azimth, 45);
 		}
-		if (_input.KeyState().D)
+		if (InputManager::Instance().KeyState().D)
 		{
 			_dx12.RotateCoordinates(Degree::Azimth, -45);
 		}
-		if (_input.KeyState().W)
+		if (InputManager::Instance().KeyState().W)
 		{
 			_dx12.RotateCoordinates(Degree::Elevation, 30);
 		}
-		if (_input.KeyState().S)
+		if (InputManager::Instance().KeyState().S)
 		{
 			_dx12.RotateCoordinates(Degree::Elevation, -30);
 		}
 
 		//Q¥EƒL[‚ğ‰Ÿ‚µ‚½‚ÍŠg‘åEk¬
 		//¶ƒVƒtƒgƒL[‚ğ‰Ÿ‚µ‚Ä‚¢‚éê‡‚ÍƒJƒƒ‰‚ğã‰º‚É•½sˆÚ“®‚³‚¹‚é
-		if (_input.KeyState().Q)
+		if (InputManager::Instance().KeyState().Q)
 		{
-			if (_input.KeyState().LeftShift)
+			if (InputManager::Instance().KeyState().LeftShift)
 			{
 				_dx12.TranslateCoordinates(Y_VECTOR * 0.1f);
 			}
@@ -82,9 +82,9 @@ PlayScene::Update()
 				_dx12.ScalingCoordinates(-90);
 			}
 		}
-		if (_input.KeyState().E)
+		if (InputManager::Instance().KeyState().E)
 		{
-			if (_input.KeyState().LeftShift)
+			if (InputManager::Instance().KeyState().LeftShift)
 			{
 				_dx12.TranslateCoordinates(Y_VECTOR * -1 * 0.1f);
 			}
@@ -96,29 +96,29 @@ PlayScene::Update()
 		//ƒAƒNƒ^[‚ªˆÚ“®‰Â”\‚©‚Ç‚¤‚©
 		if (_dx12.ImGui()->CanActorTrans())
 		{
-			if ((_input.KeyState().Left ||
-				_input.KeyState().Right ||
-				_input.KeyState().Up    ||
-				_input.KeyState().Down) &&
+			if ((InputManager::Instance().KeyState().Left ||
+				InputManager::Instance().KeyState().Right ||
+				InputManager::Instance().KeyState().Up    ||
+				InputManager::Instance().KeyState().Down) &&
 				!_actor->IsAnimationEqual(RUN00_F)
 				)
 			{
 				_actor->SetAnimationNode(RUN00_F);
 			}
 
-			if (_input.KeyState().Left)
+			if (InputManager::Instance().KeyState().Left)
 			{
 				_direction += _dx12.GetRightVector();				//ƒJƒƒ‰‚É‘Î‚µ¶•ûŒü‚ÉƒxƒNƒgƒ‹‰ÁZ
 			}
-			if (_input.KeyState().Right)
+			if (InputManager::Instance().KeyState().Right)
 			{
 				_direction += _dx12.GetRightVector() * -1;			//ƒJƒƒ‰‚É‘Î‚µ‰E•ûŒü‚ÉƒxƒNƒgƒ‹‰ÁZ
 			}
-			if (_input.KeyState().Up)
+			if (InputManager::Instance().KeyState().Up)
 			{
 				_direction += _dx12.GetXZVecEyeToTarget();			//ƒJƒƒ‰‚É‘Î‚µ‰œ•ûŒü‚ÉƒxƒNƒgƒ‹‰ÁZ
 			}
-			if (_input.KeyState().Down)
+			if (InputManager::Instance().KeyState().Down)
 			{
 				_direction += _dx12.GetXZVecEyeToTarget() * -1;		//ƒJƒƒ‰‚É‘Î‚µè‘O•ûŒü‚ÉƒxƒNƒgƒ‹‰ÁZ
 			}
@@ -132,17 +132,17 @@ PlayScene::Update()
 				_direction = XMVectorZero();						//ˆÚ“®ƒxƒNƒgƒ‹‚ğ‰Šú‰»
 			}
 
-			if ((!_input.KeyState().Left	&&
-				!_input.KeyState().Right	&&
-				!_input.KeyState().Up		&&
-				!_input.KeyState().Down)    &&
+			if ((!InputManager::Instance().KeyState().Left	&&
+				!InputManager::Instance().KeyState().Right	&&
+				!InputManager::Instance().KeyState().Up		&&
+				!InputManager::Instance().KeyState().Down)    &&
 				!_actor->IsAnimationEqual(WAIT00)
 				)
 			{
 				_actor->SetAnimationNode(WAIT00);
 			}
 
-			if (_input.KeyTracker().IsKeyPressed(Keyboard::Space) &&
+			if (InputManager::Instance().KeyTracker().IsKeyPressed(Keyboard::Space) &&
 				!_actor->IsAnimationEqual(JUMP00))
 			{
 				_actor->SetAnimationNode(JUMP00);
@@ -150,24 +150,24 @@ PlayScene::Update()
 		}
 
 		//ƒL[ƒpƒbƒh‚Ì“ü—Í‚É‰‚¶‚ÄƒJƒƒ‰‚ğ³–ÊE‘¤–ÊEã–Ê‚É”z’u
-		if (_input.KeyTracker().IsKeyPressed(Keyboard::NumPad1))
+		if (InputManager::Instance().KeyTracker().IsKeyPressed(Keyboard::NumPad1))
 		{
 			_dx12.ResetCoordinates(0, 0);
 		}
-		if (_input.KeyTracker().IsKeyPressed(Keyboard::NumPad3))
+		if (InputManager::Instance().KeyTracker().IsKeyPressed(Keyboard::NumPad3))
 		{
 			_dx12.ResetCoordinates(XM_PIDIV2, 0);
 		}
-		if (_input.KeyTracker().IsKeyPressed(Keyboard::NumPad5))
+		if (InputManager::Instance().KeyTracker().IsKeyPressed(Keyboard::NumPad5))
 		{
 			auto isPers = _dx12.Perspective();
 			_dx12.SetPersOrOrtho(!isPers);
 		}
-		if (_input.KeyTracker().IsKeyPressed(Keyboard::NumPad7))
+		if (InputManager::Instance().KeyTracker().IsKeyPressed(Keyboard::NumPad7))
 		{
 			_dx12.ResetCoordinates(0, XM_PIDIV2);
 		}
-		if (_input.KeyTracker().IsKeyPressed(Keyboard::NumPad9))
+		if (InputManager::Instance().KeyTracker().IsKeyPressed(Keyboard::NumPad9))
 		{
 			_dx12.ResetCoordinates(0, -1 * XM_PIDIV2);
 		}
@@ -201,7 +201,7 @@ PlayScene::SceneStart()
 		InstantiateObject<FBXObject>(BALL_PATH);
 
 		//ƒXƒŒƒbƒh‚ª‘S‚ÄŠ®—¹‚·‚é‚Ü‚Å‚±‚±‚Å‘Ò‹@
-		for (auto& th : _ths)											
+		for (auto& th : _ths)							
 		{
 			th.join();
 		}
@@ -280,7 +280,7 @@ PlayScene::InstantiateObject(const wchar_t* path)
 void
 PlayScene::InputUpdate()
 {
-	_input.UpdateInput();
+	InputManager::Instance().UpdateInput();
 }
 
 /// <summary>

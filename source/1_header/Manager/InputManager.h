@@ -11,24 +11,45 @@ class SpriteManager;
 class InputManager
 {
 private:
-	unique_ptr<Keyboard> _key;						//キーボード
-	Keyboard::State _keyState;							//キー状態
-	Keyboard::KeyboardStateTracker _keyTracker;			//押されているボタン
+	//キーボード
+	unique_ptr<Keyboard> _key;	
+	//キー状態
+	Keyboard::State _keyState;						
+	//押されているボタン
+	Keyboard::KeyboardStateTracker _keyTracker;			
 
-	unique_ptr<Mouse> _mouse;							//マウス
-	Mouse::State _mouseState;							//マウス状態
-	Mouse::ButtonStateTracker _mouseTracker;			//マウス状態（ボタンを押した・離した瞬間を取得）
+	//マウス
+	unique_ptr<Mouse> _mouse;							
+	//マウス状態
+	Mouse::State _mouseState;							
+	//マウス状態（ボタンを押した・離した瞬間を取得）
+	Mouse::ButtonStateTracker _mouseTracker;	
+
+	//コンストラクタ
+	InputManager();						
+	InputManager(const InputManager&) = delete;
+	//デストラクタ
+	~InputManager();
 
 public:
-	InputManager();										//コンストラクタ
+	//静的変数を返す
+	static InputManager& Instance();
 
-	void UpdateInput();									//入力情報を更新する関数
+	//初期化
+	void Init();
 
-	Keyboard::State KeyState();							//キー状態を取得
+	//入力情報を更新する関数
+	void UpdateInput();									
 
-	Keyboard::KeyboardStateTracker KeyTracker();		//キー状態を取得（キーを押した・離した瞬間を取得）
+	//キー状態を取得
+	Keyboard::State KeyState();							
 
-	Mouse::State MouseState();							//マウス状態を取得
+	//キー状態を取得（キーを押した・離した瞬間を取得）
+	Keyboard::KeyboardStateTracker KeyTracker();		
 
-	Mouse::ButtonStateTracker MouseTracker();			//マウス状態を取得（ボタンを押した・離した瞬間を取得）
+	//マウス状態を取得
+	Mouse::State MouseState();							
+
+	//マウス状態を取得（ボタンを押した・離した瞬間を取得）
+	Mouse::ButtonStateTracker MouseTracker();			
 };

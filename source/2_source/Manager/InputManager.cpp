@@ -5,10 +5,41 @@
 /// </summary>
 InputManager::InputManager()
 {
-	_key = make_unique<Keyboard>();			//Keyboardインスタンスを初期化
-	_mouse = make_unique<Mouse>();			//Mouseインスタンスを初期化
 
-	UpdateInput();							//入力を更新
+}
+
+/// <summary>
+/// デストラクタ
+/// </summary>
+InputManager::~InputManager()
+{
+
+}
+
+/// <summary>
+/// 静的変数を返す関数
+/// </summary>
+/// <returns>静的変数</returns>
+InputManager&
+InputManager::Instance()
+{
+	static InputManager instance;
+	return instance;
+}
+
+/// <summary>
+/// 初期化関数
+/// </summary>
+void
+InputManager::Init()
+{
+	//Keyboardインスタンスを初期化
+	_key = make_unique<Keyboard>();			
+	//Mouseインスタンスを初期化
+	_mouse = make_unique<Mouse>();			
+
+	//入力を更新
+	UpdateInput();							
 }
 
 /// <summary>

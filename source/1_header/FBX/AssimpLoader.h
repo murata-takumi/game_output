@@ -57,10 +57,7 @@ struct ImportSettings
 class AssimpLoader
 {
 public:
-	//デストラクタ
-	~AssimpLoader();
-
-	//初期化関数
+	//インスタンス取得関数
 	static AssimpLoader& Instance();
 
 	//シーンデータをロードする関数
@@ -77,6 +74,8 @@ private:
 	//コンストラクタ
 	AssimpLoader();
 	AssimpLoader(const AssimpLoader&) = delete;
+	//デストラクタ
+	~AssimpLoader();
 
 	//メッシュをロードする関数
 	void LoadMesh(Mesh& dst, const aiMesh* src, bool inverseU, bool inverseV);

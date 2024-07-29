@@ -67,9 +67,7 @@ private:
 	HWND _hwnd;														
 
 	//Dx12Wrapperインスタンス
-	shared_ptr<Dx12Wrapper> _dx12;									
-	//InputManagerインスタンス	
-	shared_ptr<InputManager> _input;								
+	shared_ptr<Dx12Wrapper> _dx12;								
 	//SoundManagerインスタンス
 	shared_ptr<SoundManager> _sound;								
 	//EffectManagerインスタンス

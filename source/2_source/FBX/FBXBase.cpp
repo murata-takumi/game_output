@@ -33,7 +33,7 @@ FBXBase::FBXBase(Dx12Wrapper& dx12, const wchar_t* filePath, const XMFLOAT3& siz
 /// </summary>
 FBXBase::~FBXBase()
 {
-	_scene = nullptr;
+
 }
 
 /// <summary>

@@ -181,8 +181,9 @@ Application::Init()
 	//Dx12Wrapperインスタンスを初期化
 	_dx12.reset(new Dx12Wrapper(_hwnd,_deltaTime));								
 	
-	//InputManagerインスタンスを初期化
-	_input.reset(new InputManager());											
+	//入力関連を初期化
+	auto& input = InputManager::Instance();
+	input.Init();
 
 	//SoundManagerインスタンスを初期化
 	_sound.reset(new SoundManager());
@@ -191,7 +192,7 @@ Application::Init()
 	ShowWindow(_hwnd, SW_SHOW);													
 
 	//ゲームシーンの初期化
-	_play.reset(new PlayScene(*_dx12, *_input, *_sound));
+	_play.reset(new PlayScene(*_dx12, *_sound));
 	_play->SceneStart();
 
 	return true;

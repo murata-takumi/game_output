@@ -25,7 +25,6 @@ class PlayScene
 public:
 	PlayScene(							//コンストラクタ
 		Dx12Wrapper& dx12,
-		InputManager& input,
 		SoundManager& sound
 	);
 	~PlayScene();						//デストラクタ
@@ -36,9 +35,7 @@ public:
 	void SceneEnd();					//シーン終了時の処理
 
 private:
-	Application& _app;												//Applicationインスタンス
 	Dx12Wrapper& _dx12;												//Dx12Wrapperインスタンス
-	InputManager& _input;											//InputManagerインスタンス
 	SoundManager& _sound;											//SoundManagerインスタンス
 
 	vector<shared_ptr<FBXBase>> _actorAndObjs;						//FBXObjectとFBXActorをまとめたベクトル
