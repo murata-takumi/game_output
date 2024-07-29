@@ -260,10 +260,10 @@ template<class className>
 void
 PlayScene::InstantiateObject(const wchar_t* path)
 {
+	lock_guard<mutex> lock(_mtx);
+
 	auto f = [=]() {
 		shared_ptr<className> object;
-
-		lock_guard lock(_mtx);
 
 		object = make_shared<className>(_dx12, path);
 
