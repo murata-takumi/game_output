@@ -23,10 +23,8 @@
 class PlayScene
 {
 public:
-	PlayScene(							//コンストラクタ
-		Dx12Wrapper& dx12,
-		SoundManager& sound
-	);
+	//コンストラクタ
+	PlayScene(Dx12Wrapper& dx12);
 	~PlayScene();						//デストラクタ
 
 	void Update();						//更新処理
@@ -36,7 +34,6 @@ public:
 
 private:
 	Dx12Wrapper& _dx12;												//Dx12Wrapperインスタンス
-	SoundManager& _sound;											//SoundManagerインスタンス
 
 	vector<shared_ptr<FBXBase>> _actorAndObjs;						//FBXObjectとFBXActorをまとめたベクトル
 	shared_ptr<FBXActor> _actor;									//アクターインスタンス

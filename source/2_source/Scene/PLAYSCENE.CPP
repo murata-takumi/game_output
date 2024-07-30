@@ -14,11 +14,8 @@ const float FRAME_TIME = 1.0f / 60.0f;							//XV‰ñ”‚ğ60FPS‚ÉŒÅ’è‚·‚éÛ‚Ì1ƒtƒ
 /// <param name="dx12">Dx12WrapperƒCƒ“ƒXƒ^ƒ“ƒX</param>
 /// <param name="input">InputManagerƒCƒ“ƒXƒ^ƒ“ƒX</param>
 /// <param name="sound">SoundManagerƒCƒ“ƒXƒ^ƒ“ƒX</param>
-PlayScene::PlayScene(
-	Dx12Wrapper& dx12,
-	SoundManager& sound
-)
-	:_dx12(dx12),_sound(sound), _fps(0.0f)
+PlayScene::PlayScene(Dx12Wrapper& dx12)
+	:_dx12(dx12), _fps(0.0f)
 {
 	//ƒtƒŠƒbƒvŠÔŠu‚ğæ“¾
 	_interval = Application::Instance().GetInterval();															

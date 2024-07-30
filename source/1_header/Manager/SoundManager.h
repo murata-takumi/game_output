@@ -1,6 +1,5 @@
 #pragma once
-#include "Application.h"
-
+#include "Includes.h"
 #include <DirectXTK12-master/Inc/Audio.h>
 
 /// <summary>
@@ -9,15 +8,23 @@
 class SoundManager
 {
 private:
-
-	unique_ptr<DirectX::AudioEngine> _audioEngine;		//サウンド全体を管理
-
-	unique_ptr<DirectX::SoundEffect> _buttonEffect;		//ボタン押下時の効果音を読み込む
+	//サウンド全体を管理
+	unique_ptr<DirectX::AudioEngine> _audioEngine;		
+	//ボタン押下時の効果音を読み込む
+	unique_ptr<DirectX::SoundEffect> _buttonEffect;		
+	
+	//コンストラクタ
+	SoundManager();		
+	//デストラクタ
+	~SoundManager();	
 
 public:
-	
-	SoundManager();		//コンストラクタ
-	~SoundManager();	//デストラクタ
+	//静的変数を返す
+	static SoundManager& Instance();
 
-	void CallButton();	//ボタン押下時の効果音
+	//初期化を行う
+	void Init();
+
+	//ボタン押下時の効果音
+	void CallButton();	
 };

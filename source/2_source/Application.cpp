@@ -185,14 +185,15 @@ Application::Init()
 	auto& input = InputManager::Instance();
 	input.Init();
 
-	//SoundManagerインスタンスを初期化
-	_sound.reset(new SoundManager());
+	//BGM,SE関連を初期化
+	auto& sound = SoundManager::Instance();
+	sound.Init();
 
 	//ウィンドウハンドルに対応するウィンドウを表示
 	ShowWindow(_hwnd, SW_SHOW);													
 
 	//ゲームシーンの初期化
-	_play.reset(new PlayScene(*_dx12, *_sound));
+	_play.reset(new PlayScene(*_dx12));
 	_play->SceneStart();
 
 	return true;
