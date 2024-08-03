@@ -11,11 +11,8 @@ const float FRAME_TIME = 1.0f / 60.0f;							//XV‰ñ”‚ğ60FPS‚ÉŒÅ’è‚·‚éÛ‚Ì1ƒtƒ
 /// <summary>
 /// ƒRƒ“ƒXƒgƒ‰ƒNƒ^
 /// </summary>
-/// <param name="dx12">Dx12WrapperƒCƒ“ƒXƒ^ƒ“ƒX</param>
-/// <param name="input">InputManagerƒCƒ“ƒXƒ^ƒ“ƒX</param>
-/// <param name="sound">SoundManagerƒCƒ“ƒXƒ^ƒ“ƒX</param>
-PlayScene::PlayScene(Dx12Wrapper& dx12)
-	:_dx12(dx12), _fps(0.0f)
+PlayScene::PlayScene()
+	:_dx12(Dx12Wrapper::Instance()), _fps(0.0f)
 {
 	//ƒtƒŠƒbƒvŠÔŠu‚ğæ“¾
 	_interval = Application::Instance().GetInterval();															
@@ -91,7 +88,7 @@ PlayScene::Update()
 			}
 		}
 		//ƒAƒNƒ^[‚ªˆÚ“®‰Â”\‚©‚Ç‚¤‚©
-		if (_dx12.ImGui()->CanActorTrans())
+		if (ImGuiManager::Instance().CanActorTrans())
 		{
 			if ((InputManager::Instance().KeyState().Left ||
 				InputManager::Instance().KeyState().Right ||
@@ -212,9 +209,9 @@ PlayScene::SceneStart()
 		}
 
 		//ƒAƒNƒ^[‚ğImGuiManager‘¤‚É“n‚·
-		_dx12.ImGui()->SetActor(_actorAndObjs);							
+		ImGuiManager::Instance().SetActor(_actorAndObjs);							
 		//ƒAƒNƒ^[‚ğSpriteManager‘¤‚É“n‚·
-		_dx12.Sprite()->SetActors(_actorAndObjs);						
+		SpriteManager::Instance().SetActors(_actorAndObjs);						
 
 		//ƒ[ƒhŠ®—¹
 		_isInLoad = false;		
@@ -245,7 +242,7 @@ PlayScene::SceneEnd()
 	_actor = nullptr;					
 
 	//ImGui‚Å•\¦‚³‚ê‚Ä‚¢‚éƒAƒjƒ[ƒVƒ‡ƒ“–¼‚ğ‰Šú‰»
-	_dx12.ImGui()->ResetAnimStr();		
+	ImGuiManager::Instance().ResetAnimStr();		
 }
 
 /// <summary>
@@ -344,7 +341,7 @@ PlayScene::PeraDraw()
 	_pera->BeginPeraDraw();
 
 	//”wŒi‚ğ•`‰æ
-	_dx12.Sprite()->BackGroundDraw();
+	SpriteManager::Instance().BackGroundDraw();
 
 	//ƒyƒ‰ƒ|ƒŠƒSƒ“—pƒpƒCƒvƒ‰ƒCƒ“‚ğƒZƒbƒg
 	_dx12.SetPipelines(							
@@ -381,7 +378,7 @@ PlayScene::GameDraw()
 	_dx12.CommandList()->DrawInstanced(4, 1, 0, 0);									
 
 	//ƒOƒŠƒbƒh‚ğ•`‰æ
-	if (_dx12.ImGui()->IsWriteGrid() && !_isInLoad)_dx12.Sprite()->GridDraw();		
+	if (ImGuiManager::Instance().IsWriteGrid() && !_isInLoad)SpriteManager::Instance().GridDraw();		
 
 	//‚±‚±‚ÉƒGƒtƒFƒNƒgã‚Ì•`‰æˆ—
 	EffectAndUIDraw();																
@@ -393,7 +390,7 @@ PlayScene::GameDraw()
 	_dx12.Swapchain()->Present(_interval, 0);										
 
 	//ƒOƒ‰ƒtƒBƒbƒNƒXƒƒ‚ƒŠ‚ğİ’è
-	_dx12.Sprite()->Commit();														
+	SpriteManager::Instance().Commit();														
 }
 
 /// <summary>
@@ -416,7 +413,7 @@ PlayScene::CheckIntersect(map<string, float> col0, map<string, float> col1)
 		(col1[BOX_COL_Z_MAX] - col0[BOX_COL_Z_MIN]) > FLT_EPSILON
 	};
 
-	_dx12.ImGui()->SetActorColBool(intersects);
+	ImGuiManager::Instance().SetActorColBool(intersects);
 
 	if ((col0[BOX_COL_X_MIN] - col1[BOX_COL_X_MAX]) > FLT_EPSILON)return false;
 	if ((col1[BOX_COL_X_MIN] - col0[BOX_COL_X_MAX]) > FLT_EPSILON)return false;
@@ -458,13 +455,13 @@ PlayScene::EffectAndUIDraw()
 	if (_isInLoad)						
 	{
 		//ƒ[ƒh‰æ–Ê‚ğ•`‰æ
-		_dx12.Sprite()->LoadingDraw();	
+		SpriteManager::Instance().LoadingDraw();	
 	}
 	else								
 	{
 		//Scene‚©‚çImGui‚ÉFPS‚ğ“n‚·
-		_dx12.ImGui()->SetFPS(_fps);	
+		ImGuiManager::Instance().SetFPS(_fps);	
 		//ImGui‚ÌƒEƒBƒ“ƒhƒE‚ğ•`‰æ
-		_dx12.ImGui()->ImGuiDraw();		
+		ImGuiManager::Instance().ImGuiDraw();		
 	}
 }

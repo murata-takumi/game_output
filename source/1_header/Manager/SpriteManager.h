@@ -24,10 +24,7 @@ class SpriteManager
 	template<typename T>
 	using ComPtr = ComPtr<T>;
 
-private:
-	//Dx12Wrapperインスタンス
-	Dx12Wrapper& _dx12;														
-
+private:	
 	//グラフィックスメモリ
 	unique_ptr<GraphicsMemory> _gmemory;									
 	//スプライト（画像）表示用オブジェクト
@@ -86,6 +83,12 @@ private:
 	//座標の中心
 	SimpleMath::Vector3 _origin = SimpleMath::Vector3::Zero;				
 
+	//コンストラクタ
+	SpriteManager();
+	SpriteManager(const SpriteManager&) = delete;
+	//デストラクタ
+	~SpriteManager();
+
 	//SpriteBatch用ルートシグネチャを作成する関数
 	HRESULT CreateSpriteRS();												
 	//UI用の画像のバッファー・ビューを作成する関数
@@ -97,8 +100,9 @@ private:
 	//当たり判定を描画する関数
 	void ColliderDraw(const shared_ptr<BoxCollider> collider);
 public:
-	//コンストラクタ
-	SpriteManager(Dx12Wrapper& dx12,LONG width,LONG height);		
+	static SpriteManager& Instance();
+
+	void Init(LONG width, LONG height);
 
 	//画面サイズの変更を感知して矩形を調整する
 	void AdjustSpriteRect();										

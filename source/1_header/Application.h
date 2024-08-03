@@ -64,10 +64,8 @@ private:
 	//ウィンドウ作成時に必要な情報を格納
 	WNDCLASSEX _windowClass;								
 	//ウィンドウの識別に必要な値
-	HWND _hwnd;														
+	HWND _hwnd;													
 
-	//Dx12Wrapperインスタンス
-	shared_ptr<Dx12Wrapper> _dx12;							
 	//EffectManagerインスタンス
 	shared_ptr<EffectManager> _effect;								
 	

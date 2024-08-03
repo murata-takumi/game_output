@@ -7,7 +7,6 @@
 #include <assimp/scene.h>
 
 #include <d3d12.h>
-#include <DirectXMath.h>
 #include <string>
 
 struct aiMesh;

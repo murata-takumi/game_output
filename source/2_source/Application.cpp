@@ -179,21 +179,25 @@ Application::Init()
 	//_package->CreatePackage(_T("Asset/sound"), _T("sound.pak"));
 
 	//Dx12Wrapperインスタンスを初期化
-	_dx12.reset(new Dx12Wrapper(_hwnd,_deltaTime));								
+	Dx12Wrapper::Instance().Init(_hwnd, _deltaTime);
 	
 	//入力関連を初期化
-	auto& input = InputManager::Instance();
-	input.Init();
+	InputManager::Instance().Init();
 
 	//BGM,SE関連を初期化
-	auto& sound = SoundManager::Instance();
-	sound.Init();
+	SoundManager::Instance().Init();
+
+	//スプライト周りを初期化
+	SpriteManager::Instance().Init(WINDOW_WIDTH,WINDOW_HEIGHT);
+
+	//ImGui周りを初期化
+	ImGuiManager::Instance().Init(_hwnd);
 
 	//ウィンドウハンドルに対応するウィンドウを表示
 	ShowWindow(_hwnd, SW_SHOW);													
 
 	//ゲームシーンの初期化
-	_play.reset(new PlayScene(*_dx12));
+	_play.reset(new PlayScene());
 	_play->SceneStart();
 
 	return true;

@@ -24,8 +24,9 @@ class PlayScene
 {
 public:
 	//コンストラクタ
-	PlayScene(Dx12Wrapper& dx12);
-	~PlayScene();						//デストラクタ
+	PlayScene();
+	//デストラクタ
+	~PlayScene();						
 
 	void Update();						//更新処理
 

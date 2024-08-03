@@ -3,6 +3,7 @@
 #include <DirectXTex-master/DirectXTex/d3dx12.h>
 #include <DirectXTex-master/DirectXTex/DirectXTex.h>
 #include <DirectXTK12-master/Inc/SimpleMath.h>
+#include <DirectXMath.h>
 
 #include <d3dcompiler.h>
 #include <array>

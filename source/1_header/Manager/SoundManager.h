@@ -19,7 +19,7 @@ private:
 	~SoundManager();	
 
 public:
-	//静的変数を返す
+	//シングルトンを返す
 	static SoundManager& Instance();
 
 	//初期化を行う

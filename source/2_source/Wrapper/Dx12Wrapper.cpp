@@ -7,8 +7,10 @@
 #include "Wrapper/Dx12Wrapper.h"
 #include "Wrapper/SphericalCoordinates.h"
 
-const float FADE_TIME = 1.0f;								//フェードイン・アウトにかける時間
-const XMVECTOR XZ_PLANE = XMVectorSet(1.0f,0.0f,1.0f,0.0f);	//視点→注視点のベクトルをXZ平面に制限するためのベクトル
+//フェードイン・アウトにかける時間
+const float FADE_TIME = 1.0f;								
+//視点→注視点のベクトルをXZ平面に制限するためのベクトル
+const XMVECTOR XZ_PLANE = XMVectorSet(1.0f,0.0f,1.0f,0.0f);	
 
 /// <summary>
 /// デバッグ用レイヤーを初期化する関数
@@ -22,8 +24,6 @@ void EnableDebugLayer()
 	debugLayer->EnableDebugLayer();				//デバッグレイヤーを有効化する
 	debugLayer->Release();						//有効化したらインターフェイスを開放する
 }
-
-
 
 /// <summary>
 /// デバイス関連を初期化する関数
@@ -379,20 +379,50 @@ Dx12Wrapper::InitVector()
 /// </summary>
 /// <param name="hwnd">ウィンドウハンドル</param>
 /// <param name="deltaTime">1フレーム当たりの秒数</param>
-Dx12Wrapper::Dx12Wrapper(HWND hwnd, float deltaTime) :
-	 _perspective(true), _up(0, 1, 0), _initRad(300), _deltaTime(deltaTime), _fade(1.0f),
+Dx12Wrapper::Dx12Wrapper() :
+	 _perspective(true), _up(0, 1, 0), _initRad(300), _fade(1.0f),
 	_initEye(0, 50, _initRad),_initTarget(0, 50, 0)
+{
+
+}
+
+/// <summary>
+/// デストラクタ
+/// </summary>
+Dx12Wrapper::~Dx12Wrapper()
+{
+
+}
+
+/// <summary>
+/// シングルトンを返す関数
+/// </summary>
+/// <returns>シングルトン</returns>
+Dx12Wrapper&
+Dx12Wrapper::Instance()
+{
+	static Dx12Wrapper instance;
+	return instance;
+}
+
+void
+Dx12Wrapper::Init(HWND hwnd, float deltaTime)
 {
 #ifdef _DEBUG
 	EnableDebugLayer();													//デバッグ用レイヤーを起動
 #endif 
-	auto& app = Application::Instance();								//Applicationインスタンスを取得
-	_winSize = app.GetWindowSize();										//ウィンドウのサイズを取得
-	_rate = app.GetRate();												//フレームレートを取得
+	//ウィンドウのサイズを取得
+	_winSize = Application::Instance().GetWindowSize();
+	//フレームレートを取得
+	_rate = Application::Instance().GetRate();
+	//フレーム間の時間の差分を取得
+	_deltaTime = deltaTime;
 
-	InitializeDXGIDevice();												//デバイス関連を初期化
+	//デバイス関連を初期化
+	InitializeDXGIDevice();
 
-	InitializeCommand();												//コマンド関連を初期化
+	//コマンド関連を初期化
+	InitializeCommand();
 
 	CreateSwapChain(hwnd);												//スワップチェーンを作成
 
@@ -411,13 +441,8 @@ Dx12Wrapper::Dx12Wrapper(HWND hwnd, float deltaTime) :
 	_dev->CreateFence(													//フェンスを作成
 		_fenceVal, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&_fence));
 
-	_sprite.reset(new SpriteManager(*this,_winSize.cx,_winSize.cy));	//SpriteManagerインスタンスを初期化
-
 	//_effect.reset(new EffectManager(*this));							//EffectManagerインスタンスを初期化
-
-	_imgui.reset(new ImGuiManager(*this, hwnd));						//ImGuiManagerインスタンスを初期化
 }
-
 
 /// <summary>
 /// リソースを遷移させる関数
@@ -780,16 +805,6 @@ Dx12Wrapper::CreateDescriptorHeap(
 }
 
 /// <summary>
-/// ImGuiManagerインスタンスを返す関数
-/// </summary>
-/// <returns>インスタンスのポインタ</returns>
-ImGuiManager*
-Dx12Wrapper::ImGui()const
-{
-	return _imgui.get();
-}
-
-/// <summary>
 /// 右手系のビュー変換行列を返す関数
 /// </summary>
 /// <returns>行列</returns>
@@ -834,16 +849,6 @@ EffectManager*
 Dx12Wrapper::Effect()const
 {
 	return _effect.get();
-}
-
-/// <summary>
-/// SpriteManagerインスタンスを返す関数
-/// </summary>
-/// <returns>インスタンスのポインタ</returns>
-SpriteManager*
-Dx12Wrapper::Sprite()const
-{
-	return _sprite.get();
 }
 
 /// <summary>

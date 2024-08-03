@@ -44,13 +44,9 @@ private:
 	SIZE _winSize;												
 
 	//エフェクト管理用インスタンス
-	shared_ptr<EffectManager> _effect;							
-	//スプライト管理インスタンス
-	shared_ptr<SpriteManager> _sprite;							
+	shared_ptr<EffectManager> _effect;					
 	//UI管理インスタンス
-	shared_ptr<PeraRenderer> _pera;								
-	//デバッグ用ウィンドウ管理インスタンス
-	shared_ptr<ImGuiManager> _imgui;							
+	shared_ptr<PeraRenderer> _pera;						
 	//カメラ座標用インスタンス
 	shared_ptr<SphericalCoordinates> _coordinates;				
 
@@ -169,7 +165,13 @@ private:
 		)>;
 
 	//stringをkey,リソースをvalueとした連想配列
-	map<string, ID3D12Resource*> _resourceTable;				
+	map<string, ID3D12Resource*> _resourceTable;
+
+	//コンストラクタ
+	Dx12Wrapper();
+	Dx12Wrapper(const Dx12Wrapper&) = delete;
+	//デストラクタ
+	~Dx12Wrapper();
 
 	//デバイス関連を初期化する関数
 	HRESULT InitializeDXGIDevice();								
@@ -202,8 +204,11 @@ public:
 	//stringをkey,LoadLambda_tをvalueとした連想配列
 	map<string, LoadLambda_t> _loadLambdaTable;							
 
-	//コンストラクタ
-	Dx12Wrapper(HWND hwnd, float deltatime);							
+	//シングルトンを返す関数
+	static Dx12Wrapper& Instance();
+
+	//初期化関数
+	void Init(HWND hwnd, float deltatime);
 
 	//リソースを遷移させる関数
 	void BarrierTransition(												
@@ -271,11 +276,7 @@ public:
 	XMMATRIX ProjMatrix()const;											
 
 	//EffectManagerインスタンスを返す関数
-	EffectManager* Effect() const;		
-	//SpriteManagerインスタンスを返す関数
-	SpriteManager* Sprite() const;									
-	//ImGuiManagerインスタンスを返す関数
-	ImGuiManager* ImGui() const;										
+	EffectManager* Effect() const;									
 
 	//デバイスを返す関数
 	ID3D12Device* Device() const;										

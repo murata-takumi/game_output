@@ -3,17 +3,37 @@
 #include "Manager/ImGuiManager.h"
 #include "Wrapper/Dx12Wrapper.h"
 
+//フォントを格納しているパス
+const char* FONT_PATH = "Asset/font/BIZUDPGothic-Bold.ttf";
+
 /// <summary>
 /// コンストラクタ
 /// ImGui関連の初期化を行う
 /// </summary>
 /// <param name="dx12">Dx12Wrapperインスタンス</param>
 /// <param name="hwnd">ウィンドウハンドル</param>
-ImGuiManager::ImGuiManager(Dx12Wrapper& dx12, HWND hwnd)
-	:_dx12(dx12),_app(Application::Instance()),
-	_windowWidth(static_cast<float>(_app.GetWindowSize().cx)),
-	_windowHeight(static_cast<float>(_app.GetWindowSize().cy)),
+ImGuiManager::ImGuiManager():
+	_windowWidth(static_cast<float>(Application::Instance().GetWindowSize().cx)),
+	_windowHeight(static_cast<float>(Application::Instance().GetWindowSize().cy)),
 	_size(18.0f),_speed(1.0f),_animSliderValue(0.0f), _fps(0.0f)
+{
+
+}
+
+/// <summary>
+/// デストラクタ
+/// </summary>
+ImGuiManager::~ImGuiManager()
+{
+
+}
+
+/// <summary>
+/// 初期化関数
+/// </summary>
+/// <param name="hwnd">ウィンドウハンドル</param>
+void
+ImGuiManager::Init(HWND hwnd)
 {
 	_fpsFlag |= ImGuiWindowFlags_NoMove;								//FPSを表示するウィンドウが動かないよう設定
 	_fpsFlag |= ImGuiWindowFlags_NoTitleBar;							//タイトルバーを表示しない
@@ -28,20 +48,20 @@ ImGuiManager::ImGuiManager(Dx12Wrapper& dx12, HWND hwnd)
 		assert(0);
 		return;
 	}
-	bool bInResult = ImGui_ImplWin32_Init(hwnd);					
+	bool bInResult = ImGui_ImplWin32_Init(hwnd);
 	if (!bInResult)
 	{
 		assert(0);
 		return;
 	}
 
-	_dx12.CreateDescriptorHeap(_heapForImgui,							//ImGui用ヒープを作成
+	Dx12Wrapper::Instance().CreateDescriptorHeap(_heapForImgui,							//ImGui用ヒープを作成
 		D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 0, 1,
 		D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE);
 
 
 	bInResult = ImGui_ImplDX12_Init(
-		_dx12.Device(),
+		Dx12Wrapper::Instance().Device(),
 		3,
 		DXGI_FORMAT_R8G8B8A8_UNORM,
 		_heapForImgui.Get(),
@@ -55,8 +75,19 @@ ImGuiManager::ImGuiManager(Dx12Wrapper& dx12, HWND hwnd)
 
 	ImGuiIO& io = ImGui::GetIO();										//フォントを設定
 	io.Fonts->AddFontFromFileTTF(
-		"Asset/font/BIZUDPGothic-Bold.ttf",
-		_size,NULL,io.Fonts->GetGlyphRangesJapanese());
+		FONT_PATH,
+		_size, NULL, io.Fonts->GetGlyphRangesJapanese());
+}
+
+/// <summary>
+/// シングルトンを返す関数
+/// </summary>
+/// <returns>シングルトン</returns>
+ImGuiManager&
+ImGuiManager::Instance()
+{
+	static ImGuiManager instance;
+	return instance;
 }
 
 bool
@@ -92,7 +123,7 @@ ImGuiManager::ImGuiDraw()
 		ImGui::Text("FPS:%.1f", _fps);														//FPSを表示
 		if (_fps <= 30.0f)ImGui::PopStyleColor();
 
-		ImGui::Text(_dx12.Perspective() ? "Perspective" : "OrthoGraphic");					//透視投影か平行投影か表示
+		ImGui::Text(Dx12Wrapper::Instance().Perspective() ? "Perspective" : "OrthoGraphic");					//透視投影か平行投影か表示
 
 		ImGui::End();
 	}
@@ -117,7 +148,7 @@ ImGuiManager::ImGuiDraw()
 			else																			//チェックボックスをfalseにした時
 			{
 				_actor->EndControll();														//アクターの移動・回転を初期化
-				_dx12.ResetCoordinates(0.0f,0.0f);											//カメラを初期化
+				Dx12Wrapper::Instance().ResetCoordinates(0.0f,0.0f);											//カメラを初期化
 			}
 		}
 
@@ -214,8 +245,8 @@ ImGuiManager::ImGuiDraw()
 	ImGui::Render();
 
 	ID3D12DescriptorHeap* heap[] = { _heapForImgui.Get()};							//ImGui用ヒープをセット
-	_dx12.CommandList()->SetDescriptorHeaps(1, heap);
-	ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), _dx12.CommandList());
+	Dx12Wrapper::Instance().CommandList()->SetDescriptorHeaps(1, heap);
+	ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), Dx12Wrapper::Instance().CommandList());
 }
 
 /// <summary>

@@ -17,9 +17,9 @@ InputManager::~InputManager()
 }
 
 /// <summary>
-/// 静的変数を返す関数
+/// シングルトンを返す関数
 /// </summary>
-/// <returns>静的変数</returns>
+/// <returns>シングルトン</returns>
 InputManager&
 InputManager::Instance()
 {

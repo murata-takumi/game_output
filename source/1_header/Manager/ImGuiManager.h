@@ -11,22 +11,35 @@ class FBXActor;
 class ImGuiManager
 {
 public:
-	ImGuiManager(Dx12Wrapper& dx12,HWND hwnd);						//コンストラクタ
+	//初期化関数
+	void Init(HWND hwnd);
 
-	bool CanActorTrans()const;										//アクターが移動可能かどうかを返す関数
-	bool IsWriteGrid()const;										//グリッドを描画するかどうかを返す関数
+	//シングルトンを返す関数
+	static ImGuiManager& Instance();
 
-	void ImGuiDraw();												//各ウィンドウの描画処理
+	//アクターが移動可能かどうかを返す関数
+	bool CanActorTrans()const;										
+	//グリッドを描画するかどうかを返す関数
+	bool IsWriteGrid()const;										
 
-	void SetFPS(float fps);											//PlaySceneから受け取ったデータを反映する関数
+	//各ウィンドウの描画処理
+	void ImGuiDraw();												
+
+	//PlaySceneから受け取ったデータを反映する関数
+	void SetFPS(float fps);											
 	//アクターと地面の座標ごとの真理値の当たり判定を受け取る
 	void SetActorColBool(bool intersects[]);
-	void SetActor(vector<shared_ptr<FBXBase>> actorAndObjects);		//アクターを受け取る関数
-	void ResetAnimStr();											//アニメーション名の配列を初期化する関数
+	//アクターを受け取る関数
+	void SetActor(vector<shared_ptr<FBXBase>> actorAndObjects);		
+	//アニメーション名の配列を初期化する関数
+	void ResetAnimStr();											
 
 private:
-	Application& _app;								//Applicationインスタンス
-	Dx12Wrapper& _dx12;								//Dx12Wrapperインスタンス
+	//コンストラクタ
+	ImGuiManager();
+	ImGuiManager(const ImGuiManager&) = delete;
+	//デストラクタ
+	~ImGuiManager();
 
 	shared_ptr<FBXActor> _actor;					//アクター
 	shared_ptr<FBXBase> _ground;					//地面

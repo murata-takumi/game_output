@@ -18,9 +18,9 @@ SoundManager::~SoundManager()
 }
 
 /// <summary>
-/// 静的変数を返す
+/// シングルトンを返す
 /// </summary>
-/// <returns>静的変数</returns>
+/// <returns>シングルトン</returns>
 SoundManager&
 SoundManager::Instance()
 {

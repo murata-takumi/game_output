@@ -32,7 +32,7 @@ private:
 	~InputManager();
 
 public:
-	//静的変数を返す
+	//シングルトンを返す
 	static InputManager& Instance();
 
 	//初期化
