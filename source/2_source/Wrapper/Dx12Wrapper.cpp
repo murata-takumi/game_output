@@ -1,4 +1,3 @@
-#include "Functions.h"
 #include "Manager/EffectManager.h"
 #include "Manager/ImGuiManager.h"
 #include "Manager/SpriteManager.h"
@@ -6,11 +5,13 @@
 #include "Renderer/Renderer.h"
 #include "Wrapper/Dx12Wrapper.h"
 #include "Wrapper/SphericalCoordinates.h"
-
-//フェードイン・アウトにかける時間
-const float FADE_TIME = 1.0f;								
+						
 //視点→注視点のベクトルをXZ平面に制限するためのベクトル
 const XMVECTOR XZ_PLANE = XMVectorSet(1.0f,0.0f,1.0f,0.0f);	
+//フェードイン・アウトにかける時間
+const float FADE_TIME = 1.0f;
+//半径の初期値
+const int INIT_RAD = 300;
 
 /// <summary>
 /// デバッグ用レイヤーを初期化する関数
@@ -380,8 +381,8 @@ Dx12Wrapper::InitVector()
 /// <param name="hwnd">ウィンドウハンドル</param>
 /// <param name="deltaTime">1フレーム当たりの秒数</param>
 Dx12Wrapper::Dx12Wrapper() :
-	 _perspective(true), _up(0, 1, 0), _initRad(300), _fade(1.0f),
-	_initEye(0, 50, _initRad),_initTarget(0, 50, 0)
+	 _perspective(true), _up(0, 1, 0), _fade(1.0f),
+	_initEye(0, 50, INIT_RAD),_initTarget(0, 50, 0)
 {
 
 }
@@ -583,7 +584,7 @@ Dx12Wrapper::ResetCoordinates(float azimth, float elevation)
 	InitVector();											//視点、注視点をリセット
 
 	_coordinates.reset(new SphericalCoordinates());			//球面座標を扱うSphericalCoordinatesインスタンスを作成
-	_coordinates->SetRadius(_initRad);						//半径
+	_coordinates->SetRadius(INIT_RAD);						//半径
 	_coordinates->SetAzimth(azimth);						//方位角
 	_coordinates->SetElevation(elevation);					//仰角
 
@@ -617,8 +618,8 @@ Dx12Wrapper::SetScene()
 		_currentRad = _coordinates->GetRadius();
 
 		_mappedScene->proj = XMMatrixOrthographicLH(
-			static_cast<float>(_winSize.cx) / (XM_PI * (_initRad / _currentRad)),
-			static_cast<float>(_winSize.cy) / (XM_PI * (_initRad / _currentRad)),
+			static_cast<float>(_winSize.cx) / (XM_PI * (INIT_RAD / _currentRad)),
+			static_cast<float>(_winSize.cy) / (XM_PI * (INIT_RAD / _currentRad)),
 			0.1f, 1000.0f);
 	}
 
@@ -835,8 +836,8 @@ Dx12Wrapper::ProjMatrix()const
 	else
 	{
 		return XMMatrixOrthographicRH(
-			static_cast<float>(_winSize.cx) / (XM_PI * (_initRad / _currentRad)),
-			static_cast<float>(_winSize.cy) / (XM_PI * (_initRad / _currentRad)),
+			static_cast<float>(_winSize.cx) / (XM_PI * (INIT_RAD / _currentRad)),
+			static_cast<float>(_winSize.cy) / (XM_PI * (INIT_RAD / _currentRad)),
 			0.1f, 1000.0f);
 	}
 }

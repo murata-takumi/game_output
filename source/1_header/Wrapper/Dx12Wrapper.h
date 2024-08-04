@@ -1,5 +1,6 @@
 #pragma once
 #include "Includes.h"
+#include "Functions.h"
 
 /// <summary>
 /// カメラをどちらの方に回転させるか決定する列挙体
@@ -142,10 +143,8 @@ private:
 	mutex _mtx;													
 
 	//透視投影かどうか決める真理値
-	bool _perspective;											
+	bool _perspective;
 
-	//半径の初期値
-	float _initRad;										
 	//現在の半径
 	float _currentRad;
 	//フレーム間の時間
