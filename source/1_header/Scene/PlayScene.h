@@ -39,7 +39,6 @@ private:
 	vector<shared_ptr<FBXBase>> _actorAndObjs;						//FBXObjectとFBXActorをまとめたベクトル
 	shared_ptr<FBXActor> _actor;									//アクターインスタンス
 
-	shared_ptr<Renderer> _renderer;									//Rendererインスタンス
 	shared_ptr<PeraRenderer> _pera;									//PeraRendererインスタンス
 
 	//並列処理したいスレッドのベクトル

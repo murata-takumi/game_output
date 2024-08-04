@@ -5,11 +5,9 @@
 /// <summary>
 /// コンストラクタ
 /// </summary>
-/// <param name="dx12">Dx12Wrapperインスタンス</param>
-Renderer::Renderer(Dx12Wrapper& dx12):_dx12(dx12)
+Renderer::Renderer()
 {
-	CreateRootSignature();						//ルートシグネチャ初期化
-	CreateGraphicsPipelineForPMD();				//パイプラインステート初期化
+
 }
 
 /// <summary>
@@ -18,6 +16,22 @@ Renderer::Renderer(Dx12Wrapper& dx12):_dx12(dx12)
 Renderer::~Renderer()
 {
 
+}
+
+Renderer&
+Renderer::Instance()
+{
+	static Renderer instance;
+	return instance;
+}
+
+void
+Renderer::Init()
+{
+	//ルートシグネチャ初期化
+	CreateRootSignature();						
+	//パイプラインステート初期化
+	CreateGraphicsPipelineForPMD();				
 }
 
 /// <summary>
@@ -65,7 +79,7 @@ Renderer::CreateRootSignature()
 		return result;
 	}
 
-	result = _dx12.Device()->CreateRootSignature(						//ルートシグネチャの作成
+	result = Dx12Wrapper::Instance().Device()->CreateRootSignature(						//ルートシグネチャの作成
 		0,
 		rootSigBlob->GetBufferPointer(),
 		rootSigBlob->GetBufferSize(),
@@ -200,7 +214,7 @@ Renderer::CreateGraphicsPipelineForPMD()
 	gPipeline.SampleDesc.Count = 1;														//ピクセル当たりサンプリング数
 	gPipeline.SampleDesc.Quality = 0;													//クオリティ
 
-	result = _dx12.Device()->CreateGraphicsPipelineState(&gPipeline,
+	result = Dx12Wrapper::Instance().Device()->CreateGraphicsPipelineState(&gPipeline,
 		IID_PPV_ARGS(_pipeline.ReleaseAndGetAddressOf()));								//パイプラインステート作成
 
 	return result;

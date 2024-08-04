@@ -984,20 +984,28 @@ class Renderer
 	using ComPtr = ComPtr<T>;
 
 private:
-	Dx12Wrapper& _dx12;											//Dx12Wrapperインスタンス
-
 	SIZE _winSize;												//ウィンドウサイズ
 
 	ComPtr<ID3D12PipelineState> _pipeline;						//パイプラインステート（パイプライン設定を定義するオブジェクト）
 	ComPtr<ID3D12RootSignature> _rootSignature;					//ルートシグネチャ（スロットと各ビューが管理するバッファーを関連付ける）
+    
+    //コンストラクタ
+    Renderer();
+    Renderer(const Renderer&) = delete;
+    //デストラクタ
+    ~Renderer();
 
 	HRESULT CreateRootSignature();								//ルートシグネチャ初期化関数
 	HRESULT CreateGraphicsPipelineForPMD();						//パイプラインステート初期化関数
 	bool CheckCompilerResult(HRESULT result, ID3DBlob* error);	//シェーダー読み込みの成否を確認する関数
 
 public:
-	Renderer(Dx12Wrapper& dx12);					//コンストラクタ
-	~Renderer();									//デストラクタ
+    //シングルトンを返す
+    static Renderer& Instance();
+
+    //初期化関数
+    void Init();
+
 	ID3D12PipelineState* GetPipelineState()const;	//パイプラインステートを返す関数
 	ID3D12RootSignature* GetRootSignature()const;	//ルートシグネチャを返す関数
 };

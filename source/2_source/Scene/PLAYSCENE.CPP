@@ -15,9 +15,10 @@ PlayScene::PlayScene()
 	:_dx12(Dx12Wrapper::Instance()), _fps(0.0f)
 {
 	//フリップ間隔を取得
-	_interval = Application::Instance().GetInterval();															
+	_interval = Application::Instance().GetInterval();
 
-	_renderer.reset(new Renderer(_dx12));
+	//パイプラインを初期化
+	Renderer::Instance().Init();
 	_pera.reset(new PeraRenderer(_dx12));
 }
 
@@ -345,8 +346,8 @@ PlayScene::PeraDraw()
 
 	//ペラポリゴン用パイプラインをセット
 	_dx12.SetPipelines(							
-		_renderer->GetRootSignature(),
-		_renderer->GetPipelineState(),
+		Renderer::Instance().GetRootSignature(),
+		Renderer::Instance().GetPipelineState(),
 		D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST
 	);
 
