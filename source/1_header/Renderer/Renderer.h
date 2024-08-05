@@ -984,8 +984,6 @@ class Renderer
 	using ComPtr = ComPtr<T>;
 
 private:
-	SIZE _winSize;												//ウィンドウサイズ
-
 	ComPtr<ID3D12PipelineState> _pipeline;						//パイプラインステート（パイプライン設定を定義するオブジェクト）
 	ComPtr<ID3D12RootSignature> _rootSignature;					//ルートシグネチャ（スロットと各ビューが管理するバッファーを関連付ける）
     

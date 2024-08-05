@@ -26,6 +26,10 @@ SpriteManager::~SpriteManager()
 
 }
 
+/// <summary>
+/// シングルトンを返す
+/// </summary>
+/// <returns>シングルトン</returns>
 SpriteManager&
 SpriteManager::Instance()
 {
@@ -33,6 +37,11 @@ SpriteManager::Instance()
 	return instance;
 }
 
+/// <summary>
+/// 初期化関数
+/// </summary>
+/// <param name="width">ウィンドウ幅</param>
+/// <param name="height">ウィンドウ高さ</param>
 void
 SpriteManager::Init(LONG width, LONG height)
 {

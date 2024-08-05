@@ -21,7 +21,7 @@ Renderer::~Renderer()
 /// <summary>
 /// シングルトンを返す
 /// </summary>
-/// <returns>シングルトンを返す</returns>
+/// <returns>シングルトン</returns>
 Renderer&
 Renderer::Instance()
 {

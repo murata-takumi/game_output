@@ -335,7 +335,7 @@ void
 PlayScene::PeraDraw()
 {
 	//ƒyƒ‰ƒ|ƒŠƒSƒ“•`‰æ€”õ
-	_pera->BeginPeraDraw();
+	PeraRenderer::Instance().BeginPeraDraw();
 
 	//”wŒi‚ð•`‰æ
 	SpriteManager::Instance().BackGroundDraw();
@@ -354,7 +354,7 @@ PlayScene::PeraDraw()
 	ModelDraw();								
 
 	//ƒyƒ‰ƒ|ƒŠƒSƒ“•`‰æŒãŽn––
-	_pera->EndPeraDraw();						
+	PeraRenderer::Instance().EndPeraDraw();						
 }
 
 /// <summary>
@@ -367,10 +367,10 @@ PlayScene::GameDraw()
 	Dx12Wrapper::Instance().BeginGameDraw();															
 
 	//ˆÈ‰ºƒQ[ƒ€‰æ–Ê—pƒpƒCƒvƒ‰ƒCƒ“‚ðƒZƒbƒg
-	_pera->SetPeraPipelines();														
+	PeraRenderer::Instance().SetPeraPipelines();														
 
 	//ƒyƒ‰ƒ|ƒŠƒSƒ“—pVBV‚ðƒZƒbƒg
-	Dx12Wrapper::Instance().CommandList()->IASetVertexBuffers(0, 1, _pera->PeraVBView());				
+	Dx12Wrapper::Instance().CommandList()->IASetVertexBuffers(0, 1, PeraRenderer::Instance().PeraVBView());				
 	//ƒyƒ‰ƒ|ƒŠƒSƒ“‚ð\¬‚·‚é’¸“_‚ð•`‰æ
 	Dx12Wrapper::Instance().CommandList()->DrawInstanced(4, 1, 0, 0);									
 
