@@ -34,8 +34,6 @@ public:
 	void SceneEnd();					//シーン終了時の処理
 
 private:
-	Dx12Wrapper& _dx12;												//Dx12Wrapperインスタンス
-
 	vector<shared_ptr<FBXBase>> _actorAndObjs;						//FBXObjectとFBXActorをまとめたベクトル
 	shared_ptr<FBXActor> _actor;									//アクターインスタンス
 

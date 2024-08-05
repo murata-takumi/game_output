@@ -12,14 +12,10 @@ const float FRAME_TIME = 1.0f / 60.0f;							//XV‰ñ”‚ğ60FPS‚ÉŒÅ’è‚·‚éÛ‚Ì1ƒtƒ
 /// ƒRƒ“ƒXƒgƒ‰ƒNƒ^
 /// </summary>
 PlayScene::PlayScene()
-	:_dx12(Dx12Wrapper::Instance()), _fps(0.0f)
+	:_fps(0.0f)
 {
 	//ƒtƒŠƒbƒvŠÔŠu‚ğæ“¾
 	_interval = Application::Instance().GetInterval();
-
-	//ƒpƒCƒvƒ‰ƒCƒ“‚ğ‰Šú‰»
-	Renderer::Instance().Init();
-	_pera.reset(new PeraRenderer(_dx12));
 }
 
 /// <summary>
@@ -49,19 +45,19 @@ PlayScene::Update()
 		//’‹“_‚ğ’†S‚É‹“_‚ğ‰ñ“]
 		if (InputManager::Instance().KeyState().A)
 		{
-			_dx12.RotateCoordinates(Degree::Azimth, 45);
+			Dx12Wrapper::Instance().RotateCoordinates(Degree::Azimth, 45);
 		}
 		if (InputManager::Instance().KeyState().D)
 		{
-			_dx12.RotateCoordinates(Degree::Azimth, -45);
+			Dx12Wrapper::Instance().RotateCoordinates(Degree::Azimth, -45);
 		}
 		if (InputManager::Instance().KeyState().W)
 		{
-			_dx12.RotateCoordinates(Degree::Elevation, 30);
+			Dx12Wrapper::Instance().RotateCoordinates(Degree::Elevation, 30);
 		}
 		if (InputManager::Instance().KeyState().S)
 		{
-			_dx12.RotateCoordinates(Degree::Elevation, -30);
+			Dx12Wrapper::Instance().RotateCoordinates(Degree::Elevation, -30);
 		}
 
 		//Q¥EƒL[‚ğ‰Ÿ‚µ‚½‚ÍŠg‘åEk¬
@@ -70,22 +66,22 @@ PlayScene::Update()
 		{
 			if (InputManager::Instance().KeyState().LeftShift)
 			{
-				_dx12.TranslateCoordinates(Y_VECTOR * 0.1f);
+				Dx12Wrapper::Instance().TranslateCoordinates(Y_VECTOR * 0.1f);
 			}
 			else
 			{
-				_dx12.ScalingCoordinates(-90);
+				Dx12Wrapper::Instance().ScalingCoordinates(-90);
 			}
 		}
 		if (InputManager::Instance().KeyState().E)
 		{
 			if (InputManager::Instance().KeyState().LeftShift)
 			{
-				_dx12.TranslateCoordinates(Y_VECTOR * -1 * 0.1f);
+				Dx12Wrapper::Instance().TranslateCoordinates(Y_VECTOR * -1 * 0.1f);
 			}
 			else
 			{
-				_dx12.ScalingCoordinates(90);
+				Dx12Wrapper::Instance().ScalingCoordinates(90);
 			}
 		}
 		//ƒAƒNƒ^[‚ªˆÚ“®‰Â”\‚©‚Ç‚¤‚©
@@ -103,26 +99,26 @@ PlayScene::Update()
 
 			if (InputManager::Instance().KeyState().Left)
 			{
-				_direction += _dx12.GetRightVector();				//ƒJƒƒ‰‚É‘Î‚µ¶•ûŒü‚ÉƒxƒNƒgƒ‹‰ÁZ
+				_direction += Dx12Wrapper::Instance().GetRightVector();				//ƒJƒƒ‰‚É‘Î‚µ¶•ûŒü‚ÉƒxƒNƒgƒ‹‰ÁZ
 			}
 			if (InputManager::Instance().KeyState().Right)
 			{
-				_direction += _dx12.GetRightVector() * -1;			//ƒJƒƒ‰‚É‘Î‚µ‰E•ûŒü‚ÉƒxƒNƒgƒ‹‰ÁZ
+				_direction += Dx12Wrapper::Instance().GetRightVector() * -1;			//ƒJƒƒ‰‚É‘Î‚µ‰E•ûŒü‚ÉƒxƒNƒgƒ‹‰ÁZ
 			}
 			if (InputManager::Instance().KeyState().Up)
 			{
-				_direction += _dx12.GetXZVecEyeToTarget();			//ƒJƒƒ‰‚É‘Î‚µ‰œ•ûŒü‚ÉƒxƒNƒgƒ‹‰ÁZ
+				_direction += Dx12Wrapper::Instance().GetXZVecEyeToTarget();			//ƒJƒƒ‰‚É‘Î‚µ‰œ•ûŒü‚ÉƒxƒNƒgƒ‹‰ÁZ
 			}
 			if (InputManager::Instance().KeyState().Down)
 			{
-				_direction += _dx12.GetXZVecEyeToTarget() * -1;		//ƒJƒƒ‰‚É‘Î‚µè‘O•ûŒü‚ÉƒxƒNƒgƒ‹‰ÁZ
+				_direction += Dx12Wrapper::Instance().GetXZVecEyeToTarget() * -1;		//ƒJƒƒ‰‚É‘Î‚µè‘O•ûŒü‚ÉƒxƒNƒgƒ‹‰ÁZ
 			}
 
 			if (XMVector3Length(_direction).m128_f32[0] > 0.0f)
 			{
 				_direction = XMVector3Normalize(_direction);		//ˆÚ“®ƒxƒNƒgƒ‹‚ğ³‹K‰»
 				_actor->Translate(_direction);						//ƒAƒNƒ^[‚ğˆÚ“®
-				_dx12.TranslateCoordinates(_direction);				//ƒJƒƒ‰‚àˆÚ“®
+				Dx12Wrapper::Instance().TranslateCoordinates(_direction);				//ƒJƒƒ‰‚àˆÚ“®
 
 				_direction = XMVectorZero();						//ˆÚ“®ƒxƒNƒgƒ‹‚ğ‰Šú‰»
 			}
@@ -147,24 +143,24 @@ PlayScene::Update()
 		//ƒL[ƒpƒbƒh‚Ì“ü—Í‚É‰‚¶‚ÄƒJƒƒ‰‚ğ³–ÊE‘¤–ÊEã–Ê‚É”z’u
 		if (InputManager::Instance().KeyTracker().IsKeyPressed(Keyboard::NumPad1))
 		{
-			_dx12.ResetCoordinates(0, 0);
+			Dx12Wrapper::Instance().ResetCoordinates(0, 0);
 		}
 		if (InputManager::Instance().KeyTracker().IsKeyPressed(Keyboard::NumPad3))
 		{
-			_dx12.ResetCoordinates(XM_PIDIV2, 0);
+			Dx12Wrapper::Instance().ResetCoordinates(XM_PIDIV2, 0);
 		}
 		if (InputManager::Instance().KeyTracker().IsKeyPressed(Keyboard::NumPad5))
 		{
-			auto isPers = _dx12.Perspective();
-			_dx12.SetPersOrOrtho(!isPers);
+			auto isPers = Dx12Wrapper::Instance().Perspective();
+			Dx12Wrapper::Instance().SetPersOrOrtho(!isPers);
 		}
 		if (InputManager::Instance().KeyTracker().IsKeyPressed(Keyboard::NumPad7))
 		{
-			_dx12.ResetCoordinates(0, XM_PIDIV2);
+			Dx12Wrapper::Instance().ResetCoordinates(0, XM_PIDIV2);
 		}
 		if (InputManager::Instance().KeyTracker().IsKeyPressed(Keyboard::NumPad9))
 		{
-			_dx12.ResetCoordinates(0, -1 * XM_PIDIV2);
+			Dx12Wrapper::Instance().ResetCoordinates(0, -1 * XM_PIDIV2);
 		}
 	}
 
@@ -179,7 +175,7 @@ void
 PlayScene::SceneStart()
 {
 	//ƒJƒƒ‰ˆÊ’u‚ğƒŠƒZƒbƒg
-	_dx12.ResetCoordinates(0,0);								
+	Dx12Wrapper::Instance().ResetCoordinates(0,0);								
 
 	//ƒvƒŒƒCƒ„[‚ÌˆÚ“®ƒxƒNƒgƒ‹‚ğ‰Šú‰»
 	_direction = XMVectorZero();										
@@ -220,12 +216,12 @@ PlayScene::SceneStart()
 		//ƒtƒF[ƒhƒCƒ“ˆ—‚ğ•À—ñˆ—
 		auto startFunc = [&]()
 		{
-			_dx12.Fade(1.0f, 0.0f);										
+			Dx12Wrapper::Instance().Fade(1.0f, 0.0f);										
 		};
 		ParallelProcess(startFunc);
 
 		//ƒGƒtƒFƒNƒgÀs
-		//_dx12.Effect()->CallEffect();									
+		//Dx12Wrapper::Instance().Effect()->CallEffect();									
 	};
 	//ã‹L‚Ì“Ç‚İ‚İˆ—‚ğ’Êí‚Ì•`‰æˆ—‚Æ•Às‚µ‚Äs‚¤
 	ParallelProcess(f);													
@@ -260,7 +256,7 @@ PlayScene::InstantiateObject(const wchar_t* path)
 	auto f = [=]() {
 		shared_ptr<className> object;
 
-		object = make_shared<className>(_dx12, path);
+		object = make_shared<className>(Dx12Wrapper::Instance(), path);
 
 		_actorAndObjs.emplace_back(object);
 	};
@@ -345,14 +341,14 @@ PlayScene::PeraDraw()
 	SpriteManager::Instance().BackGroundDraw();
 
 	//ƒyƒ‰ƒ|ƒŠƒSƒ“—pƒpƒCƒvƒ‰ƒCƒ“‚ğƒZƒbƒg
-	_dx12.SetPipelines(							
+	Dx12Wrapper::Instance().SetPipelines(							
 		Renderer::Instance().GetRootSignature(),
 		Renderer::Instance().GetPipelineState(),
 		D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST
 	);
 
 	//ƒrƒ…[EƒvƒƒWƒFƒNƒVƒ‡ƒ“s—ñ‚ğ“K—p
-	_dx12.SetScene();
+	Dx12Wrapper::Instance().SetScene();
 
 	//ƒ‚ƒfƒ‹•`‰æˆ—
 	ModelDraw();								
@@ -368,15 +364,15 @@ void
 PlayScene::GameDraw()
 {
 	//ƒQ[ƒ€‰æ–Ê•`‰æ€”õ
-	_dx12.BeginGameDraw();															
+	Dx12Wrapper::Instance().BeginGameDraw();															
 
 	//ˆÈ‰ºƒQ[ƒ€‰æ–Ê—pƒpƒCƒvƒ‰ƒCƒ“‚ğƒZƒbƒg
 	_pera->SetPeraPipelines();														
 
 	//ƒyƒ‰ƒ|ƒŠƒSƒ“—pVBV‚ğƒZƒbƒg
-	_dx12.CommandList()->IASetVertexBuffers(0, 1, _pera->PeraVBView());				
+	Dx12Wrapper::Instance().CommandList()->IASetVertexBuffers(0, 1, _pera->PeraVBView());				
 	//ƒyƒ‰ƒ|ƒŠƒSƒ“‚ğ\¬‚·‚é’¸“_‚ğ•`‰æ
-	_dx12.CommandList()->DrawInstanced(4, 1, 0, 0);									
+	Dx12Wrapper::Instance().CommandList()->DrawInstanced(4, 1, 0, 0);									
 
 	//ƒOƒŠƒbƒh‚ğ•`‰æ
 	if (ImGuiManager::Instance().IsWriteGrid() && !_isInLoad)SpriteManager::Instance().GridDraw();		
@@ -385,10 +381,10 @@ PlayScene::GameDraw()
 	EffectAndUIDraw();																
 
 	//ƒQ[ƒ€‰æ–Ê•`‰æŒãn––
-	_dx12.EndGameDraw();															
+	Dx12Wrapper::Instance().EndGameDraw();															
 
 	//ƒXƒƒbƒvƒ`ƒF[ƒ“‚ÌƒtƒŠƒbƒvˆ—
-	_dx12.Swapchain()->Present(_interval, 0);										
+	Dx12Wrapper::Instance().Swapchain()->Present(_interval, 0);										
 
 	//ƒOƒ‰ƒtƒBƒbƒNƒXƒƒ‚ƒŠ‚ğİ’è
 	SpriteManager::Instance().Commit();														

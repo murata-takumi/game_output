@@ -193,6 +193,10 @@ Application::Init()
 	//ImGui周りを初期化
 	ImGuiManager::Instance().Init(_hwnd);
 
+	//パイプラインを初期化
+	Renderer::Instance().Init();
+	PeraRenderer::Instance().Init();
+
 	//ウィンドウハンドルに対応するウィンドウを表示
 	ShowWindow(_hwnd, SW_SHOW);													
 

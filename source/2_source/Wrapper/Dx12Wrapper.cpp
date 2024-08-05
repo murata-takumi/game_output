@@ -406,11 +406,17 @@ Dx12Wrapper::Instance()
 	return instance;
 }
 
+/// <summary>
+/// 初期化関数
+/// </summary>
+/// <param name="hwnd">ウィンドウハンドル</param>
+/// <param name="deltaTime">フレーム間の経過時間</param>
 void
 Dx12Wrapper::Init(HWND hwnd, float deltaTime)
 {
 #ifdef _DEBUG
-	EnableDebugLayer();													//デバッグ用レイヤーを起動
+	//デバッグ用レイヤーを起動
+	EnableDebugLayer();													
 #endif 
 	//ウィンドウのサイズを取得
 	_winSize = Application::Instance().GetWindowSize();

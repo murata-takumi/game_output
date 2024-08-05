@@ -272,34 +272,52 @@ class Dx12Wrapper;
 class PeraRenderer
 {
 private:
-	Dx12Wrapper& _dx12;								//Dx12Wrapperインスタンス
+	//ペラポリゴン用の頂点バッファー
+	ComPtr<ID3D12Resource> _peraVB;					
+	//RTV/SRV両方を書き込むためのリソース
+	ComPtr<ID3D12Resource> _peraResource;			
+	//RTV用ヒープ
+	ComPtr<ID3D12DescriptorHeap> _peraRTVHeap;		
+	//SRV用ヒープ
+	ComPtr<ID3D12DescriptorHeap> _peraSRVHeap;		
+	//ペラポリゴン用のパイプラインステート
+	ComPtr<ID3D12PipelineState> _peraPipeline;		
+	//ペラポリゴン用のルートシグネチャ
+	ComPtr<ID3D12RootSignature> _peraRS;			
+	//ペラポリゴン用の頂点バッファービュー
+	D3D12_VERTEX_BUFFER_VIEW _peraVBV = {};			
 
-	//ペラポリゴン周り
-	ComPtr<ID3D12Resource> _peraVB;					//ペラポリゴン用の頂点バッファー
-	ComPtr<ID3D12Resource> _peraResource;			//RTV/SRV両方を書き込むためのリソース
-	ComPtr<ID3D12DescriptorHeap> _peraRTVHeap;		//RTV用ヒープ
-	ComPtr<ID3D12DescriptorHeap> _peraSRVHeap;		//SRV用ヒープ
-	ComPtr<ID3D12PipelineState> _peraPipeline;		//ペラポリゴン用のパイプラインステート
-	ComPtr<ID3D12RootSignature> _peraRS;			//ペラポリゴン用のルートシグネチャ
+	//コンストラクタ
+	PeraRenderer();
+	PeraRenderer(const PeraRenderer&) = delete;
+	//デストラクタ
+	~PeraRenderer();
 
-	D3D12_VERTEX_BUFFER_VIEW _peraVBV = {};			//ペラポリゴン用の頂点バッファービュー
-
-	HRESULT CreatePeraResourcesAndView();			//ペラポリゴン用RT・SR・RTV・SRVを作成する関数
-
-	HRESULT CreatePeraVertex();						//ペラポリゴン用頂点バッファー・VBVを作成する関数
-
-	HRESULT CreatePeraPipeline();					//ペラポリゴン用パイプラインを作成する関数
+	//ペラポリゴン用RT・SR・RTV・SRVを作成する関数
+	HRESULT CreatePeraResourcesAndView();			
+	//ペラポリゴン用頂点バッファー・VBVを作成する関数
+	HRESULT CreatePeraVertex();						
+	//ペラポリゴン用パイプラインを作成する関数
+	HRESULT CreatePeraPipeline();					
 
 public:
+	//シングルトンを返す
+	static PeraRenderer& Instance();
 
-	PeraRenderer(Dx12Wrapper& dx12);			//コンストラクタ
-	~PeraRenderer();							//デストラクタ
+	//初期化
+	void Init();
 
-	void BeginPeraDraw();						//ペラポリゴン用リソースの遷移(SHADER_RESOURCE→RENDER_TARGET)・RTVのセットを実行する関数
-	void SetPeraPipelines();					//ペラポリゴン用ルートシグネチャ・パイプラインをセットする関数
-	void EndPeraDraw();							//ペラポリゴン用リソースの遷移(RENDER_TARGET→SHADER_RESOURCE)を実行する関数
+	//ペラポリゴン用リソースの遷移(SHADER_RESOURCE→RENDER_TARGET)・RTVのセットを実行する関数
+	void BeginPeraDraw();		
+	//ペラポリゴン用ルートシグネチャ・パイプラインをセットする関数
+	void SetPeraPipelines();					
+	//ペラポリゴン用リソースの遷移(RENDER_TARGET→SHADER_RESOURCE)を実行する関数
+	void EndPeraDraw();							
 
-	D3D12_VERTEX_BUFFER_VIEW* PeraVBView();		//ペラポリゴン用頂点バッファービューを返す関数
-	ID3D12PipelineState* PeraPipeline();		//ペラポリゴン用パイプラインを返す関数
-	ID3D12RootSignature* PeraRootSignature();	//ペラポリゴン用ルートシグネチャを返す関数
+	//ペラポリゴン用頂点バッファービューを返す関数
+	D3D12_VERTEX_BUFFER_VIEW* PeraVBView();		
+	//ペラポリゴン用パイプラインを返す関数
+	ID3D12PipelineState* PeraPipeline();		
+	//ペラポリゴン用ルートシグネチャを返す関数
+	ID3D12RootSignature* PeraRootSignature();	
 };

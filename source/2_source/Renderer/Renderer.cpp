@@ -18,6 +18,10 @@ Renderer::~Renderer()
 
 }
 
+/// <summary>
+/// シングルトンを返す
+/// </summary>
+/// <returns>シングルトンを返す</returns>
 Renderer&
 Renderer::Instance()
 {
@@ -25,6 +29,9 @@ Renderer::Instance()
 	return instance;
 }
 
+/// <summary>
+/// 初期化関数
+/// </summary>
 void
 Renderer::Init()
 {
