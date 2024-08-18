@@ -3,7 +3,9 @@
 #include "Wrapper/Dx12Wrapper.h"
 
 //アニメーション名に付与する文字列リテラル
-const char* CHARA_REF = "Character1_Reference|";		
+const char* CHARA_REF = "Character1_Reference|";
+//当たり判定の大きさ
+const XMFLOAT3 COL_SIZE = XMFLOAT3(60, 170, 60);
 //アニメーションのブレンドに掛ける秒数
 const float BLEND_SPEED = 0.2f;
 //アニメーション名の不要な文字列を削除するためのインデックス
@@ -17,7 +19,7 @@ const int COLLIDER_BONE = 0;
 /// <param name="dx12">Dx12Wrapperインスタンス</param>
 /// <param name="filePath">モデルのパス</param>
 FBXActor::FBXActor(Dx12Wrapper& dx12, const wchar_t* filePath, XMFLOAT3 pos)
-	:FBXBase(dx12,filePath,XMFLOAT3(60, 170, 60), XMFLOAT3(0, 0, 0),pos),
+	:FBXBase(dx12,filePath, COL_SIZE, pos),
 	_crntNode(nullptr), _frontVec(XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f)),
 	_canControll(false),_isInBlend(false),_isInLoop(true),_isOnGround(true),
 	_canChangeAnim(true),_blendWeight(0.0f), _animTime(0.0f),

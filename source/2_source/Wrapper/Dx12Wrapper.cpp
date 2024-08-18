@@ -959,6 +959,16 @@ Dx12Wrapper::Rect() const
 }
 
 /// <summary>
+/// 視点座標を返す関数
+/// </summary>
+/// <returns>視点座標</returns>
+XMVECTOR
+Dx12Wrapper::Eye() const
+{
+	return XMLoadFloat3(&_eye);
+}
+
+/// <summary>
 /// 透視投影かどうか返す関数
 /// </summary>
 /// <returns>真理値</returns>

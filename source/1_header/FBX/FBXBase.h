@@ -72,7 +72,7 @@ protected:
 public:
 	//コンストラクタ
 	FBXBase(Dx12Wrapper& dx12, const wchar_t* filePath,					
-		const XMFLOAT3& size, const XMFLOAT3& center, XMFLOAT3 pos);
+		const XMFLOAT3& size,const XMFLOAT3& pos, const XMFLOAT3& diff = XMFLOAT3(0.0f,0.0f,0.0f));
 	//デストラクタ
 	virtual ~FBXBase();													
 

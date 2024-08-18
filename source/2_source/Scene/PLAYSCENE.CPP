@@ -32,14 +32,16 @@ PlayScene::~PlayScene()
 void
 PlayScene::Update()
 {
-	InputUpdate();													//入力を更新
+	//入力を更新
+	InputUpdate();													
 
-	if (!_isInLoad)													//操作可能な場合入力を反映する
+	//操作可能な場合入力を反映する
+	if (!_isInLoad)													
 	{
-		auto cols0 = _actorAndObjs[0]->Collider()->BoundValues();
-		auto cols1 = _actor->Collider()->BoundValues();
+		auto groundCol = _actorAndObjs[0]->Collider()->BoundValues();
+		auto actorCol = _actor->Collider()->BoundValues();
 
-		_actor->SetOnGround(CheckIntersect(cols0, cols1));
+		_actor->SetOnGround(CheckIntersect(groundCol, actorCol));
 
 		//WASDキーの入力に応じて視点を移動させる
 		//注視点を中心に視点を回転
@@ -186,10 +188,10 @@ PlayScene::SceneStart()
 		//ロード中だと示す
 		_isInLoad = true;
 
-		//スレッドにアクターの作成処理を追加
+		//スレッドに各オブジェクトの作成処理を追加
 		InstantiateObject<FBXActor>(ACTOR_PATH);
 		InstantiateObject<FBXObject>(GROUND_PATH);
-		InstantiateObject<FBXObject>(BALL_PATH);
+		//InstantiateObject<FBXObject>(BALL_PATH);
 
 		//スレッドが全て完了するまでここで待機
 		for (auto& th : _ths)							
@@ -197,9 +199,19 @@ PlayScene::SceneStart()
 			th.join();
 		}
 
+		//オブジェクトの中からアクターを探す
 		for (const auto& object : _actorAndObjs)
 		{
 			if (_actor = dynamic_pointer_cast<FBXActor>(object))
+			{
+				break;
+			}
+		}
+
+		//オブジェクトの中から床を探す
+		for (const auto& object : _actorAndObjs)
+		{
+			if (_ground = dynamic_pointer_cast<FBXObject>(object))
 			{
 				break;
 			}
@@ -404,18 +416,18 @@ PlayScene::CheckIntersect(map<string, float> col0, map<string, float> col1)
 	{
 		(col0[BOX_COL_X_MIN] - col1[BOX_COL_X_MAX]) > FLT_EPSILON,
 		(col1[BOX_COL_X_MIN] - col0[BOX_COL_X_MAX]) > FLT_EPSILON,
-		(col0[BOX_COL_Y_MAX] - col1[BOX_COL_Y_MIN]) > FLT_EPSILON,
-		(col1[BOX_COL_Y_MAX] - col0[BOX_COL_Y_MIN]) > FLT_EPSILON,
-		(col0[BOX_COL_Z_MAX] - col1[BOX_COL_Z_MIN]) > FLT_EPSILON,
-		(col1[BOX_COL_Z_MAX] - col0[BOX_COL_Z_MIN]) > FLT_EPSILON
+		(col0[BOX_COL_Y_MIN] - col1[BOX_COL_Y_MAX]) > FLT_EPSILON,
+		(col1[BOX_COL_Y_MIN] - col0[BOX_COL_Y_MAX]) > FLT_EPSILON,
+		(col0[BOX_COL_Z_MIN] - col1[BOX_COL_Z_MAX]) > FLT_EPSILON,
+		(col1[BOX_COL_Z_MIN] - col0[BOX_COL_Z_MAX]) > FLT_EPSILON
 	};
 
 	ImGuiManager::Instance().SetActorColBool(intersects);
 
 	if ((col0[BOX_COL_X_MIN] - col1[BOX_COL_X_MAX]) > FLT_EPSILON)return false;
 	if ((col1[BOX_COL_X_MIN] - col0[BOX_COL_X_MAX]) > FLT_EPSILON)return false;
-	if ((col0[BOX_COL_Y_MAX] - col1[BOX_COL_Y_MIN]) > FLT_EPSILON)return false;
-	if ((col1[BOX_COL_Y_MAX] - col0[BOX_COL_Y_MIN]) > FLT_EPSILON)return false;
+	if ((col0[BOX_COL_Y_MIN] - col1[BOX_COL_Y_MAX]) > FLT_EPSILON)return false;
+	if ((col1[BOX_COL_Y_MIN] - col0[BOX_COL_Y_MAX]) > FLT_EPSILON)return false;
 	if ((col0[BOX_COL_Z_MIN] - col1[BOX_COL_Z_MAX]) > FLT_EPSILON)return false;
 	if ((col1[BOX_COL_Z_MIN] - col0[BOX_COL_Z_MAX]) > FLT_EPSILON)return false;
 

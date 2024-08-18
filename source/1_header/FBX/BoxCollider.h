@@ -14,6 +14,15 @@ private:
 	vector<XMVECTOR> _verts;
 	//境界値
 	map<string,float> _boundValues;
+	//中心ベクトルの初期値
+	XMVECTOR _initCenter;
+
+	//正面ベクトル
+	XMVECTOR _frontDir;
+	//横ベクトル
+	XMVECTOR _rightDir;
+	//上ベクトル
+	XMVECTOR _upDir;
 	//オブジェクトの角度
 	float _angle;
 
@@ -22,6 +31,9 @@ private:
 
 public:
 
+	//更新される中心ベクトル
+	XMVECTOR _center;
+
 	//コンストラクタ
 	BoxCollider(const XMFLOAT3& size, const XMFLOAT3& center);	
 	//デストラクタ
@@ -29,6 +41,9 @@ public:
 
 	//座標を更新する関数
 	void Update(const XMMATRIX& mat,float angle = 0.0f);
+	
+	//向きを設定する関数
+	void SetDir(const XMVECTOR& dir);
 
 	//頂点を返す関数
 	vector<XMVECTOR> Vertices()const;	

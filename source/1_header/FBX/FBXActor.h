@@ -31,7 +31,7 @@ private:
 	//アニメーション実行用ノードの配列
 	unique_ptr<AnimNode> _animNodes[Length];
 	//現在実行するノード
-	AnimNode* _crntNode;												
+	AnimNode* _crntNode = nullptr;												
 
 	//ボーン行列のベクトル
 	vector<XMMATRIX> _boneMats;	
@@ -50,31 +50,31 @@ private:
 	vector<string> _animStr;												
 
 	//正面ベクトル
-	XMVECTOR _frontVec;			
+	XMVECTOR _frontVec = XMVectorSet(0.0f,0.0f,1.0f,0.0f);
 
 	//操作可能かを判別する真理値
-	bool _canControll;			
+	bool _canControll = false;			
 	//ブレンド中かを判別する真理値
-	bool _isInBlend;														
+	bool _isInBlend = false;														
 
 	//地面の上にいるかを判別する真理値
-	bool _isOnGround;														
+	bool _isOnGround = true;														
 
 	//アニメーションをループさせるか決める真理値
-	bool _isInLoop;	
+	bool _isInLoop = true;	
 	//アニメーションが変更可能か決める真理値
-	bool _canChangeAnim;													
+	bool _canChangeAnim = true;													
 
 	//最終的なアクターの回転角（Y軸）
-	float _destRad;	
+	float _destRad = 0.0f;
 	//モーションブレンド時に使用するウェイト値
-	float _blendWeight;	
+	float _blendWeight = 0.0f;	
 	//アニメーションの再生時間
-	float _animTime;			
+	float _animTime = 0.0f;			
 	//アニメーションの第2フレーム（Tポーズでないポーズの最初のフレーム）の秒数
 	float _secFrameTime;			
 	//アクターの向き（Y軸）
-	float _rotY;
+	float _rotY = 0.0f;
 	//Z軸からプレイヤーの向きまでの角度
 	float _zToFrontAngle;
 

@@ -2,6 +2,9 @@
 #include "FBX/FBXObject.h"
 #include "Wrapper/Dx12Wrapper.h"
 
+//当たり判定のサイズ
+const XMFLOAT3 COL_SIZE = XMFLOAT3(2000.0f, 1.0f, 2000.0f);
+
 /// <summary>
 /// コンストラクタ
 /// </summary>
@@ -9,9 +12,7 @@
 /// <param name="filePath">モデルパス</param>
 /// <param name="pos">初期座標</param>
 FBXObject::FBXObject(Dx12Wrapper& dx12, const wchar_t* filePath, XMFLOAT3 pos)
-	:FBXBase(dx12, filePath, 
-		XMFLOAT3(2000.0f, 1.0f, 2000.0f), XMFLOAT3(0.0f, 0.0f, 0.0f)
-		,pos)
+	:FBXBase(dx12, filePath,COL_SIZE, pos)
 {
 	//座標変換用バッファー・ビュー作成
 	CreateTransformView();											

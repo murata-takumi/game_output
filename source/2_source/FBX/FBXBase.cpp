@@ -8,9 +8,9 @@
 /// <param name="dx12">Dx12Wrapperインスタンス</param>
 /// <param name="filePath">モデル格納ファイル名</param>
 /// <param name="size">当たり判定の大きさ</param>
-/// <param name="center">当たり判定の中心</param>
+/// <param name="diff">当たり判定の差分</param>
 /// <param name="pos">初期座標</param>
-FBXBase::FBXBase(Dx12Wrapper& dx12, const wchar_t* filePath, const XMFLOAT3& size, const XMFLOAT3& center, XMFLOAT3 pos)
+FBXBase::FBXBase(Dx12Wrapper& dx12, const wchar_t* filePath, const XMFLOAT3& size, const XMFLOAT3& pos, const XMFLOAT3& diff)
 	:_dx12(dx12), _pos(XMLoadFloat3(&pos))
 {
 	//モデル関連の情報を初期化
@@ -24,7 +24,7 @@ FBXBase::FBXBase(Dx12Wrapper& dx12, const wchar_t* filePath, const XMFLOAT3& siz
 	CreateShaderResourceView();													
 
 	//当たり判定を作成
-	_collider = make_shared<BoxCollider>(size, center);							
+	_collider = make_shared<BoxCollider>(size, diff);
 }
 
 /// <summary>

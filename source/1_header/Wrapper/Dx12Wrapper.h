@@ -296,7 +296,10 @@ public:
 	//ビューポートを返す関数
 	D3D12_VIEWPORT* ViewPort() const;									
 	//シザー矩形を返す関数
-	D3D12_RECT* Rect() const;											
+	D3D12_RECT* Rect() const;
+
+	//視点座標を返す関数
+	XMVECTOR Eye() const;
 
 	//透視投影かどうか返す関数
 	bool Perspective()const;

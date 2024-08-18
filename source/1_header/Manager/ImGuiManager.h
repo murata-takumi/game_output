@@ -7,6 +7,7 @@
 
 class Dx12Wrapper;
 class FBXBase;
+class FBXObject;
 class FBXActor;
 class ImGuiManager
 {
@@ -42,7 +43,7 @@ private:
 	~ImGuiManager();
 
 	shared_ptr<FBXActor> _actor;					//アクター
-	shared_ptr<FBXBase> _ground;					//地面
+	shared_ptr<FBXObject> _ground;					//地面
 
 	ComPtr<ID3D12DescriptorHeap> _heapForImgui;		//ImGui用ヒープ
 

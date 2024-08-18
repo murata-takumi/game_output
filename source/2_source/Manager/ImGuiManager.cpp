@@ -1,5 +1,6 @@
 #include "Functions.h"
 #include "FBX/FBXActor.h"
+#include "FBX/FBXObject.h"
 #include "Manager/ImGuiManager.h"
 #include "Wrapper/Dx12Wrapper.h"
 
@@ -154,6 +155,40 @@ ImGuiManager::ImGuiDraw()
 
 		ImGui::Checkbox("IsOnGround", &_actor->_isOnGround);
 
+		ImGui::DragFloat("CenterX", &_actor->Collider()->_center.m128_f32[0]);
+		ImGui::DragFloat("CenterY", &_actor->Collider()->_center.m128_f32[1]);
+		ImGui::DragFloat("CenterZ", &_actor->Collider()->_center.m128_f32[2]);
+
+		//アクターの境界値
+		ImGui::DragFloat(BOX_COL_X_MIN.c_str(), &_actor->Collider()->BoundValues()[BOX_COL_X_MIN]);
+		ImGui::DragFloat(BOX_COL_X_MAX.c_str(), &_actor->Collider()->BoundValues()[BOX_COL_X_MAX]);
+		ImGui::DragFloat(BOX_COL_Y_MIN.c_str(), &_actor->Collider()->BoundValues()[BOX_COL_Y_MIN]);
+		ImGui::DragFloat(BOX_COL_Y_MAX.c_str(), &_actor->Collider()->BoundValues()[BOX_COL_Y_MAX]);
+		ImGui::DragFloat(BOX_COL_Z_MIN.c_str(), &_actor->Collider()->BoundValues()[BOX_COL_Z_MIN]);
+		ImGui::DragFloat(BOX_COL_Z_MAX.c_str(), &_actor->Collider()->BoundValues()[BOX_COL_Z_MAX]);
+
+		ImGui::NewLine();
+
+		//地面の境界値
+		ImGui::DragFloat(BOX_COL_X_MIN.c_str(), &_ground->Collider()->BoundValues()[BOX_COL_X_MIN]);
+		ImGui::DragFloat(BOX_COL_X_MAX.c_str(), &_ground->Collider()->BoundValues()[BOX_COL_X_MAX]);
+		ImGui::DragFloat(BOX_COL_Y_MIN.c_str(), &_ground->Collider()->BoundValues()[BOX_COL_Y_MIN]);
+		ImGui::DragFloat(BOX_COL_Y_MAX.c_str(), &_ground->Collider()->BoundValues()[BOX_COL_Y_MAX]);
+		ImGui::DragFloat(BOX_COL_Z_MIN.c_str(), &_ground->Collider()->BoundValues()[BOX_COL_Z_MIN]);
+		ImGui::DragFloat(BOX_COL_Z_MAX.c_str(), &_ground->Collider()->BoundValues()[BOX_COL_Z_MAX]);
+
+		ImGui::NewLine();
+
+		ImGui::Checkbox("X1", &_intersects[0]);
+		ImGui::SameLine();
+		ImGui::Checkbox("X2", &_intersects[1]);
+		ImGui::Checkbox("Y1", &_intersects[2]);
+		ImGui::SameLine();
+		ImGui::Checkbox("Y2", &_intersects[3]);
+		ImGui::Checkbox("Z1", &_intersects[4]);
+		ImGui::SameLine();
+		ImGui::Checkbox("Z2", &_intersects[5]);
+
 		ImGui::End();
 	}
 
@@ -279,12 +314,18 @@ ImGuiManager::SetActorColBool(bool intersects[])
 void
 ImGuiManager::SetActor(vector<shared_ptr<FBXBase>> actorAndObjects)
 {
-	_ground = actorAndObjects[1];
-
 	//ベクトルの中からアクターを探して取得
 	for (const auto& object : actorAndObjects)						
 	{
 		if (_actor = dynamic_pointer_cast<FBXActor>(object))
+		{
+			break;
+		}
+	}
+	//ベクトルの中からアクターを探して取得
+	for (const auto& object : actorAndObjects)
+	{
+		if (_ground = dynamic_pointer_cast<FBXObject>(object))
 		{
 			break;
 		}

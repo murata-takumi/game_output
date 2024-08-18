@@ -28,29 +28,43 @@ public:
 	//デストラクタ
 	~PlayScene();						
 
-	void Update();						//更新処理
+	//更新処理
+	void Update();						
 
-	void SceneStart();					//シーン開始時の処理
-	void SceneEnd();					//シーン終了時の処理
+	//シーン開始時の処理
+	void SceneStart();				
+	//シーン終了時の処理
+	void SceneEnd();					
 
 private:
-	vector<shared_ptr<FBXBase>> _actorAndObjs;						//FBXObjectとFBXActorをまとめたベクトル
-	shared_ptr<FBXActor> _actor;									//アクターインスタンス
+	//FBXObjectとFBXActorをまとめたベクトル
+	vector<shared_ptr<FBXBase>> _actorAndObjs;						
+	//アクターインスタンス
+	shared_ptr<FBXActor> _actor;
+	//床インスタンス
+	shared_ptr<FBXObject> _ground;									
 
 	//並列処理したいスレッドのベクトル
 	vector<thread> _ths;
 
-	XMVECTOR _direction;											//プレイヤー、カメラの進行ベクトル
+	//プレイヤー、カメラの進行ベクトル
+	XMVECTOR _direction;
 
-	bool _isInLoad;													//ロード中であることを示す真理値
+	//ロード中であることを示す真理値
+	bool _isInLoad;													
 
-	LARGE_INTEGER _currentTime;										//ゲームの現在時間を格納する値
-	LARGE_INTEGER _updatedTime;										//ゲームの直前の時間を格納する値
-	LARGE_INTEGER _beforeTime;										//ゲームの時間を一時保存しておくための値
+	//ゲームの現在時間を格納する値
+	LARGE_INTEGER _currentTime;							
+	//ゲームの直前の時間を格納する値
+	LARGE_INTEGER _updatedTime;						
+	//ゲームの時間を一時保存しておくための値
+	LARGE_INTEGER _beforeTime;										
 
-	double _fps;													//1秒当たりに画面が切り替わる回数
+	//1秒当たりに画面が切り替わる回数
+	double _fps;													
 
-	int _interval;													//フリップ間隔
+	//フリップ間隔
+	int _interval;													
 
 	//オブジェクトを生成する関数
 	template<class className> void InstantiateObject(const wchar_t* path);

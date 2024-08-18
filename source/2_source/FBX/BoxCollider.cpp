@@ -2,6 +2,8 @@
 #include "FBX/BoxCollider.h"
 #include "Includes.h"
 
+//正面ベクトルの初期値
+const XMVECTOR INITIAL_FRONT = XMVectorSet(0.0f,0.0f,1.0f,0.0f);
 //正面と右の角度の閾値
 const float THRESHOLD_BETWEEN_FRONT_AND_RIGHT = 45.0f;
 //右と背後の角度の閾値
@@ -15,22 +17,25 @@ const float THRESHOLD_BETWEEN_LEFT_AND_FRONT = 315.0f;
 /// コンストラクタ
 /// 当たり判定を構成する頂点を作成する
 /// </summary>
-/// <param name="x">X幅</param>
-/// <param name="y">Y高さ</param>
-/// <param name="z">Z幅</param>
+/// <param name="size">当たり判定の幅、高さ、奥行のサイズ</param>
 /// <param name="center">当たり判定の中心ベクトル</param>
 BoxCollider::BoxCollider(const XMFLOAT3& size, const XMFLOAT3& center)
 {
+	//ベクトルを初期化
+	SetDir(INITIAL_FRONT);
+
 	auto x = size.x;
 	auto y = size.y;
 	auto z = size.z;
 
+	//中心を初期化
+	_initCenter = XMLoadFloat3(&center);
 	auto centerX = center.x;
 	auto centerY = center.y;
 	auto centerZ = center.z;
 
 	//頂点の初期化
-	_initVerts.emplace_back(XMVectorSet(centerX - x / 2, centerY - y / 2, centerZ - z / 2, 0.0f));		
+	_initVerts.emplace_back(XMVectorSet(centerX - x / 2, centerY - y / 2, centerZ - z / 2, 0.0f));
 	_initVerts.emplace_back(XMVectorSet(centerX - x / 2, centerY - y / 2, centerZ + z / 2, 0.0f));
 	_initVerts.emplace_back(XMVectorSet(centerX + x / 2, centerY - y / 2, centerZ + z / 2, 0.0f));
 	_initVerts.emplace_back(XMVectorSet(centerX + x / 2, centerY - y / 2, centerZ - z / 2, 0.0f));
@@ -41,7 +46,8 @@ BoxCollider::BoxCollider(const XMFLOAT3& size, const XMFLOAT3& center)
 	_initVerts.emplace_back(XMVectorSet(centerX + x / 2, centerY + y / 2, centerZ - z / 2, 0.0f));
 
 	//頂点を代入
-	_verts = _initVerts;																		
+	_verts = _initVerts;
+	_center = _initCenter;
 
 	//境界値を初期化
 	SetBoundValues();																					
@@ -101,8 +107,8 @@ BoxCollider::SetBoundValues()
 	}
 
 	//Y座標の境界値
-	_boundValues[BOX_COL_Y_MIN] = _verts[0].m128_f32[1];
-	_boundValues[BOX_COL_Y_MAX] = _verts[4].m128_f32[1];
+	_boundValues[BOX_COL_Y_MIN] = _verts[4].m128_f32[1];
+	_boundValues[BOX_COL_Y_MAX] = _verts[0].m128_f32[1];
 }
 
 /// <summary>
@@ -135,8 +141,13 @@ BoxCollider::Update(const XMMATRIX& mat, float angle)
 	);
 	inputVec = XMVector3Normalize(inputVec);
 
+	SetDir(inputVec);
+
 	//オブジェクトの角度を保存
 	_angle = angle;
+
+	//中心も更新
+	_center = XMVector3Transform(_initCenter, newWorldMat);
 
 	//各初期座標に対し座標変換を行い、実際に表示する座標に代入
 	for (int i = 0; i < _initVerts.size(); i++)	
@@ -146,6 +157,24 @@ BoxCollider::Update(const XMMATRIX& mat, float angle)
 
 	//境界値を更新
 	SetBoundValues();																
+}
+
+/// <summary>
+/// ベクトルをセットする関数
+/// </summary>
+/// <param name="dir">正面ベクトル</param>
+void
+BoxCollider::SetDir(const XMVECTOR& dir)
+{
+	//まずは正面ベクトル
+	_frontDir = XMVector3Normalize(dir);
+
+	//XZ平面に対し鉛直なベクトルをとり、それと正面ベクトルの外積を取り右ベクトルとする
+	auto vertical = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+	_rightDir = XMVector3Normalize(XMVector3Dot(_frontDir, vertical));
+
+	//正面ベクトル、右ベクトルの外積を上ベクトルとする
+	_upDir = XMVector3Normalize(XMVector3Dot(_frontDir, _rightDir));
 }
 
 /// <summary>
