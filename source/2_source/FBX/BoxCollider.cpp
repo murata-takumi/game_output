@@ -133,14 +133,14 @@ BoxCollider::Update(const XMMATRIX& mat, float angle)
 		XMMatrixRotationQuaternion(skew) * XMMatrixTranslationFromVector(trans);
 	newWorldMat.r[3].m128_f32[0] *= -1.0f;
 
+	//正規化した正面ベクトルを取得
 	auto inputVec = XMVectorSet(
-		mat.r[2].m128_f32[0],
+		-1 * mat.r[2].m128_f32[0],
 		mat.r[2].m128_f32[1],
 		mat.r[2].m128_f32[2],
 		0.0f
 	);
 	inputVec = XMVector3Normalize(inputVec);
-
 	SetDir(inputVec);
 
 	//オブジェクトの角度を保存
@@ -171,10 +171,12 @@ BoxCollider::SetDir(const XMVECTOR& dir)
 
 	//XZ平面に対し鉛直なベクトルをとり、それと正面ベクトルの外積を取り右ベクトルとする
 	auto vertical = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
-	_rightDir = XMVector3Normalize(XMVector3Dot(_frontDir, vertical));
+	_rightDir = XMVector3Normalize(XMVector3Cross(_frontDir, vertical));
 
 	//正面ベクトル、右ベクトルの外積を上ベクトルとする
-	_upDir = XMVector3Normalize(XMVector3Dot(_frontDir, _rightDir));
+	_upDir = XMVector3Normalize(XMVector3Cross(_frontDir, _rightDir));
+	//反転も忘れずに
+	_upDir *= -1.0f;
 }
 
 /// <summary>

@@ -17,12 +17,6 @@ private:
 	//中心ベクトルの初期値
 	XMVECTOR _initCenter;
 
-	//正面ベクトル
-	XMVECTOR _frontDir;
-	//横ベクトル
-	XMVECTOR _rightDir;
-	//上ベクトル
-	XMVECTOR _upDir;
 	//オブジェクトの角度
 	float _angle;
 
@@ -33,6 +27,12 @@ public:
 
 	//更新される中心ベクトル
 	XMVECTOR _center;
+	//正面ベクトル
+	XMVECTOR _frontDir;
+	//横ベクトル
+	XMVECTOR _rightDir;
+	//上ベクトル
+	XMVECTOR _upDir;
 
 	//コンストラクタ
 	BoxCollider(const XMFLOAT3& size, const XMFLOAT3& center);	
