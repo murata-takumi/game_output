@@ -155,57 +155,13 @@ ImGuiManager::ImGuiDraw()
 
 		ImGui::Checkbox("IsOnGround", &_actor->_isOnGround);
 
-		//当たり判定の変数
-		//{
-		//	ImGui::DragFloat("CenterX", &_actor->Collider()->_center.m128_f32[0]);
-		//	ImGui::DragFloat("CenterY", &_actor->Collider()->_center.m128_f32[1]);
-		//	ImGui::DragFloat("CenterZ", &_actor->Collider()->_center.m128_f32[2]);
-
-		//	//アクターの境界値
-		//ImGui::DragFloat(BOX_COL_X_MIN.c_str(), &_actor->Collider()->BoundValues()[BOX_COL_X_MIN]);
-		//ImGui::DragFloat(BOX_COL_X_MAX.c_str(), &_actor->Collider()->BoundValues()[BOX_COL_X_MAX]);
-		//ImGui::DragFloat(BOX_COL_Y_MIN.c_str(), &_actor->Collider()->BoundValues()[BOX_COL_Y_MIN]);
-		//ImGui::DragFloat(BOX_COL_Y_MAX.c_str(), &_actor->Collider()->BoundValues()[BOX_COL_Y_MAX]);
-		//ImGui::DragFloat(BOX_COL_Z_MIN.c_str(), &_actor->Collider()->BoundValues()[BOX_COL_Z_MIN]);
-		//ImGui::DragFloat(BOX_COL_Z_MAX.c_str(), &_actor->Collider()->BoundValues()[BOX_COL_Z_MAX]);
-
-		//	ImGui::NewLine();
-
-		//	//地面の境界値
-		//	ImGui::DragFloat(BOX_COL_X_MIN.c_str(), &_ground->Collider()->BoundValues()[BOX_COL_X_MIN]);
-		//	ImGui::DragFloat(BOX_COL_X_MAX.c_str(), &_ground->Collider()->BoundValues()[BOX_COL_X_MAX]);
-		//	ImGui::DragFloat(BOX_COL_Y_MIN.c_str(), &_ground->Collider()->BoundValues()[BOX_COL_Y_MIN]);
-		//	ImGui::DragFloat(BOX_COL_Y_MAX.c_str(), &_ground->Collider()->BoundValues()[BOX_COL_Y_MAX]);
-		//	ImGui::DragFloat(BOX_COL_Z_MIN.c_str(), &_ground->Collider()->BoundValues()[BOX_COL_Z_MIN]);
-		//	ImGui::DragFloat(BOX_COL_Z_MAX.c_str(), &_ground->Collider()->BoundValues()[BOX_COL_Z_MAX]);
-
-		//	ImGui::NewLine();
-
-		//	ImGui::Checkbox("X1", &_intersects[0]);
-		//	ImGui::SameLine();
-		//	ImGui::Checkbox("X2", &_intersects[1]);
-		//	ImGui::Checkbox("Y1", &_intersects[2]);
-		//	ImGui::SameLine();
-		//	ImGui::Checkbox("Y2", &_intersects[3]);
-		//	ImGui::Checkbox("Z1", &_intersects[4]);
-		//	ImGui::SameLine();
-		//	ImGui::Checkbox("Z2", &_intersects[5]);
-		//}
-
 		{
-			ImGui::DragFloat("FrontX", &_actor->Collider()->_frontDir.m128_f32[0]);
-			ImGui::DragFloat("FrontY", &_actor->Collider()->_frontDir.m128_f32[1]);
-			ImGui::DragFloat("FrontZ", &_actor->Collider()->_frontDir.m128_f32[2]);
-
-			ImGui::NewLine();
-
-			ImGui::DragFloat("RightX", &_actor->Collider()->_rightDir.m128_f32[0]);
-			ImGui::DragFloat("RightY", &_actor->Collider()->_rightDir.m128_f32[1]);
-			ImGui::DragFloat("RightZ", &_actor->Collider()->_rightDir.m128_f32[2]);
-
-			ImGui::DragFloat("UpX", &_actor->Collider()->_upDir.m128_f32[0]);
-			ImGui::DragFloat("UpY", &_actor->Collider()->_upDir.m128_f32[1]);
-			ImGui::DragFloat("UpZ", &_actor->Collider()->_upDir.m128_f32[2]);
+			ImGui::Checkbox("Front1", &_front1);
+			ImGui::Checkbox("Right1", &_right1);
+			ImGui::Checkbox("Up1", &_up1);
+			ImGui::Checkbox("Front2", &_front2);
+			ImGui::Checkbox("Right2", &_right2);
+			ImGui::Checkbox("Up2", &_up2);
 		}
 		
 		ImGui::End();

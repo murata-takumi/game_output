@@ -12,6 +12,7 @@ class FBXActor;
 class ImGuiManager
 {
 public:
+	bool _front1, _right1, _up1, _front2, _right2, _up2;
 	//初期化関数
 	void Init(HWND hwnd);
 
@@ -35,6 +36,7 @@ public:
 	//アニメーション名の配列を初期化する関数
 	void ResetAnimStr();											
 
+	bool _isCrossed;
 private:
 	//コンストラクタ
 	ImGuiManager();

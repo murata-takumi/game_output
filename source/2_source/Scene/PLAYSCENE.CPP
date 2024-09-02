@@ -41,7 +41,8 @@ PlayScene::Update()
 		auto groundCol = _actorAndObjs[0]->Collider()->BoundValues();
 		auto actorCol = _actor->Collider()->BoundValues();
 
-		_actor->SetOnGround(CheckIntersect(groundCol, actorCol));
+		_actor->SetOnGround(CheckOBBs(_actorAndObjs[0]->Collider()->_obb, _actor->Collider()->_obb));
+		ImGuiManager::Instance()._isCrossed = CheckOBBs(_actorAndObjs[0]->Collider()->_obb, _actor->Collider()->_obb);
 
 		//WASDキーの入力に応じて視点を移動させる
 		//注視点を中心に視点を回転
@@ -432,6 +433,108 @@ PlayScene::CheckIntersect(map<string, float> col0, map<string, float> col1)
 	if ((col1[BOX_COL_Z_MIN] - col0[BOX_COL_Z_MAX]) > FLT_EPSILON)return false;
 
 	return true;
+}
+
+/// <summary>
+/// 二つのOBBが衝突しているか確認する関数
+/// </summary>
+/// <param name="obb1"></param>
+/// <param name="obb2"></param>
+/// <returns>衝突しているかどうか</returns>
+bool
+PlayScene::CheckOBBs(const OBB& obb1, const OBB& obb2)
+{
+	//各OBBの右、上、正面ベクトル
+	XMVECTOR rightLen1 = obb1._rightDir * obb1._halfWidth;
+	XMVECTOR upLen1 = obb1._upDir * obb1._halfHeight;
+	XMVECTOR frontLen1 = obb1._frontDir * obb1._halfDepth;
+	XMVECTOR rightLen2 = obb2._rightDir * obb2._halfWidth;
+	XMVECTOR upLen2 = obb2._upDir * obb2._halfHeight;
+	XMVECTOR frontLen2 = obb2._frontDir * obb2._halfDepth;
+
+	//双方のOBBの中心を結ぶベクトル
+	XMVECTOR vecBetCenter = obb1._center - obb2._center;
+
+	//obb1_front
+	float r = LenOnSeparateAxis(obb1._frontDir, rightLen2, upLen2, frontLen2);
+	float lenBetCenter = fabs(XMVector3Dot(vecBetCenter,obb1._frontDir ).m128_f32[0]);
+	bool a = lenBetCenter > r + obb1._halfDepth;
+	ImGuiManager::Instance()._front1 = a;
+	if (a)
+	{
+		return false;
+	}
+
+	//obb1_right
+	r = LenOnSeparateAxis(obb1._rightDir, rightLen2, upLen2, frontLen2);
+	lenBetCenter = fabs(XMVector3Dot(vecBetCenter,obb1._rightDir).m128_f32[0]);
+	a = lenBetCenter > r + obb1._halfWidth;
+	ImGuiManager::Instance()._right1 = a;
+	if (a)
+	{
+		return false;
+	}
+
+	//obb1_up
+	r = LenOnSeparateAxis(obb1._upDir, rightLen2, upLen2, frontLen2);
+	lenBetCenter = fabs(XMVector3Dot(vecBetCenter,obb1._upDir).m128_f32[0]);
+	a = lenBetCenter > r + obb1._halfHeight;
+	ImGuiManager::Instance()._up1 = a;
+	if (a)
+	{
+		return false;
+	}
+
+	//obb2_front
+	r = LenOnSeparateAxis(obb2._frontDir, rightLen1, upLen1, frontLen1);
+	lenBetCenter = fabs(XMVector3Dot(vecBetCenter,obb2._frontDir).m128_f32[0]);
+	a = lenBetCenter > r + obb2._halfDepth;
+	ImGuiManager::Instance()._front2 = a;
+	if (a)
+	{
+		return false;
+	}
+
+	//obb2_right
+	r = LenOnSeparateAxis(obb2._rightDir, rightLen1, upLen1, frontLen1);
+	lenBetCenter = fabs(XMVector3Dot(vecBetCenter,obb2._rightDir).m128_f32[0]);
+	a = lenBetCenter > r + obb2._halfWidth;
+	ImGuiManager::Instance()._right2 = a;
+	if (a)
+	{
+		return false;
+	}
+
+	//obb2_up
+	r = LenOnSeparateAxis(obb2._upDir, rightLen1, upLen1, frontLen1);
+	lenBetCenter = fabs(XMVector3Dot(vecBetCenter,obb2._upDir).m128_f32[0]);
+	a = lenBetCenter > r + obb2._halfHeight;
+	ImGuiManager::Instance()._up2 = a;
+	if (a)
+	{
+		return false;
+	}
+
+	return true;
+}
+
+/// <summary>
+/// 分離軸に対し投影された各ベクトルの大きさの和を求める関数
+/// </summary>
+/// <param name="sep">分離軸</param>
+/// <param name="right">右ベクトル</param>
+/// <param name="up">上ベクトル</param>
+/// <param name="front">正面ベクトル</param>
+/// <returns>ベクトルの大きさの和</returns>
+float 
+PlayScene::LenOnSeparateAxis(const XMVECTOR& sep, const XMVECTOR& right, const XMVECTOR& up, const XMVECTOR& front)
+{
+	//分離軸と各ベクトルの内積を取り、その絶対値が投影された大きさとなる
+	float r1 = fabs(XMVector3Dot(sep, right).m128_f32[0]);
+	float r2 = fabs(XMVector3Dot(sep, up).m128_f32[0]);
+	float r3 = fabs(XMVector3Dot(sep, front).m128_f32[0]);
+
+	return r1 + r2 + r3;
 }
 
 /// <summary>

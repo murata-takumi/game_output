@@ -219,7 +219,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <DiagnosticsFormat>Classic</DiagnosticsFormat>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
-      <Optimization>MaxSpeed</Optimization>
+      <Optimization>Disabled</Optimization>
       <MinimalRebuild>false</MinimalRebuild>
     </ClCompile>
     <Link>
