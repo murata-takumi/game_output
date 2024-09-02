@@ -579,7 +579,7 @@ FBXActor::Update()
 	XMMATRIX newWorldMat = XMMatrixScalingFromVector(scale) * XMMatrixRotationQuaternion(skew) * XMMatrixTranslationFromVector(trans);
 
 	//当たり判定を更新
-	_collider->Update(newWorldMat *	_mappedMats[0],_zToFrontAngle);
+	_collider->Update(newWorldMat *	_mappedMats[0]);
 
 	//経過時間を渡し、ボーン行列を取得
 	BoneTransform(_animTime);														

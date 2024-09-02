@@ -22,16 +22,16 @@ const float THRESHOLD_BETWEEN_LEFT_AND_FRONT = 315.0f;
 BoxCollider::BoxCollider(const XMFLOAT3& size, const XMFLOAT3& center)
 {
 	//ベクトルを初期化
-	_obb.SetVec(INITIAL_FRONT);
+	SetVec(INITIAL_FRONT);
 
 	auto x = size.x;
 	auto y = size.y;
 	auto z = size.z;
 
 	//半分の長さも取得
-	_obb._halfWidth = size.x / 2;
-	_obb._halfHeight = size.y / 2;
-	_obb._halfDepth = size.z / 2;
+	_halfWidth = size.x / 2;
+	_halfHeight = size.y / 2;
+	_halfDepth = size.z / 2;
 
 	//中心を初期化
 	_initCenter = XMLoadFloat3(&center);
@@ -52,10 +52,7 @@ BoxCollider::BoxCollider(const XMFLOAT3& size, const XMFLOAT3& center)
 
 	//頂点を代入
 	_verts = _initVerts;
-	_obb._center = _initCenter;
-
-	//境界値を初期化
-	SetBoundValues();																					
+	_center = _initCenter;																				
 }
 
 /// <summary>
@@ -67,63 +64,13 @@ BoxCollider::~BoxCollider()
 }
 
 /// <summary>
-/// 当たり判定に必要な境界値を設定する関数
-/// </summary>
-void
-BoxCollider::SetBoundValues()
-{
-	//X、Z座標の境界値
-	//現在のオブジェクトの角度に応じて場合分けする
-	//下方向
-	if(THRESHOLD_BETWEEN_LEFT_AND_FRONT <= _angle || _angle < THRESHOLD_BETWEEN_FRONT_AND_RIGHT)
-	{
-		_boundValues[BOX_COL_X_MIN] = _verts[1].m128_f32[0];
-		_boundValues[BOX_COL_X_MAX] = _verts[3].m128_f32[0];
-
-		_boundValues[BOX_COL_Z_MIN] = _verts[1].m128_f32[2];
-		_boundValues[BOX_COL_Z_MAX] = _verts[3].m128_f32[2];
-	}
-	//右方向
-	else if (THRESHOLD_BETWEEN_FRONT_AND_RIGHT <= _angle && _angle < THRESHOLD_BETWEEN_RIGHT_AND_BACK)
-	{
-		_boundValues[BOX_COL_X_MIN] = _verts[1].m128_f32[0];
-		_boundValues[BOX_COL_X_MAX] = _verts[3].m128_f32[0];
-
-		_boundValues[BOX_COL_Z_MIN] = _verts[2].m128_f32[2];
-		_boundValues[BOX_COL_Z_MAX] = _verts[0].m128_f32[2];
-	}
-	//上方向
-	else if (THRESHOLD_BETWEEN_RIGHT_AND_BACK <= _angle && _angle < THRESHOLD_BETWEEN_BACK_AND_LEFT)
-	{
-		_boundValues[BOX_COL_X_MIN] = _verts[2].m128_f32[0];
-		_boundValues[BOX_COL_X_MAX] = _verts[0].m128_f32[0];
-
-		_boundValues[BOX_COL_Z_MIN] = _verts[3].m128_f32[2];
-		_boundValues[BOX_COL_Z_MAX] = _verts[1].m128_f32[2];
-	}
-	//左方向
-	else if (THRESHOLD_BETWEEN_BACK_AND_LEFT <= _angle && _angle < THRESHOLD_BETWEEN_LEFT_AND_FRONT)
-	{
-		_boundValues[BOX_COL_X_MIN] = _verts[0].m128_f32[0];
-		_boundValues[BOX_COL_X_MAX] = _verts[2].m128_f32[0];
-
-		_boundValues[BOX_COL_Z_MIN] = _verts[0].m128_f32[2];
-		_boundValues[BOX_COL_Z_MAX] = _verts[2].m128_f32[2];
-	}
-
-	//Y座標の境界値
-	_boundValues[BOX_COL_Y_MIN] = _verts[4].m128_f32[1];
-	_boundValues[BOX_COL_Y_MAX] = _verts[0].m128_f32[1];
-}
-
-/// <summary>
 /// 毎フレームの更新を行う関数
 /// 座標変換を行う
 /// </summary>
 /// <param name="mat">座標変換に用いる行列</param>
 /// <param name="angle">オブジェクトの角度</param>
 void
-BoxCollider::Update(const XMMATRIX& mat, float angle)
+BoxCollider::Update(const XMMATRIX& mat)
 {
 	//スケーリング、回転、平行移動成分を行列から取得
 	XMVECTOR scale, trans, skew;
@@ -146,23 +93,18 @@ BoxCollider::Update(const XMMATRIX& mat, float angle)
 		0.0f
 	);
 	inputVec = XMVector3Normalize(inputVec);
-	//OBBのベクトルを更新
-	_obb.SetVec(inputVec);
 
-	//オブジェクトの角度を保存
-	_angle = angle;
+	//OBBのベクトルを更新
+	SetVec(inputVec);
 
 	//中心も更新
-	_obb._center = XMVector3Transform(_initCenter, newWorldMat);
+	_center = XMVector3Transform(_initCenter, newWorldMat);
 
 	//各初期座標に対し座標変換を行い、実際に表示する座標に代入
 	for (int i = 0; i < _initVerts.size(); i++)	
 	{
 		_verts[i] = XMVector3Transform(_initVerts[i], newWorldMat);
-	}
-
-	//境界値を更新
-	SetBoundValues();																
+	}															
 }
 
 /// <summary>
@@ -173,14 +115,4 @@ vector<XMVECTOR>
 BoxCollider::Vertices()const
 {
 	return _verts;
-}
-
-/// <summary>
-/// 当たり判定の各座標を取得する関数
-/// </summary>
-/// <returns>各座標のベクトル</returns>
-map<string, float>
-BoxCollider::BoundValues()const
-{
-	return _boundValues;
 }

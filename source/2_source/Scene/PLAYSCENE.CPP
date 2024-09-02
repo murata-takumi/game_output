@@ -38,11 +38,8 @@ PlayScene::Update()
 	//操作可能な場合入力を反映する
 	if (!_isInLoad)													
 	{
-		auto groundCol = _actorAndObjs[0]->Collider()->BoundValues();
-		auto actorCol = _actor->Collider()->BoundValues();
-
-		_actor->SetOnGround(CheckOBBs(_actorAndObjs[0]->Collider()->_obb, _actor->Collider()->_obb));
-		ImGuiManager::Instance()._isCrossed = CheckOBBs(_actorAndObjs[0]->Collider()->_obb, _actor->Collider()->_obb);
+		_actor->SetOnGround(CheckColliders(*_actorAndObjs[0]->Collider(), *_actor->Collider()));
+		ImGuiManager::Instance()._isCrossed = CheckColliders(*_actorAndObjs[0]->Collider(), *_actor->Collider());
 
 		//WASDキーの入力に応じて視点を移動させる
 		//注視点を中心に視点を回転
@@ -404,61 +401,29 @@ PlayScene::GameDraw()
 }
 
 /// <summary>
-/// 二つの当たり判定が衝突しているか確認する関数
-/// </summary>
-/// <param name="col0">当たり判定その1</param>
-/// <param name="col1">当たり判定その2</param>
-/// <returns>衝突しているかどうか</returns>
-bool 
-PlayScene::CheckIntersect(map<string, float> col0, map<string, float> col1)
-{
-	//col0がGround、col1がActor
-	bool intersects[6] =
-	{
-		(col0[BOX_COL_X_MIN] - col1[BOX_COL_X_MAX]) > FLT_EPSILON,
-		(col1[BOX_COL_X_MIN] - col0[BOX_COL_X_MAX]) > FLT_EPSILON,
-		(col0[BOX_COL_Y_MIN] - col1[BOX_COL_Y_MAX]) > FLT_EPSILON,
-		(col1[BOX_COL_Y_MIN] - col0[BOX_COL_Y_MAX]) > FLT_EPSILON,
-		(col0[BOX_COL_Z_MIN] - col1[BOX_COL_Z_MAX]) > FLT_EPSILON,
-		(col1[BOX_COL_Z_MIN] - col0[BOX_COL_Z_MAX]) > FLT_EPSILON
-	};
-
-	ImGuiManager::Instance().SetActorColBool(intersects);
-
-	if ((col0[BOX_COL_X_MIN] - col1[BOX_COL_X_MAX]) > FLT_EPSILON)return false;
-	if ((col1[BOX_COL_X_MIN] - col0[BOX_COL_X_MAX]) > FLT_EPSILON)return false;
-	if ((col0[BOX_COL_Y_MIN] - col1[BOX_COL_Y_MAX]) > FLT_EPSILON)return false;
-	if ((col1[BOX_COL_Y_MIN] - col0[BOX_COL_Y_MAX]) > FLT_EPSILON)return false;
-	if ((col0[BOX_COL_Z_MIN] - col1[BOX_COL_Z_MAX]) > FLT_EPSILON)return false;
-	if ((col1[BOX_COL_Z_MIN] - col0[BOX_COL_Z_MAX]) > FLT_EPSILON)return false;
-
-	return true;
-}
-
-/// <summary>
 /// 二つのOBBが衝突しているか確認する関数
 /// </summary>
 /// <param name="obb1"></param>
 /// <param name="obb2"></param>
 /// <returns>衝突しているかどうか</returns>
 bool
-PlayScene::CheckOBBs(const OBB& obb1, const OBB& obb2)
+PlayScene::CheckColliders(const BoxCollider& col1, const BoxCollider& col2)
 {
 	//各OBBの右、上、正面ベクトル
-	XMVECTOR rightLen1 = obb1._rightDir * obb1._halfWidth;
-	XMVECTOR upLen1 = obb1._upDir * obb1._halfHeight;
-	XMVECTOR frontLen1 = obb1._frontDir * obb1._halfDepth;
-	XMVECTOR rightLen2 = obb2._rightDir * obb2._halfWidth;
-	XMVECTOR upLen2 = obb2._upDir * obb2._halfHeight;
-	XMVECTOR frontLen2 = obb2._frontDir * obb2._halfDepth;
+	XMVECTOR rightLen1 = col1._rightDir * col1._halfWidth;
+	XMVECTOR upLen1 = col1._upDir * col1._halfHeight;
+	XMVECTOR frontLen1 = col1._frontDir * col1._halfDepth;
+	XMVECTOR rightLen2 = col2._rightDir * col2._halfWidth;
+	XMVECTOR upLen2 = col2._upDir * col2._halfHeight;
+	XMVECTOR frontLen2 = col2._frontDir * col2._halfDepth;
 
 	//双方のOBBの中心を結ぶベクトル
-	XMVECTOR vecBetCenter = obb1._center - obb2._center;
+	XMVECTOR vecBetCenter = col1._center - col2._center;
 
 	//obb1_front
-	float r = LenOnSeparateAxis(obb1._frontDir, rightLen2, upLen2, frontLen2);
-	float lenBetCenter = fabs(XMVector3Dot(vecBetCenter,obb1._frontDir ).m128_f32[0]);
-	bool a = lenBetCenter > r + obb1._halfDepth;
+	float r = LenOnSeparateAxis(col1._frontDir, rightLen2, upLen2, frontLen2);
+	float lenBetCenter = fabs(XMVector3Dot(vecBetCenter,col1._frontDir ).m128_f32[0]);
+	bool a = lenBetCenter > r + col1._halfDepth;
 	ImGuiManager::Instance()._front1 = a;
 	if (a)
 	{
@@ -466,9 +431,9 @@ PlayScene::CheckOBBs(const OBB& obb1, const OBB& obb2)
 	}
 
 	//obb1_right
-	r = LenOnSeparateAxis(obb1._rightDir, rightLen2, upLen2, frontLen2);
-	lenBetCenter = fabs(XMVector3Dot(vecBetCenter,obb1._rightDir).m128_f32[0]);
-	a = lenBetCenter > r + obb1._halfWidth;
+	r = LenOnSeparateAxis(col1._rightDir, rightLen2, upLen2, frontLen2);
+	lenBetCenter = fabs(XMVector3Dot(vecBetCenter,col1._rightDir).m128_f32[0]);
+	a = lenBetCenter > r + col1._halfWidth;
 	ImGuiManager::Instance()._right1 = a;
 	if (a)
 	{
@@ -476,9 +441,9 @@ PlayScene::CheckOBBs(const OBB& obb1, const OBB& obb2)
 	}
 
 	//obb1_up
-	r = LenOnSeparateAxis(obb1._upDir, rightLen2, upLen2, frontLen2);
-	lenBetCenter = fabs(XMVector3Dot(vecBetCenter,obb1._upDir).m128_f32[0]);
-	a = lenBetCenter > r + obb1._halfHeight;
+	r = LenOnSeparateAxis(col1._upDir, rightLen2, upLen2, frontLen2);
+	lenBetCenter = fabs(XMVector3Dot(vecBetCenter,col1._upDir).m128_f32[0]);
+	a = lenBetCenter > r + col1._halfHeight;
 	ImGuiManager::Instance()._up1 = a;
 	if (a)
 	{
@@ -486,9 +451,9 @@ PlayScene::CheckOBBs(const OBB& obb1, const OBB& obb2)
 	}
 
 	//obb2_front
-	r = LenOnSeparateAxis(obb2._frontDir, rightLen1, upLen1, frontLen1);
-	lenBetCenter = fabs(XMVector3Dot(vecBetCenter,obb2._frontDir).m128_f32[0]);
-	a = lenBetCenter > r + obb2._halfDepth;
+	r = LenOnSeparateAxis(col2._frontDir, rightLen1, upLen1, frontLen1);
+	lenBetCenter = fabs(XMVector3Dot(vecBetCenter,col2._frontDir).m128_f32[0]);
+	a = lenBetCenter > r + col2._halfDepth;
 	ImGuiManager::Instance()._front2 = a;
 	if (a)
 	{
@@ -496,9 +461,9 @@ PlayScene::CheckOBBs(const OBB& obb1, const OBB& obb2)
 	}
 
 	//obb2_right
-	r = LenOnSeparateAxis(obb2._rightDir, rightLen1, upLen1, frontLen1);
-	lenBetCenter = fabs(XMVector3Dot(vecBetCenter,obb2._rightDir).m128_f32[0]);
-	a = lenBetCenter > r + obb2._halfWidth;
+	r = LenOnSeparateAxis(col2._rightDir, rightLen1, upLen1, frontLen1);
+	lenBetCenter = fabs(XMVector3Dot(vecBetCenter,col2._rightDir).m128_f32[0]);
+	a = lenBetCenter > r + col2._halfWidth;
 	ImGuiManager::Instance()._right2 = a;
 	if (a)
 	{
@@ -506,9 +471,9 @@ PlayScene::CheckOBBs(const OBB& obb1, const OBB& obb2)
 	}
 
 	//obb2_up
-	r = LenOnSeparateAxis(obb2._upDir, rightLen1, upLen1, frontLen1);
-	lenBetCenter = fabs(XMVector3Dot(vecBetCenter,obb2._upDir).m128_f32[0]);
-	a = lenBetCenter > r + obb2._halfHeight;
+	r = LenOnSeparateAxis(col2._upDir, rightLen1, upLen1, frontLen1);
+	lenBetCenter = fabs(XMVector3Dot(vecBetCenter,col2._upDir).m128_f32[0]);
+	a = lenBetCenter > r + col2._halfHeight;
 	ImGuiManager::Instance()._up2 = a;
 	if (a)
 	{

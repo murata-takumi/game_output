@@ -2,16 +2,17 @@
 #include "Application.h"
 
 /// <summary>
-/// Orinented Bounding Box(有向境界ボックス)
-/// 正面、右、上ベクトルと幅、高さ、奥行の半分、中心をデータとして持つ
+/// 矩形の当たり判定を実装するクラス
 /// </summary>
-struct OBB
+class BoxCollider
 {
-	//それぞれ中心、正面、右、上ベクトル
-	XMVECTOR _center,_frontDir,_rightDir,_upDir;
-
-	//それぞれ幅、高さ、奥行の長さの半分
-	float _halfWidth, _halfHeight, _halfDepth;
+private:
+	//頂点の初期値
+	vector<XMVECTOR> _initVerts;
+	//画面に表示する頂点
+	vector<XMVECTOR> _verts;
+	//中心ベクトルの初期値
+	XMVECTOR _initCenter;
 
 	/// <summary>
 	/// ベクトルを設定する関数
@@ -31,33 +32,14 @@ struct OBB
 		//反転も忘れずに
 		_upDir *= -1.0f;
 	}
-};
-
-/// <summary>
-/// 矩形の当たり判定を実装するクラス
-/// </summary>
-class BoxCollider
-{
-private:
-
-	//頂点の初期値
-	vector<XMVECTOR> _initVerts;
-	//画面に表示する頂点
-	vector<XMVECTOR> _verts;
-	//境界値
-	map<string,float> _boundValues;
-	//中心ベクトルの初期値
-	XMVECTOR _initCenter;
-
-	//オブジェクトの角度
-	float _angle;
-
-	//境界値を設定する関数
-	void SetBoundValues();								
 
 public:
-	//当たり判定
-	OBB _obb;
+
+	//それぞれ中心、正面、右、上ベクトル
+	XMVECTOR _center, _frontDir, _rightDir, _upDir;
+
+	//それぞれ幅、高さ、奥行の長さの半分
+	float _halfWidth, _halfHeight, _halfDepth;
 
 	//コンストラクタ
 	BoxCollider(const XMFLOAT3& size, const XMFLOAT3& center);	
@@ -65,10 +47,8 @@ public:
 	~BoxCollider();
 
 	//座標を更新する関数
-	void Update(const XMMATRIX& mat,float angle = 0.0f);
+	void Update(const XMMATRIX& mat);
 
 	//頂点を返す関数
-	vector<XMVECTOR> Vertices()const;	
-	//境界値を返す関数
-	map<string, float> BoundValues()const;
+	vector<XMVECTOR> Vertices()const;
 };
