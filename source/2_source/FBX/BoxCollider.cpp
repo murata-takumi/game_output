@@ -64,11 +64,30 @@ BoxCollider::~BoxCollider()
 }
 
 /// <summary>
+/// 当たり判定が持つ三方向のベクトルを設定する関数
+/// </summary>
+/// <param name="vec">オブジェクトの正面ベクトル</param>
+void 
+BoxCollider::SetVec(const XMVECTOR& vec)
+{
+	//まずは正面ベクトル
+	_frontDir = XMVector3Normalize(vec);
+
+	//XZ平面に対し鉛直なベクトルをとり、それと正面ベクトルの外積を取り右ベクトルとする
+	auto vertical = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+	_rightDir = XMVector3Normalize(XMVector3Cross(_frontDir, vertical));
+
+	//正面ベクトル、右ベクトルの外積を上ベクトルとする
+	_upDir = XMVector3Normalize(XMVector3Cross(_frontDir, _rightDir));
+	//反転も忘れずに
+	_upDir *= -1.0f;
+}
+
+/// <summary>
 /// 毎フレームの更新を行う関数
 /// 座標変換を行う
 /// </summary>
 /// <param name="mat">座標変換に用いる行列</param>
-/// <param name="angle">オブジェクトの角度</param>
 void
 BoxCollider::Update(const XMMATRIX& mat)
 {

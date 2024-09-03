@@ -61,7 +61,9 @@ FBXObject::CreateTransformView()
 	}
 	_mappedMats[0] = XMMatrixIdentity();
 	//平行移動
-	_mappedMats[0] *= XMMatrixTranslationFromVector(_pos);			
+	_mappedMats[0] *= XMMatrixTranslationFromVector(_pos);		
+
+	_collider->Update(_mappedMats[0]);
 
 	//ディスクリプタヒープの作成
 	D3D12_DESCRIPTOR_HEAP_DESC transformDescHeapDesc = {};							
@@ -82,10 +84,7 @@ FBXObject::CreateTransformView()
 	cbvDesc.BufferLocation = _transBuffer->GetGPUVirtualAddress();
 	cbvDesc.SizeInBytes = static_cast<UINT>(_transBuffer->GetDesc().Width);
 
-	_dx12.Device()->CreateConstantBufferView(&cbvDesc,_transHeap->GetCPUDescriptorHandleForHeapStart());
-
-	//当たり判定を初期化
-	_collider->Update(_mappedMats[0]);											
+	_dx12.Device()->CreateConstantBufferView(&cbvDesc,_transHeap->GetCPUDescriptorHandleForHeapStart());							
 
 	return result;
 }
