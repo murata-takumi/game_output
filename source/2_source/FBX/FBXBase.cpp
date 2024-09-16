@@ -8,11 +8,13 @@
 /// <param name="dx12">Dx12Wrapperインスタンス</param>
 /// <param name="filePath">モデル格納ファイル名</param>
 /// <param name="size">当たり判定の大きさ</param>
-/// <param name="diff">当たり判定の差分</param>
 /// <param name="pos">初期座標</param>
+/// <param name="diff">当たり判定の差分</param>
 FBXBase::FBXBase(Dx12Wrapper& dx12, const wchar_t* filePath, const XMFLOAT3& size, const XMFLOAT3& pos, const XMFLOAT3& diff)
 	:_dx12(dx12), _pos(XMLoadFloat3(&pos))
 {
+	_collectNormal = true;
+
 	//モデル関連の情報を初期化
 	InitModel(filePath);														
 
@@ -81,6 +83,8 @@ FBXBase::CreateVertexBufferView()
 	//返り値を初期化
 	result = S_OK;											
 
+	_normals.emplace_back(_meshes[0].vertices[0]);
+
 	//ビュー数をメッシュ数に合わせる
 	_vbViews.reserve(_meshes.size());													
 	//全メッシュに対し処理を実行
@@ -91,9 +95,27 @@ FBXBase::CreateVertexBufferView()
 		D3D12_VERTEX_BUFFER_VIEW tmpVBView = {};
 
 		//頂点全体のデータサイズ
-		auto size = sizeof(FBXVertex) * _meshes[i].vertices.size();						
-		//頂点一個のデータサイズ
-		auto stride = sizeof(FBXVertex);												
+		auto size = sizeof(FBXVertex) * _meshes[i].vertices.size();
+
+		if (_collectNormal)
+		{
+			for (auto& vert : _meshes[i].vertices)
+			{
+				_normals.emplace_back(vert);
+				auto vec = XMLoadFloat3(&vert.normal);
+
+				for (auto& a : _normals)
+				{
+					auto aVec = XMLoadFloat3(&a.normal);
+					auto b = fabs(1.0f - XMVector3Dot(vec, aVec).m128_f32[0]);
+					if (b <= FLT_EPSILON)
+					{
+						_normals.pop_back();
+						break;
+					}
+				}
+			}
+		}
 
 		//ヒーププロパティ
 		auto heapProp = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);				

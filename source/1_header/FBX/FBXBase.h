@@ -55,7 +55,12 @@ protected:
 	XMMATRIX* _mappedMats = nullptr;										
 
 	//座標
-	XMVECTOR _pos;															
+	XMVECTOR _pos;
+
+	vector<FBXVertex> _normals;
+
+	//法線を収集するかどうか
+	bool _collectNormal = false;
 
 	//モデルを初期化する関数
 	void InitModel(const wchar_t* filePath);								

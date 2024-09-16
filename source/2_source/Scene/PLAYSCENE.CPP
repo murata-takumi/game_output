@@ -3,9 +3,20 @@
 #include "Scene/PlayScene.h"
 #include "Includes.h"
 
-const wchar_t* ACTOR_PATH = L"Asset/model/Unitychan.fbx";		//モデルデータが格納されているファイルパス
-const wchar_t* GROUND_PATH = L"Asset/model/G.fbx";				//地面データが格納されているファイルパス
-const wchar_t* BALL_PATH = L"Asset/model/Ball BLEND.fbx";		//サッカーボールのデータが格納されているファイルパス
+//プレイヤーデータが格納されているファイルパス
+const wchar_t* ACTOR_PATH = L"Asset/model/Unitychan.fbx";		
+//地面データが格納されているファイルパス
+const wchar_t* GROUND_PATH = L"Asset/model/G.fbx";				
+//コインのデータが格納されているファイルパス
+const wchar_t* COIN_PATH = L"Asset/model/Coin_Resize.fbx";				
+
+//プレイヤーの当たり判定の大きさ
+const XMFLOAT3 PLAYER_COLL_SIZE = XMFLOAT3(60.0f, 170.0f, 60.0f);
+//地面の当たり判定の大きさ
+const XMFLOAT3 GROUND_COLL_SIZE = XMFLOAT3(2000.0f, 1.0f, 2000.0f);
+//コインの当たり判定の大きさ
+const XMFLOAT3 COIN_COLL_SIZE = XMFLOAT3(20.0f, 20.0f, 20.0f);
+
 const float FRAME_TIME = 1.0f / 60.0f;							//更新回数を60FPSに固定する際の1フレームの秒数
 
 /// <summary>
@@ -187,9 +198,9 @@ PlayScene::SceneStart()
 		_isInLoad = true;
 
 		//スレッドに各オブジェクトの作成処理を追加
-		InstantiateObject<FBXActor>(ACTOR_PATH);
-		InstantiateObject<FBXObject>(GROUND_PATH);
-		//InstantiateObject<FBXObject>(BALL_PATH);
+		InstantiateObject<FBXActor>(ACTOR_PATH,PLAYER_COLL_SIZE);
+		InstantiateObject<FBXObject>(GROUND_PATH,GROUND_COLL_SIZE);
+		InstantiateObject<FBXObject>(COIN_PATH,COIN_COLL_SIZE);
 
 		//スレッドが全て完了するまでここで待機
 		for (auto& th : _ths)							
@@ -257,16 +268,17 @@ PlayScene::SceneEnd()
 /// </summary>
 /// <typeparam name="className">オブジェクトのクラス</typeparam>
 /// <param name="path">オブジェクトデータを格納しているパス</param>
+/// <param name="size">オブジェクトの当たり判定のサイズ</param>
 template<class className>
 void
-PlayScene::InstantiateObject(const wchar_t* path)
+PlayScene::InstantiateObject(const wchar_t* path, XMFLOAT3 size)
 {
 	lock_guard<mutex> lock(_mtx);
 
 	auto f = [=]() {
 		shared_ptr<className> object;
 
-		object = make_shared<className>(Dx12Wrapper::Instance(), path);
+		object = make_shared<className>(Dx12Wrapper::Instance(), path, size);
 
 		_actorAndObjs.emplace_back(object);
 	};
@@ -401,10 +413,10 @@ PlayScene::GameDraw()
 }
 
 /// <summary>
-/// 二つのOBBが衝突しているか確認する関数
+/// 二つの当たり判定が衝突しているか確認する関数
 /// </summary>
-/// <param name="obb1"></param>
-/// <param name="obb2"></param>
+/// <param name="col1">当たり判定その1</param>
+/// <param name="col22">当たり判定その2</param>
 /// <returns>衝突しているかどうか</returns>
 bool
 PlayScene::CheckColliders(const BoxCollider& col1, const BoxCollider& col2)

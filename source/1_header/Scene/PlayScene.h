@@ -67,7 +67,7 @@ private:
 	int _interval;													
 
 	//オブジェクトを生成する関数
-	template<class className> void InstantiateObject(const wchar_t* path);
+	template<class className> void InstantiateObject(const wchar_t* path,XMFLOAT3 size);
 
 	//ペラポリゴンの描画処理をまとめた関数
 	void PeraDraw();	
