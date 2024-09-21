@@ -28,10 +28,7 @@ private:
 	//グラフィックスメモリ
 	unique_ptr<GraphicsMemory> _gmemory;									
 	//スプライト（画像）表示用オブジェクト
-	unique_ptr<SpriteBatch> _spriteBatch;									
-
-	//FBXBase及び派生オブジェクトを格納したベクトル
-	vector<shared_ptr<FBXBase>> _actorAndObjs;								
+	unique_ptr<SpriteBatch> _spriteBatch;
 
 	//ピクセルシェーダー用データ
 	ID3DBlob* _psBlob = nullptr;											
@@ -114,11 +111,8 @@ public:
 	void BackGroundDraw();
 
 	//マウスカーソルを描画
-	void GridDraw();							
+	void GridDraw(const map<string, shared_ptr<FBXBase>> actorAndObjs);
 
 	//グラフィックスメモリをコマンドリストにセット
-	void Commit();													
-
-	//アクターを設定する関数
-	void SetActors(vector<shared_ptr<FBXBase>> actorAndObjects);	
+	void Commit();
 };

@@ -32,7 +32,7 @@ public:
 	//アクターと地面の座標ごとの真理値の当たり判定を受け取る
 	void SetActorColBool(bool intersects[]);
 	//アクターを受け取る関数
-	void SetActor(vector<shared_ptr<FBXBase>> actorAndObjects);		
+	void SetActor(const map<string, shared_ptr<FBXBase>> actorAndObjs);
 	//アニメーション名の配列を初期化する関数
 	void ResetAnimStr();											
 

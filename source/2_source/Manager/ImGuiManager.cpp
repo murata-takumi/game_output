@@ -287,20 +287,20 @@ ImGuiManager::SetActorColBool(bool intersects[])
 /// </summary>
 /// <param name="actor">アクターのベクトル</param>
 void
-ImGuiManager::SetActor(vector<shared_ptr<FBXBase>> actorAndObjects)
+ImGuiManager::SetActor(const map<string, shared_ptr<FBXBase>> actorAndObjs)
 {
 	//ベクトルの中からアクターを探して取得
-	for (const auto& object : actorAndObjects)						
+	for (const auto& object : actorAndObjs)
 	{
-		if (_actor = dynamic_pointer_cast<FBXActor>(object))
+		if (_actor = dynamic_pointer_cast<FBXActor>(object.second))
 		{
 			break;
 		}
 	}
 	//ベクトルの中からアクターを探して取得
-	for (const auto& object : actorAndObjects)
+	for (const auto& object : actorAndObjs)
 	{
-		if (_ground = dynamic_pointer_cast<FBXObject>(object))
+		if (_ground = dynamic_pointer_cast<FBXObject>(object.second))
 		{
 			break;
 		}

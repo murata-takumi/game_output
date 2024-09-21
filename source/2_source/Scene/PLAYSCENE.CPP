@@ -8,14 +8,20 @@ const wchar_t* ACTOR_PATH = L"Asset/model/Unitychan.fbx";
 //地面データが格納されているファイルパス
 const wchar_t* GROUND_PATH = L"Asset/model/G.fbx";				
 //コインのデータが格納されているファイルパス
-const wchar_t* COIN_PATH = L"Asset/model/Coin_Resize.fbx";				
+const wchar_t* COIN_PATH = L"Asset/model/Coin.fbx";				
 
 //プレイヤーの当たり判定の大きさ
-const XMFLOAT3 PLAYER_COLL_SIZE = XMFLOAT3(60.0f, 170.0f, 60.0f);
+const XMFLOAT3 ACTOR_COLL_SIZE = XMFLOAT3(60.0f, 170.0f, 60.0f);
 //地面の当たり判定の大きさ
 const XMFLOAT3 GROUND_COLL_SIZE = XMFLOAT3(2000.0f, 1.0f, 2000.0f);
 //コインの当たり判定の大きさ
-const XMFLOAT3 COIN_COLL_SIZE = XMFLOAT3(20.0f, 20.0f, 20.0f);
+const XMFLOAT3 COIN_COLL_SIZE = XMFLOAT3(25.0f, 25.0f, 25.0f);
+//コインの初期座標
+const XMFLOAT3 COIN_INIT_POS = XMFLOAT3(0.0f, 12.5f, 100.0f);
+
+const string ACTOR_NAME = "Actor";
+const string GROUND_NAME = "Ground";
+const string COIN_NAME = "Coin";
 
 const float FRAME_TIME = 1.0f / 60.0f;							//更新回数を60FPSに固定する際の1フレームの秒数
 
@@ -49,8 +55,14 @@ PlayScene::Update()
 	//操作可能な場合入力を反映する
 	if (!_isInLoad)													
 	{
-		_actor->SetOnGround(CheckColliders(*_actorAndObjs[0]->Collider(), *_actor->Collider()));
-		ImGuiManager::Instance()._isCrossed = CheckColliders(*_actorAndObjs[0]->Collider(), *_actor->Collider());
+		_actor->SetOnGround(CheckColliders(*_actorAndObjs[GROUND_NAME]->Collider(), *_actor->Collider()));
+		ImGuiManager::Instance()._isCrossed = CheckColliders(*_actorAndObjs[GROUND_NAME]->Collider(), *_actor->Collider());
+
+		//コインとアクターが接触したらコインを削除
+		if (_actorAndObjs[COIN_NAME] && CheckColliders(*_actorAndObjs[COIN_NAME]->Collider(), *_actor->Collider()))
+		{
+			_actorAndObjs.erase(COIN_NAME);
+		}
 
 		//WASDキーの入力に応じて視点を移動させる
 		//注視点を中心に視点を回転
@@ -198,9 +210,9 @@ PlayScene::SceneStart()
 		_isInLoad = true;
 
 		//スレッドに各オブジェクトの作成処理を追加
-		InstantiateObject<FBXActor>(ACTOR_PATH,PLAYER_COLL_SIZE);
-		InstantiateObject<FBXObject>(GROUND_PATH,GROUND_COLL_SIZE);
-		InstantiateObject<FBXObject>(COIN_PATH,COIN_COLL_SIZE);
+		InstantiateObject<FBXActor>(ACTOR_PATH,ACTOR_NAME,ACTOR_COLL_SIZE);
+		InstantiateObject<FBXObject>(GROUND_PATH,GROUND_NAME,GROUND_COLL_SIZE);
+		InstantiateObject<FBXObject>(COIN_PATH,COIN_NAME,COIN_COLL_SIZE, COIN_INIT_POS);
 
 		//スレッドが全て完了するまでここで待機
 		for (auto& th : _ths)							
@@ -211,25 +223,13 @@ PlayScene::SceneStart()
 		//オブジェクトの中からアクターを探す
 		for (const auto& object : _actorAndObjs)
 		{
-			if (_actor = dynamic_pointer_cast<FBXActor>(object))
+			if (_actor = dynamic_pointer_cast<FBXActor>(object.second))
 			{
 				break;
 			}
 		}
 
-		//オブジェクトの中から床を探す
-		for (const auto& object : _actorAndObjs)
-		{
-			if (_ground = dynamic_pointer_cast<FBXObject>(object))
-			{
-				break;
-			}
-		}
-
-		//アクターをImGuiManager側に渡す
-		ImGuiManager::Instance().SetActor(_actorAndObjs);							
-		//アクターをSpriteManager側に渡す
-		SpriteManager::Instance().SetActors(_actorAndObjs);						
+		ImGuiManager::Instance().SetActor(_actorAndObjs);
 
 		//ロード完了
 		_isInLoad = false;		
@@ -271,16 +271,17 @@ PlayScene::SceneEnd()
 /// <param name="size">オブジェクトの当たり判定のサイズ</param>
 template<class className>
 void
-PlayScene::InstantiateObject(const wchar_t* path, XMFLOAT3 size)
+PlayScene::InstantiateObject(const wchar_t* path,string name, XMFLOAT3 size,XMFLOAT3 pos)
 {
 	lock_guard<mutex> lock(_mtx);
 
 	auto f = [=]() {
 		shared_ptr<className> object;
 
-		object = make_shared<className>(Dx12Wrapper::Instance(), path, size);
+		object = make_shared<className>(Dx12Wrapper::Instance(), path, size, pos);
 
-		_actorAndObjs.emplace_back(object);
+		//_actorAndObjs.emplace_back(object);
+		_actorAndObjs[name] = object;
 	};
 
 	//スレッドにアクターの作成処理を追加
@@ -397,7 +398,7 @@ PlayScene::GameDraw()
 	Dx12Wrapper::Instance().CommandList()->DrawInstanced(4, 1, 0, 0);									
 
 	//グリッドを描画
-	if (ImGuiManager::Instance().IsWriteGrid() && !_isInLoad)SpriteManager::Instance().GridDraw();		
+	if (ImGuiManager::Instance().IsWriteGrid() && !_isInLoad)SpriteManager::Instance().GridDraw(_actorAndObjs);		
 
 	//ここにエフェクト上の描画処理
 	EffectAndUIDraw();																
@@ -525,10 +526,10 @@ PlayScene::ModelDraw()
 	{
 		for (const auto& item : _actorAndObjs)
 		{
-			if (item != nullptr)
+			if (item.second != nullptr)
 			{
-				item->Draw();
-				item->Update();
+				item.second->Draw();
+				item.second->Update();
 			}
 		}
 	}

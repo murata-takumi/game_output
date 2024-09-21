@@ -389,7 +389,7 @@ SpriteManager::BackGroundDraw()
 /// グリッドを描画する関数
 /// </summary>
 void
-SpriteManager::GridDraw()
+SpriteManager::GridDraw(const map<string, shared_ptr<FBXBase>> actorAndObjs)
 {
 	//ビュー･プロジェクション行列を取得
 	_view = Dx12Wrapper::Instance().ViewMatrix();											
@@ -422,9 +422,9 @@ SpriteManager::GridDraw()
 	_batch->DrawLine(v1, v2);
 
 	//当たり判定を持つオブジェクトが存在したら当たり判定の描画
-	for (const auto& actor : _actorAndObjs)
+	for (const auto& actor : actorAndObjs)
 	{
-		if (actor != nullptr)ColliderDraw(actor->Collider());
+		if (actor.second != nullptr)ColliderDraw(actor.second->Collider());
 	}
 
 	//描画終了
@@ -438,14 +438,4 @@ void
 SpriteManager::Commit()
 {
 	_gmemory->Commit(Dx12Wrapper::Instance().CommandQueue());
-}
-
-/// <summary>
-/// アクターを設定する関数
-/// </summary>
-/// <param name="actor">アクター</param>
-void
-SpriteManager::SetActors(vector<shared_ptr<FBXBase>> actorAndObjects)
-{
-	_actorAndObjs = actorAndObjects;
 }

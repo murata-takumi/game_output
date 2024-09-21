@@ -38,7 +38,7 @@ public:
 
 private:
 	//FBXObjectとFBXActorをまとめたベクトル
-	vector<shared_ptr<FBXBase>> _actorAndObjs;						
+	map<string, shared_ptr<FBXBase>> _actorAndObjs;
 	//アクターインスタンス
 	shared_ptr<FBXActor> _actor;
 	//床インスタンス
@@ -67,7 +67,7 @@ private:
 	int _interval;													
 
 	//オブジェクトを生成する関数
-	template<class className> void InstantiateObject(const wchar_t* path,XMFLOAT3 size);
+	template<class className> void InstantiateObject(const wchar_t* path, string name,XMFLOAT3 size, XMFLOAT3 pos = XMFLOAT3(0.0f,0.0f,0.0f));
 
 	//ペラポリゴンの描画処理をまとめた関数
 	void PeraDraw();	
