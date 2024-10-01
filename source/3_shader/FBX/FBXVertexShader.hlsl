@@ -56,7 +56,8 @@ Output FBXVS
 	//頂点座標
 	output.pos = viewPos;										
 	//システム座標
-	output.svpos = projPos;											
+	output.svpos = projPos;	
+    output.normal = normal;
 	//カラー
 	output.color = color;											
 	//UV座標

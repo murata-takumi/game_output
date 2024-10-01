@@ -3,8 +3,13 @@
 
 //テクスチャ
 Texture2D<float4> tex : register(t0);	
+//トゥーンテクスチャ
+Texture2D<float4> toonTex : register(t1);	
+
 //サンプラー（テクスチャの取得方法を決める）
-SamplerState smp : register(s0);		
+SamplerState smp : register(s0);	
+//サンプラー（トゥーンテクスチャの取得方法を決める）
+SamplerState toonSmp : register(s1);
 
 //ビュープロジェクション用スロット
 cbuffer SceneData : register(b0)

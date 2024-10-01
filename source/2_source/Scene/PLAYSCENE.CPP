@@ -6,7 +6,7 @@
 //プレイヤーデータが格納されているファイルパス
 const wchar_t* ACTOR_PATH = L"Asset/model/Unitychan.fbx";		
 //地面データが格納されているファイルパス
-const wchar_t* GROUND_PATH = L"Asset/model/G.fbx";				
+const wchar_t* GROUND_PATH = L"Asset/model/Field.fbx";				
 //コインのデータが格納されているファイルパス
 const wchar_t* COIN_PATH = L"Asset/model/Coin.fbx";				
 
@@ -524,6 +524,9 @@ PlayScene::ModelDraw()
 	//プレイヤーが読み込み完了している場合FBXBaseクラスを基盤とするオブジェクト全般に対し描画・更新処理を行う
 	if (!_isInLoad)									
 	{
+		//トゥーンテクスチャも描画する
+		Renderer::Instance().Draw();
+
 		for (const auto& item : _actorAndObjs)
 		{
 			if (item.second != nullptr)

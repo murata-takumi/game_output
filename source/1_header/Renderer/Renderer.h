@@ -984,18 +984,32 @@ class Renderer
 	using ComPtr = ComPtr<T>;
 
 private:
-	ComPtr<ID3D12PipelineState> _pipeline;						//パイプラインステート（パイプライン設定を定義するオブジェクト）
-	ComPtr<ID3D12RootSignature> _rootSignature;					//ルートシグネチャ（スロットと各ビューが管理するバッファーを関連付ける）
+    //パイプラインステート（パイプライン設定を定義するオブジェクト）
+	ComPtr<ID3D12PipelineState> _pipeline;						
+    //ルートシグネチャ（GPUのスロットと各ビューが管理するバッファーを関連付ける）
+	ComPtr<ID3D12RootSignature> _rootSignature;					
     
+    //トゥーンテクスチャ用ヒープ
+    ComPtr<ID3D12DescriptorHeap> _toonHeap;
+
+    //トゥーンテクスチャ用ヒープハンドル（GPU）
+    D3D12_GPU_DESCRIPTOR_HANDLE _GpuToonHeapHandle;
+
     //コンストラクタ
     Renderer();
     Renderer(const Renderer&) = delete;
     //デストラクタ
     ~Renderer();
 
-	HRESULT CreateRootSignature();								//ルートシグネチャ初期化関数
-	HRESULT CreateGraphicsPipelineForPMD();						//パイプラインステート初期化関数
-	bool CheckCompilerResult(HRESULT result, ID3DBlob* error);	//シェーダー読み込みの成否を確認する関数
+    //ルートシグネチャ初期化関数
+	HRESULT CreateRootSignature();								
+    //パイプラインステート初期化関数
+	HRESULT CreateGraphicsPipelineForPMD();						
+    //トゥーンテクスチャ用SRVの作成関数
+    HRESULT CreateToonShaderResourceView();
+
+    //シェーダー読み込みの成否を確認する関数
+	bool CheckCompilerResult(HRESULT result, ID3DBlob* error);	
 
 public:
     //シングルトンを返す
@@ -1004,6 +1018,11 @@ public:
     //初期化関数
     void Init();
 
-	ID3D12PipelineState* GetPipelineState()const;	//パイプラインステートを返す関数
-	ID3D12RootSignature* GetRootSignature()const;	//ルートシグネチャを返す関数
+    //トゥーンシェーダー描画
+    void Draw();
+
+    //パイプラインステートを返す関数
+	ID3D12PipelineState* GetPipelineState()const;	
+    //ルートシグネチャを返す関数
+	ID3D12RootSignature* GetRootSignature()const;	
 };
