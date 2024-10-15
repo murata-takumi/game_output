@@ -114,7 +114,7 @@ private:
 	{
 		XMMATRIX view;
 		XMMATRIX proj;
-		XMFLOAT3 eye;
+		XMFLOAT3 light;
 	};
 	//マップ用ポインタ
 	SceneData* _mappedScene;									
@@ -132,7 +132,9 @@ private:
 	//注視点座標
 	XMFLOAT3 _target;											
 	//上座標
-	XMFLOAT3 _up;												
+	XMFLOAT3 _up;				
+	//ライト座標
+	XMFLOAT3 _light;
 
 	//視点の初期座標
 	XMFLOAT3 _initEye;											

@@ -381,8 +381,7 @@ Dx12Wrapper::InitVector()
 /// <param name="hwnd">ウィンドウハンドル</param>
 /// <param name="deltaTime">1フレーム当たりの秒数</param>
 Dx12Wrapper::Dx12Wrapper() :
-	 _perspective(true), _up(0, 1, 0), _fade(1.0f),
-	_initEye(0, 50, INIT_RAD),_initTarget(0, 50, 0)
+	 _perspective(true), _up(0, 1, 0),_light(1.0f,1.0f,0.0f), _fade(1.0f),_initEye(0, 50, INIT_RAD),_initTarget(0, 50, 0)
 {
 
 }
@@ -629,7 +628,7 @@ Dx12Wrapper::SetScene()
 			0.1f, 1000.0f);
 	}
 
-	_mappedScene->eye = _eye;
+	_mappedScene->light = _light;
 
 	ID3D12DescriptorHeap* sceneHeaps[] = { _sceneDescHeap.Get() };				//ディスクリプタヒープをコマンドリストにセット
 	_cmdList->SetDescriptorHeaps(1, sceneHeaps);

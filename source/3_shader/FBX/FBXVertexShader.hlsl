@@ -52,9 +52,9 @@ Output FBXVS
 	float4 viewPos = mul(view, worldPos);							
 	//プロジェクション行列を反映
 	float4 projPos = mul(proj, viewPos);
-
+	
 	//頂点座標
-	output.pos = viewPos;										
+    output.pos = mul(inverse(world), light);
 	//システム座標
 	output.svpos = projPos;	
     output.normal = normal;
@@ -62,7 +62,6 @@ Output FBXVS
 	output.color = color;											
 	//UV座標
 	output.uv = uv;
-	output.dis = worldPos - eye;
 
 	return output;
 }
