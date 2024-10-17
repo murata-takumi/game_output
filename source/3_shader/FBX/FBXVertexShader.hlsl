@@ -54,7 +54,7 @@ Output FBXVS
 	float4 projPos = mul(proj, viewPos);
 	
 	//頂点座標
-    output.pos = mul(inverse(world), light);
+    output.pos = projPos;
 	//システム座標
 	output.svpos = projPos;	
     output.normal = normal;
