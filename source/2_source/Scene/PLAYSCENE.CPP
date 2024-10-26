@@ -31,8 +31,7 @@ const float FRAME_TIME = 1.0f / 60.0f;							//XV‰ñ”‚ğ60FPS‚ÉŒÅ’è‚·‚éÛ‚Ì1ƒtƒ
 PlayScene::PlayScene()
 	:_fps(0.0f)
 {
-	//ƒtƒŠƒbƒvŠÔŠu‚ğæ“¾
-	_interval = Application::Instance().GetInterval();
+
 }
 
 /// <summary>
@@ -62,6 +61,8 @@ PlayScene::Update()
 		if (_actorAndObjs[COIN_NAME] && CheckColliders(*_actorAndObjs[COIN_NAME]->Collider(), *_actor->Collider()))
 		{
 			_actorAndObjs.erase(COIN_NAME);
+
+			SoundManager::Instance().CallSound(COIN);
 		}
 
 		//WASDƒL[‚Ì“ü—Í‚É‰‚¶‚Ä‹“_‚ğˆÚ“®‚³‚¹‚é
@@ -107,15 +108,16 @@ PlayScene::Update()
 				Dx12Wrapper::Instance().ScalingCoordinates(90);
 			}
 		}
+		
 		//ƒAƒNƒ^[‚ªˆÚ“®‰Â”\‚©‚Ç‚¤‚©
 		if (ImGuiManager::Instance().CanActorTrans())
 		{
-			if ((InputManager::Instance().KeyState().Left ||
+			auto isInTrans = InputManager::Instance().KeyState().Left ||
 				InputManager::Instance().KeyState().Right ||
-				InputManager::Instance().KeyState().Up    ||
-				InputManager::Instance().KeyState().Down) &&
-				!_actor->IsAnimationEqual(RUN00_F)
-				)
+				InputManager::Instance().KeyState().Up ||
+				InputManager::Instance().KeyState().Down;
+
+			if (isInTrans)
 			{
 				_actor->SetAnimationNode(RUN00_F);
 			}
@@ -139,25 +141,23 @@ PlayScene::Update()
 
 			if (XMVector3Length(_direction).m128_f32[0] > 0.0f)
 			{
-				_direction = XMVector3Normalize(_direction);		//ˆÚ“®ƒxƒNƒgƒ‹‚ğ³‹K‰»
-				_actor->Translate(_direction);						//ƒAƒNƒ^[‚ğˆÚ“®
-				Dx12Wrapper::Instance().TranslateCoordinates(_direction);				//ƒJƒƒ‰‚àˆÚ“®
+				//ˆÚ“®ƒxƒNƒgƒ‹‚ğ³‹K‰»
+				_direction = XMVector3Normalize(_direction);		
+				//ƒAƒNƒ^[‚ğˆÚ“®
+				_actor->Translate(_direction);						
+				//ƒJƒƒ‰‚àˆÚ“®
+				Dx12Wrapper::Instance().TranslateCoordinates(_direction);				
 
-				_direction = XMVectorZero();						//ˆÚ“®ƒxƒNƒgƒ‹‚ğ‰Šú‰»
+				//ˆÚ“®ƒxƒNƒgƒ‹‚ğ‰Šú‰»
+				_direction = XMVectorZero();						
 			}
 
-			if ((!InputManager::Instance().KeyState().Left	&&
-				!InputManager::Instance().KeyState().Right	&&
-				!InputManager::Instance().KeyState().Up		&&
-				!InputManager::Instance().KeyState().Down)    &&
-				!_actor->IsAnimationEqual(WAIT00)
-				)
+			if (!isInTrans)
 			{
 				_actor->SetAnimationNode(WAIT00);
 			}
 
-			if (InputManager::Instance().KeyTracker().IsKeyPressed(Keyboard::Space) &&
-				!_actor->IsAnimationEqual(JUMP00))
+			if (InputManager::Instance().KeyTracker().IsKeyPressed(Keyboard::Space))
 			{
 				_actor->SetAnimationNode(JUMP00);
 			}
@@ -407,7 +407,7 @@ PlayScene::GameDraw()
 	Dx12Wrapper::Instance().EndGameDraw();															
 
 	//ƒXƒƒbƒvƒ`ƒF[ƒ“‚ÌƒtƒŠƒbƒvˆ—
-	Dx12Wrapper::Instance().Swapchain()->Present(_interval, 0);										
+	Dx12Wrapper::Instance().Swapchain()->Present(Application::Instance().GetInterval(), 0);
 
 	//ƒOƒ‰ƒtƒBƒbƒNƒXƒƒ‚ƒŠ‚ğİ’è
 	SpriteManager::Instance().Commit();														

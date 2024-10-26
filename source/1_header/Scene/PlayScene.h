@@ -61,10 +61,7 @@ private:
 	LARGE_INTEGER _beforeTime;										
 
 	//1秒当たりに画面が切り替わる回数
-	double _fps;													
-
-	//フリップ間隔
-	int _interval;													
+	double _fps;												
 
 	//オブジェクトを生成する関数
 	template<class className> void InstantiateObject(const wchar_t* path, string name,XMFLOAT3 size, XMFLOAT3 pos = XMFLOAT3(0.0f,0.0f,0.0f));

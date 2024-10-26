@@ -4,6 +4,10 @@
 
 //アニメーション名に付与する文字列リテラル
 const char* CHARA_REF = "Character1_Reference|";
+//移動速度
+const float MOVE_SPEED = 300.0f;
+//重力加速度
+const float GRAVITY_ACCERALATION = 9.8f;
 //アニメーションのブレンドに掛ける秒数
 const float BLEND_SPEED = 0.2f;
 //アニメーション名の不要な文字列を削除するためのインデックス
@@ -134,7 +138,8 @@ void
 FBXActor::SetAnimationNode(AnimEnum anim)
 {
 	//アニメーションを変更できる状態か確認
-	if (!_canChangeAnim) return;
+	//同じアニメーションの再生しようとした時も関数を終了させる
+	if (!_canChangeAnim || IsAnimationEqual(anim)) return;
 
 	//前ノードの終了処理
 	if (_crntNode != nullptr)
@@ -562,7 +567,7 @@ FBXActor::Update()
 		//アニメーションノードの更新
 		_crntNode->Update(_animTime);												
 
-		if (!_isOnGround && !IsAnimationEqual(JUMP00))_pos.m128_f32[1] -= _dx12.GetDeltaTime() * 45.0f * 9.8f;
+		if (!_isOnGround && !IsAnimationEqual(JUMP00))_pos.m128_f32[1] -= _dx12.GetDeltaTime() * 45.0f * GRAVITY_ACCERALATION;
 
 		//回転、平行移動
 		_mappedMats[0] = XMMatrixRotationY(_rotY);									
@@ -598,7 +603,7 @@ void
 FBXActor::Translate(const XMVECTOR& input)
 {
 	//座標に入力に応じたベクトルを加算
-	_pos += input * _dx12.GetDeltaTime() * 300.0f;
+	_pos += input * _dx12.GetDeltaTime() * MOVE_SPEED;
 
 	//入力ベクトルと正面ベクトルの角度差を取得
 	auto diff = XMVector3AngleBetweenVectors(input, _frontVec).m128_f32[0];			
@@ -828,5 +833,12 @@ FBXActor::SetIsInLoop(bool val)
 bool
 FBXActor::IsAnimationEqual(AnimEnum anim)
 {
-	return _crntNode->GetAnimEnum() == anim;
+	if (!_crntNode)
+	{
+		return false;
+	}
+	else
+	{
+		return _crntNode->GetAnimEnum() == anim;
+	}
 }

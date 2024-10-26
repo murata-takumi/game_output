@@ -4,8 +4,8 @@
 //UV座標を基に頂点にテクスチャを付与する
 float4 FBXPS(Output input) : SV_TARGET
 {
-    float3 l = mul(inverse(world), light);
-    float diffuseB = saturate(dot(l, input.normal.xyz));
+    float3 inversedLightl = mul(inverse(world), light);
+    float diffuseB = saturate(dot(inversedLightl, input.normal.xyz));
 
 	float4 ret = tex.Sample(smp,input.uv);
 	
