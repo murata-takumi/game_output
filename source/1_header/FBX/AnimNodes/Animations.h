@@ -9,6 +9,7 @@ enum AnimEnum
 	WAIT00,
 	RUN00_F,
 	JUMP00,
+	FALL,
 	Length,
 };
 
@@ -21,4 +22,5 @@ static map<AnimEnum, string> animations
 	{WAIT00,"WAIT00"},
 	{RUN00_F,"RUN00_F"},
 	{JUMP00,"JUMP00"},
+	{FALL,"JUMP00B"},
 };

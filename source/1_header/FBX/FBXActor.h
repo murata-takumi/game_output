@@ -4,6 +4,7 @@
 #include "FBX/AnimNodes/WAIT00Node.h"
 #include "FBX/AnimNodes/RUN00_FNode.h"
 #include "FBX/AnimNodes/JUMP00Node.h"
+#include "FBX/AnimNodes/FallNode.h"
 #include "FBX/FBXBase.h"
 
 /// <summary>
@@ -16,6 +17,7 @@ class AnimNode;
 class WAIT00Node;
 class RUN00_FNode;
 class JUMP00Node;
+class FallNode;
 class FBXActor : public FBXBase
 {	
 	template<typename T>using ComPtr = ComPtr<T>;
@@ -69,6 +71,8 @@ private:
 	float _destRad = 0.0f;
 	//モーションブレンド時に使用するウェイト値
 	float _blendWeight = 0.0f;	
+	//アニメーションの再生速度
+	float _animSpeed = 1.0f;
 	//アニメーションの再生時間
 	float _animTime = 0.0f;			
 	//アニメーションの第2フレーム（Tポーズでないポーズの最初のフレーム）の秒数
@@ -130,8 +134,10 @@ public:
 	float GetSecondFrame();												
 
 	//実行するアニメーション名を指定する関数
-	void SetAnimStr(string animStr);			
+	void SetAnimStr(string animStr);
 	//アニメーションの再生速度を設定する関数
+	void SetAnimationSpeed(float speed);
+	//アニメーションの再生時間を設定する関数
 	void SetAnimationTime(float time);					
 	//アクターをTポーズにする関数
 	void InitPose();													
@@ -150,7 +156,7 @@ public:
 	bool GetCanControll()const;											
 
 	//アニメーションが引数に等しいか返す関数
-	bool IsAnimationEqual(AnimEnum anim);								
+	bool IsAnimationEqual(AnimEnum anim)const;								
 	//アニメーション間のブレンドを実行する関数
 	void SetAnimationNode(AnimEnum anim);		
 	//アニメーションをセットする関数
@@ -162,4 +168,6 @@ public:
 	void SetOnGround(bool val);
 	//アニメーションループ可能か設定する
 	void SetIsInLoop(bool val);
+	//地面に接しているかどうかを返す
+	bool GetOnGround()const;
 };

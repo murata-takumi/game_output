@@ -8,19 +8,14 @@
 #include "FBX/FBXObject.h"
 #include "Manager/EffectManager.h"
 #include "Manager/ImGuiManager.h"
-#include "Manager/InputManager.h"
-#include "Manager/SoundManager.h"
-#include "Manager/SpriteManager.h"
-#include "Renderer/PeraRenderer.h"
-#include "Renderer/Renderer.h"
-#include "Wrapper/Dx12Wrapper.h"
+#include "Scene/BaseScene.h"
 
 #include <chrono>
 
 /// <summary>
 /// ゲームシーンを管理するクラス
 /// </summary>
-class PlayScene
+class PlayScene : public BaseScene
 {
 public:
 	//コンストラクタ

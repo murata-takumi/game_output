@@ -22,6 +22,7 @@
     <ClInclude Include="1_header\Application.h" />
     <ClInclude Include="1_header\FBX\AnimNodes\Animations.h" />
     <ClInclude Include="1_header\FBX\AnimNodes\AnimNode.h" />
+    <ClInclude Include="1_header\FBX\AnimNodes\FallNode.h" />
     <ClInclude Include="1_header\FBX\AnimNodes\JUMP00Node.h" />
     <ClInclude Include="1_header\FBX\AnimNodes\RUN00_FNode.h" />
     <ClInclude Include="1_header\FBX\AnimNodes\WAIT00Node.h" />
@@ -41,13 +42,16 @@
     <ClInclude Include="1_header\Package\Package.h" />
     <ClInclude Include="1_header\Renderer\PeraRenderer.h" />
     <ClInclude Include="1_header\Renderer\Renderer.h" />
+    <ClInclude Include="1_header\Scene\BaseScene.h" />
     <ClInclude Include="1_header\Scene\PlayScene.h" />
+    <ClInclude Include="1_header\Scene\TitleScene.h" />
     <ClInclude Include="1_header\Wrapper\Dx12Wrapper.h" />
     <ClInclude Include="1_header\Wrapper\SphericalCoordinates.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="2_source\Application.cpp" />
     <ClCompile Include="2_source\FBX\AnimNodes\AnimNode.cpp" />
+    <ClCompile Include="2_source\FBX\AnimNodes\FallNode.cpp" />
     <ClCompile Include="2_source\FBX\AnimNodes\JUMP00Node.cpp" />
     <ClCompile Include="2_source\FBX\AnimNodes\RUN00_FNode.cpp" />
     <ClCompile Include="2_source\FBX\AnimNodes\WAIT00Node.cpp" />
@@ -66,7 +70,9 @@
     <ClCompile Include="2_source\Package\Package.cpp" />
     <ClCompile Include="2_source\Renderer\PeraRenderer.cpp" />
     <ClCompile Include="2_source\Renderer\Renderer.cpp" />
+    <ClCompile Include="2_source\Scene\BaseScene.cpp" />
     <ClCompile Include="2_source\Scene\PlayScene.cpp" />
+    <ClCompile Include="2_source\Scene\TitleScene.cpp" />
     <ClCompile Include="2_source\Wrapper\Dx12Wrapper.cpp" />
     <ClCompile Include="2_source\Wrapper\SphericalCoordinates.cpp" />
   </ItemGroup>

@@ -31,6 +31,7 @@ FBXActor::FBXActor(Dx12Wrapper& dx12, const wchar_t* filePath, XMFLOAT3 size, XM
 	_animNodes[WAIT00] = make_unique<WAIT00Node>(this,WAIT00);
 	_animNodes[RUN00_F] = make_unique<RUN00_FNode>(this, RUN00_F);
 	_animNodes[JUMP00] = make_unique<JUMP00Node>(this, JUMP00);
+	_animNodes[FALL] = make_unique<FallNode>(this, FALL);
 
 	//アニメーションに関するデータを初期化
 	InitAnimation();															
@@ -555,7 +556,7 @@ FBXActor::Update()
 		//現フレームの時間を取得し前フレームの時間との差分を経過時間に加算
 		QueryPerformanceCounter(&_currFrameTime);
 		auto diff = GetLIntDiff(_currFrameTime, _befFrameTime);
-		_animTime += static_cast<float>(diff) * GetAnimTickPerSpeed(_currentActorAnim);
+		_animTime += static_cast<float>(diff) * GetAnimTickPerSpeed(_currentActorAnim) * _animSpeed;
 
 		//最初のフレームを無視したうえでアニメーションがループするよう設定
 		if (_isInLoop)
@@ -786,6 +787,16 @@ FBXActor::SetAnimStr(string animStr)
 }
 
 /// <summary>
+/// アニメーションの再生速度を設定する
+/// </summary>
+/// <param name="speed">再生速度</param>
+void 
+FBXActor::SetAnimationSpeed(float speed)
+{
+	_animSpeed = speed;
+}
+
+/// <summary>
 /// ImGui側からアニメーションの再生時間を貰う関数
 /// </summary>
 /// <param name="time">再生時間</param>
@@ -826,12 +837,22 @@ FBXActor::SetIsInLoop(bool val)
 }
 
 /// <summary>
+/// 地面に接しているかどうかを返す
+/// </summary>
+/// <returns>真理値</returns>
+bool
+FBXActor::GetOnGround()const
+{
+	return _isOnGround;
+}
+
+/// <summary>
 /// 現在のアニメーションを取得する関数
 /// </summary>
 /// <param name="anim">比較したいアニメーション</param>
 /// <returns>引数と現在のアニメーションが等しいか</returns>
 bool
-FBXActor::IsAnimationEqual(AnimEnum anim)
+FBXActor::IsAnimationEqual(AnimEnum anim)const
 {
 	if (!_crntNode)
 	{

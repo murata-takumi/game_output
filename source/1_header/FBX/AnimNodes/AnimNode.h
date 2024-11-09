@@ -20,11 +20,12 @@ public:
 	//コンストラクタ
 	AnimNode(FBXActor* actor, AnimEnum anim);
 
-	//毎フレーム呼び出す
-	virtual void Update(float animTime);
 
 	//アニメーション開始時に呼び出す関数
 	virtual void StartAnimation();
+
+	//毎フレーム呼び出す
+	virtual void Update(float& animTime);
 
 	//アニメーション終了時に呼び出す
 	virtual void EndAnimation();

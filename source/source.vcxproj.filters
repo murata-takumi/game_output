@@ -135,6 +135,15 @@
     <ClInclude Include="1_header\Includes.h">
       <Filter>1_header</Filter>
     </ClInclude>
+    <ClInclude Include="1_header\Scene\TitleScene.h">
+      <Filter>1_header\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="1_header\Scene\BaseScene.h">
+      <Filter>1_header\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="1_header\FBX\AnimNodes\FallNode.h">
+      <Filter>1_header\FBX\AnimNodes</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="2_source\Application.cpp">
@@ -204,6 +213,15 @@
       <Filter>2_source\FBX\AnimNodes</Filter>
     </ClCompile>
     <ClCompile Include="2_source\FBX\AnimNodes\JUMP00Node.cpp">
+      <Filter>2_source\FBX\AnimNodes</Filter>
+    </ClCompile>
+    <ClCompile Include="2_source\Scene\TitleScene.cpp">
+      <Filter>2_source\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="2_source\Scene\BaseScene.cpp">
+      <Filter>2_source\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="2_source\FBX\AnimNodes\FallNode.cpp">
       <Filter>2_source\FBX\AnimNodes</Filter>
     </ClCompile>
   </ItemGroup>

@@ -16,11 +16,21 @@ AnimNode::AnimNode(FBXActor* actor, AnimEnum anim)
 }
 
 /// <summary>
+/// アニメーション開始時に呼び出す関数
+/// アクターにアニメーションを実行させる
+/// </summary>
+void
+AnimNode::StartAnimation()
+{
+	_actor->BlendAnimation(_anim);
+};
+
+/// <summary>
 /// アニメーション実行時、毎フレーム呼び出す関数
 /// </summary>
 /// <param name="animTime">アニメーションの再生時間</param>
 void 
-AnimNode::Update(float animTime)
+AnimNode::Update(float& animTime)
 {
 
 };
@@ -32,16 +42,6 @@ void
 AnimNode::EndAnimation()
 {
 
-};
-
-/// <summary>
-/// アニメーション開始時に呼び出す関数
-/// アクターにアニメーションを実行させる
-/// </summary>
-void
-AnimNode::StartAnimation()
-{
-	_actor->BlendAnimation(_anim);
 };
 
 /// <summary>

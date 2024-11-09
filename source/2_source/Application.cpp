@@ -1,5 +1,7 @@
 #include "Application.h"
 #include "Package/Package.h"
+#include "Scene/BaseScene.h"
+#include "Scene/TitleScene.h"
 #include "Scene/PlayScene.h"
 
 const unsigned int DISPLAY_WIDTH = GetSystemMetrics(SM_CXSCREEN);		//ディスプレイ幅
@@ -201,6 +203,7 @@ Application::Init()
 	ShowWindow(_hwnd, SW_SHOW);													
 
 	//ゲームシーンの初期化
+	_title.reset(new TitleScene());
 	_play.reset(new PlayScene());
 	_play->SceneStart();
 
@@ -260,6 +263,45 @@ Application::GetWindowSize()const
 	ret.cy = WINDOW_HEIGHT;
 
 	return ret;
+}
+
+/// <summary>
+/// シーンを切り替える関数
+/// </summary>
+/// <param name="name">切り替えたいシーン</param>
+void
+Application::ChangeScene(SceneNames name)
+{
+	//引数に応じて遷移先のシーンを決める
+	switch (name)
+	{
+	case SceneNames::Title:
+		//タイトルシーンへ遷移
+		SetScene(_title);		
+		break;
+	case SceneNames::Play:
+		//ゲームシーンへ遷移
+		SetScene(_play);		
+		break;
+	default:			
+		//シーン名が上記のどれでもない場合異常終了
+		assert(0);
+		break;
+	}
+}
+
+/// <summary>
+/// シーンの設定・終了時の処理・開始時の処理を実行する関数
+/// </summary>
+/// <param name="scene">切り替えたいシーンオブジェクト</param>
+void
+Application::SetScene(shared_ptr<BaseScene> scene)
+{
+	if (_scene != nullptr)_scene->SceneEnd();	//シーン終了時の処理
+
+	if (scene != nullptr)_scene = scene;		//シーン切り替え
+
+	_scene->SceneStart();						//シーン開始時の処理
 }
 
 /// <summary>

@@ -29,7 +29,7 @@ const float FRAME_TIME = 1.0f / 60.0f;							//XV‰ñ”‚ğ60FPS‚ÉŒÅ’è‚·‚éÛ‚Ì1ƒtƒ
 /// ƒRƒ“ƒXƒgƒ‰ƒNƒ^
 /// </summary>
 PlayScene::PlayScene()
-	:_fps(0.0f)
+	:BaseScene(),_fps(0.0f)
 {
 
 }
@@ -112,33 +112,25 @@ PlayScene::Update()
 		//ƒAƒNƒ^[‚ªˆÚ“®‰Â”\‚©‚Ç‚¤‚©
 		if (ImGuiManager::Instance().CanActorTrans())
 		{
-			auto isInTrans = InputManager::Instance().KeyState().Left ||
-				InputManager::Instance().KeyState().Right ||
-				InputManager::Instance().KeyState().Up ||
-				InputManager::Instance().KeyState().Down;
-
-			if (isInTrans)
-			{
-				_actor->SetAnimationNode(RUN00_F);
-			}
-
+			//ƒJƒƒ‰‚É‘Î‚µ“ü—Í•ûŒü‚ÉƒxƒNƒgƒ‹‰ÁZ
 			if (InputManager::Instance().KeyState().Left)
 			{
-				_direction += Dx12Wrapper::Instance().GetRightVector();				//ƒJƒƒ‰‚É‘Î‚µ¶•ûŒü‚ÉƒxƒNƒgƒ‹‰ÁZ
+				_direction += Dx12Wrapper::Instance().GetRightVector();				
 			}
 			if (InputManager::Instance().KeyState().Right)
 			{
-				_direction += Dx12Wrapper::Instance().GetRightVector() * -1;			//ƒJƒƒ‰‚É‘Î‚µ‰E•ûŒü‚ÉƒxƒNƒgƒ‹‰ÁZ
+				_direction += Dx12Wrapper::Instance().GetRightVector() * -1;
 			}
 			if (InputManager::Instance().KeyState().Up)
 			{
-				_direction += Dx12Wrapper::Instance().GetXZVecEyeToTarget();			//ƒJƒƒ‰‚É‘Î‚µ‰œ•ûŒü‚ÉƒxƒNƒgƒ‹‰ÁZ
+				_direction += Dx12Wrapper::Instance().GetXZVecEyeToTarget();
 			}
 			if (InputManager::Instance().KeyState().Down)
 			{
-				_direction += Dx12Wrapper::Instance().GetXZVecEyeToTarget() * -1;		//ƒJƒƒ‰‚É‘Î‚µè‘O•ûŒü‚ÉƒxƒNƒgƒ‹‰ÁZ
+				_direction += Dx12Wrapper::Instance().GetXZVecEyeToTarget() * -1;
 			}
 
+			//‚Ç‚ê‚©“ü—Í‚³‚ê‚Ä‚¢‚ê‚ÎˆÚ“®ˆ—
 			if (XMVector3Length(_direction).m128_f32[0] > 0.0f)
 			{
 				//ˆÚ“®ƒxƒNƒgƒ‹‚ğ³‹K‰»
@@ -147,19 +139,26 @@ PlayScene::Update()
 				_actor->Translate(_direction);						
 				//ƒJƒƒ‰‚àˆÚ“®
 				Dx12Wrapper::Instance().TranslateCoordinates(_direction);				
+				
+				_actor->SetAnimationNode(RUN00_F);
 
 				//ˆÚ“®ƒxƒNƒgƒ‹‚ğ‰Šú‰»
 				_direction = XMVectorZero();						
 			}
-
-			if (!isInTrans)
+			else
 			{
 				_actor->SetAnimationNode(WAIT00);
 			}
 
-			if (InputManager::Instance().KeyTracker().IsKeyPressed(Keyboard::Space))
+			//ƒXƒy[ƒXƒL[‚ª‰Ÿ‚³‚ê‚½‚çƒWƒƒƒ“ƒvˆ—
+			if (InputManager::Instance().KeyTracker().IsKeyPressed(Keyboard::Space) && _actor->GetOnGround())
 			{
 				_actor->SetAnimationNode(JUMP00);
+			}
+
+			if (!_actor->GetOnGround())
+			{
+				_actor->SetAnimationNode(FALL);
 			}
 		}
 

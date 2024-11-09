@@ -1,5 +1,5 @@
 #pragma once
-#include "FBX/AnimNodes/JUMP00Node.h"
+#include "FBX/AnimNodes/FallNode.h"
 #include "FBX/FBXActor.h"
 
 /// <summary>
@@ -7,7 +7,7 @@
 /// </summary>
 /// <param name="actor">ポインタ</param>
 /// <param name="anim">列挙体</param>
-JUMP00Node::JUMP00Node(FBXActor* actor, AnimEnum anim)
+FallNode::FallNode(FBXActor* actor, AnimEnum anim)
 	:AnimNode(actor, anim)
 {
 
@@ -17,15 +17,14 @@ JUMP00Node::JUMP00Node(FBXActor* actor, AnimEnum anim)
 /// アニメーション開始時に呼び出す関数
 /// </summary>
 void
-JUMP00Node::StartAnimation()
+FallNode::StartAnimation()
 {
 	AnimNode::StartAnimation();
 
-	_actor->SetAnimationTime(8.5f);
+	_actor->SetIsInLoop(true);
 	//別アニメーションに遷移しないようにする
 	_actor->SetCanChangeAnim(false);
-	//ループしないようにする
-	_actor->SetIsInLoop(false);
+	_actor->SetAnimationSpeed(0.1f);
 }
 
 /// <summary>
@@ -33,13 +32,25 @@ JUMP00Node::StartAnimation()
 /// </summary>
 /// <param name="animTime">現在の経過時間</param>
 void
-JUMP00Node::Update(float& animTime)
+FallNode::Update(float& animTime)
 {
 	AnimNode::Update(animTime);
 
-	//一定時間経過したらアニメーション遷移できるようにする
-	if (animTime >= 35.0f)
+	//ループしているように見せる為の苦肉の策
+	if (animTime <= 30.0f)
 	{
+		animTime = 30.0f;
+		_actor->SetAnimationSpeed(0.1f);
+	}
+	else if (31.0f < animTime)
+	{
+		animTime = 31.0f;
+		_actor->SetAnimationSpeed(-0.1f);
+	}
+
+	if (_actor->GetOnGround())
+	{
+		//別アニメーションに遷移できるようにする
 		_actor->SetCanChangeAnim(true);
 	}
 }
@@ -48,8 +59,8 @@ JUMP00Node::Update(float& animTime)
 /// アニメーション終了時に呼び出す関数
 /// </summary>
 void
-JUMP00Node::EndAnimation()
+FallNode::EndAnimation()
 {
-	//ループできるようにする
-	_actor->SetIsInLoop(true);
+	_actor->SetIsInLoop(false);
+	_actor->SetAnimationSpeed(1.0f);
 }

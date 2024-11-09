@@ -439,3 +439,15 @@ SpriteManager::Commit()
 {
 	_gmemory->Commit(Dx12Wrapper::Instance().CommandQueue());
 }
+
+bool
+SpriteManager::TitleIsOnStart()
+{
+	return true;
+}
+
+bool
+SpriteManager::TitleIsOnEnd()
+{
+	return true;
+}

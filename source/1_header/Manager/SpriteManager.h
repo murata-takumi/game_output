@@ -115,4 +115,8 @@ public:
 
 	//グラフィックスメモリをコマンドリストにセット
 	void Commit();
+
+	bool TitleIsOnStart();
+
+	bool TitleIsOnEnd();
 };
