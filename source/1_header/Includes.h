@@ -35,5 +35,8 @@ const string BOX_COL_Y_MAX = "YMax";
 const string BOX_COL_Z_MIN = "ZMin";
 const string BOX_COL_Z_MAX = "ZMax";
 
+//更新回数を60FPSに固定する際の1フレームの秒数
+const float FRAME_TIME = 1.0f / 60.0f;
+
 const int DIFF = 15;
 const int ANIMATION_HEIGHT = 200;

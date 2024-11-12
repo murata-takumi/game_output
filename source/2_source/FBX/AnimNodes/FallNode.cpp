@@ -21,7 +21,6 @@ FallNode::StartAnimation()
 {
 	AnimNode::StartAnimation();
 
-	_actor->SetIsInLoop(true);
 	//別アニメーションに遷移しないようにする
 	_actor->SetCanChangeAnim(false);
 	_actor->SetAnimationSpeed(0.1f);
@@ -61,6 +60,5 @@ FallNode::Update(float& animTime)
 void
 FallNode::EndAnimation()
 {
-	_actor->SetIsInLoop(false);
 	_actor->SetAnimationSpeed(1.0f);
 }

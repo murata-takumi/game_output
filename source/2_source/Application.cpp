@@ -205,7 +205,8 @@ Application::Init()
 	//ゲームシーンの初期化
 	_title.reset(new TitleScene());
 	_play.reset(new PlayScene());
-	_play->SceneStart();
+	
+	ChangeScene(SceneNames::Play);
 
 	return true;
 }
@@ -235,7 +236,7 @@ Application::Run()
 		//シーンの更新処理
 		else
 		{			
-			_play->Update();									
+			_scene->Update();									
 		}
 	}
 }
@@ -275,11 +276,11 @@ Application::ChangeScene(SceneNames name)
 	//引数に応じて遷移先のシーンを決める
 	switch (name)
 	{
-	case SceneNames::Title:
+	case Title:
 		//タイトルシーンへ遷移
 		SetScene(_title);		
 		break;
-	case SceneNames::Play:
+	case Play:
 		//ゲームシーンへ遷移
 		SetScene(_play);		
 		break;

@@ -21,6 +21,4 @@ public:
 	void SceneEnd() override;		
 
 protected:
-	//”wŒi‚ğ•`‰æ‚·‚éŠÖ”
-	void BackGroundDraw() override;
 };

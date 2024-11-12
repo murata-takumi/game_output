@@ -19,17 +19,16 @@ const XMFLOAT3 COIN_COLL_SIZE = XMFLOAT3(25.0f, 25.0f, 25.0f);
 //コインの初期座標
 const XMFLOAT3 COIN_INIT_POS = XMFLOAT3(0.0f, 12.5f, 100.0f);
 
+//オブジェクトの名前一覧
 const string ACTOR_NAME = "Actor";
 const string GROUND_NAME = "Ground";
 const string COIN_NAME = "Coin";
-
-const float FRAME_TIME = 1.0f / 60.0f;							//更新回数を60FPSに固定する際の1フレームの秒数
 
 /// <summary>
 /// コンストラクタ
 /// </summary>
 PlayScene::PlayScene()
-	:BaseScene(),_fps(0.0f)
+	:BaseScene()
 {
 
 }
@@ -43,16 +42,73 @@ PlayScene::~PlayScene()
 }
 
 /// <summary>
+/// シーン開始時に実行する関数
+/// </summary>
+void
+PlayScene::SceneStart()
+{
+	//カメラ位置をリセット
+	Dx12Wrapper::Instance().ResetCoordinates(0,0);								
+
+	//プレイヤーの移動ベクトルを初期化
+	_direction = XMVectorZero();										
+
+	//モデル読み込み処理
+	auto f = [&]()
+	{
+		//ロード中だと示す
+		BaseScene::_canInput = false;
+
+		//スレッドに各オブジェクトの作成処理を追加
+		InstantiateObject<FBXActor>(ACTOR_PATH,ACTOR_NAME,ACTOR_COLL_SIZE);
+		InstantiateObject<FBXObject>(GROUND_PATH,GROUND_NAME,GROUND_COLL_SIZE);
+		InstantiateObject<FBXObject>(COIN_PATH,COIN_NAME,COIN_COLL_SIZE, COIN_INIT_POS);
+
+		//スレッドが全て完了するまでここで待機
+		for (auto& th : _ths)							
+		{
+			th.join();
+		}
+
+		//オブジェクトの中からアクターを探す
+		for (const auto& object : _actorAndObjs)
+		{
+			if (_actor = dynamic_pointer_cast<FBXActor>(object.second))
+			{
+				break;
+			}
+		}
+
+		ImGuiManager::Instance().SetActor(_actorAndObjs);
+
+		//ロード完了
+		BaseScene::_canInput = true;
+
+		//フェードイン処理を並列処理
+		auto startFunc = [&]()
+		{
+			Dx12Wrapper::Instance().Fade(1.0f, 0.0f);										
+		};
+		BaseScene::ParallelProcess(startFunc);
+
+		//エフェクト実行
+		//Dx12Wrapper::Instance().Effect()->CallEffect();									
+	};
+	//上記の読み込み処理を通常の描画処理と並行して行う
+	BaseScene::ParallelProcess(f);
+}
+
+/// <summary>
 /// 更新処理
 /// </summary>
 void
 PlayScene::Update()
 {
 	//入力を更新
-	InputUpdate();													
+	BaseScene::InputUpdate();
 
 	//操作可能な場合入力を反映する
-	if (!_isInLoad)													
+	if (BaseScene::_canInput)
 	{
 		_actor->SetOnGround(CheckColliders(*_actorAndObjs[GROUND_NAME]->Collider(), *_actor->Collider()));
 		ImGuiManager::Instance()._isCrossed = CheckColliders(*_actorAndObjs[GROUND_NAME]->Collider(), *_actor->Collider());
@@ -62,7 +118,7 @@ PlayScene::Update()
 		{
 			_actorAndObjs.erase(COIN_NAME);
 
-			SoundManager::Instance().CallSound(COIN);
+			SoundManager::Instance().CallSound(Sounds::COIN);
 		}
 
 		//WASDキーの入力に応じて視点を移動させる
@@ -108,14 +164,14 @@ PlayScene::Update()
 				Dx12Wrapper::Instance().ScalingCoordinates(90);
 			}
 		}
-		
+
 		//アクターが移動可能かどうか
 		if (ImGuiManager::Instance().CanActorTrans())
 		{
 			//カメラに対し入力方向にベクトル加算
 			if (InputManager::Instance().KeyState().Left)
 			{
-				_direction += Dx12Wrapper::Instance().GetRightVector();				
+				_direction += Dx12Wrapper::Instance().GetRightVector();
 			}
 			if (InputManager::Instance().KeyState().Right)
 			{
@@ -134,17 +190,19 @@ PlayScene::Update()
 			if (XMVector3Length(_direction).m128_f32[0] > 0.0f)
 			{
 				//移動ベクトルを正規化
-				_direction = XMVector3Normalize(_direction);		
+				_direction = XMVector3Normalize(_direction);
 				//アクターを移動
-				_actor->Translate(_direction);						
+				_actor->Translate(_direction);
 				//カメラも移動
-				Dx12Wrapper::Instance().TranslateCoordinates(_direction);				
-				
+				Dx12Wrapper::Instance().TranslateCoordinates(_direction);
+
+				//移動アニメーション
 				_actor->SetAnimationNode(RUN00_F);
 
 				//移動ベクトルを初期化
-				_direction = XMVectorZero();						
+				_direction = XMVectorZero();
 			}
+			//入力されていなければ待機アニメーション
 			else
 			{
 				_actor->SetAnimationNode(WAIT00);
@@ -187,64 +245,7 @@ PlayScene::Update()
 	}
 
 	//描画処理
-	DrawUpdate();
-}
-
-/// <summary>
-/// シーン開始時に実行する関数
-/// </summary>
-void
-PlayScene::SceneStart()
-{
-	//カメラ位置をリセット
-	Dx12Wrapper::Instance().ResetCoordinates(0,0);								
-
-	//プレイヤーの移動ベクトルを初期化
-	_direction = XMVectorZero();										
-
-	//モデル読み込み処理
-	auto f = [&]()
-	{
-		//ロード中だと示す
-		_isInLoad = true;
-
-		//スレッドに各オブジェクトの作成処理を追加
-		InstantiateObject<FBXActor>(ACTOR_PATH,ACTOR_NAME,ACTOR_COLL_SIZE);
-		InstantiateObject<FBXObject>(GROUND_PATH,GROUND_NAME,GROUND_COLL_SIZE);
-		InstantiateObject<FBXObject>(COIN_PATH,COIN_NAME,COIN_COLL_SIZE, COIN_INIT_POS);
-
-		//スレッドが全て完了するまでここで待機
-		for (auto& th : _ths)							
-		{
-			th.join();
-		}
-
-		//オブジェクトの中からアクターを探す
-		for (const auto& object : _actorAndObjs)
-		{
-			if (_actor = dynamic_pointer_cast<FBXActor>(object.second))
-			{
-				break;
-			}
-		}
-
-		ImGuiManager::Instance().SetActor(_actorAndObjs);
-
-		//ロード完了
-		_isInLoad = false;		
-
-		//フェードイン処理を並列処理
-		auto startFunc = [&]()
-		{
-			Dx12Wrapper::Instance().Fade(1.0f, 0.0f);										
-		};
-		ParallelProcess(startFunc);
-
-		//エフェクト実行
-		//Dx12Wrapper::Instance().Effect()->CallEffect();									
-	};
-	//上記の読み込み処理を通常の描画処理と並行して行う
-	ParallelProcess(f);													
+	BaseScene::DrawUpdate();
 }
 
 /// <summary>
@@ -285,131 +286,6 @@ PlayScene::InstantiateObject(const wchar_t* path,string name, XMFLOAT3 size,XMFL
 
 	//スレッドにアクターの作成処理を追加
 	_ths.emplace_back(f);
-}
-
-/// <summary>
-/// 入力を更新する関数
-/// </summary>
-void
-PlayScene::InputUpdate()
-{
-	InputManager::Instance().UpdateInput();
-}
-
-/// <summary>
-/// 現在のフレームレートを更新する関数
-/// </summary>
-void
-PlayScene::FPSUpdate()
-{
-	//現在フレームの時間を取得
-	QueryPerformanceCounter(&_currentTime);							
-
-	//前回FPS更新時との時間の差分
-	auto diff = GetLIntDiff(_currentTime, _updatedTime);			
-	//前フレームとの時間の差分
-	auto frameTime = GetLIntDiff(_currentTime, _beforeTime);		
-
-	//処理時間に余裕がある場合、処理を待ち合わせる
-	if (frameTime < FRAME_TIME)										
-	{
-		DWORD sleepTime =
-			static_cast<DWORD>((FRAME_TIME - frameTime) * 1000);
-		timeBeginPeriod(1);
-
-		Sleep(sleepTime);
-
-		timeEndPeriod(1);
-	}
-
-	//前回FPS更新から1秒以上たった時
-	if (diff >= 1)													
-	{
-		//1秒を前フレームとの時間の差分で割り、FPSを取得
-		_fps = 1 / frameTime;
-		_updatedTime = _currentTime;
-	}
-
-	//前フレームの時間を更新
-	_beforeTime = _currentTime;										
-}
-
-/// <summary>
-/// 各描画の更新をまとめて行う関数
-/// </summary>
-void
-PlayScene::DrawUpdate()
-{
-	//FPSを更新
-	FPSUpdate();			
-
-	//ペラポリゴン描画処理
-	PeraDraw();				
-
-	//ゲーム画面描画処理
-	GameDraw();				
-}
-
-/// <summary>
-/// ペラポリゴンの描画処理をまとめた関数
-/// </summary>
-void
-PlayScene::PeraDraw()
-{
-	//ペラポリゴン描画準備
-	PeraRenderer::Instance().BeginPeraDraw();
-
-	//背景を描画
-	SpriteManager::Instance().BackGroundDraw();
-
-	//ペラポリゴン用パイプラインをセット
-	Dx12Wrapper::Instance().SetPipelines(							
-		Renderer::Instance().GetRootSignature(),
-		Renderer::Instance().GetPipelineState(),
-		D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST
-	);
-
-	//ビュー・プロジェクション行列を適用
-	Dx12Wrapper::Instance().SetScene();
-
-	//モデル描画処理
-	ModelDraw();								
-
-	//ペラポリゴン描画後始末
-	PeraRenderer::Instance().EndPeraDraw();						
-}
-
-/// <summary>
-/// ゲーム画面描画処理
-/// </summary>
-void
-PlayScene::GameDraw()
-{
-	//ゲーム画面描画準備
-	Dx12Wrapper::Instance().BeginGameDraw();															
-
-	//以下ゲーム画面用パイプラインをセット
-	PeraRenderer::Instance().SetPeraPipelines();														
-
-	//ペラポリゴン用VBVをセット
-	Dx12Wrapper::Instance().CommandList()->IASetVertexBuffers(0, 1, PeraRenderer::Instance().PeraVBView());				
-	//ペラポリゴンを構成する頂点を描画
-	Dx12Wrapper::Instance().CommandList()->DrawInstanced(4, 1, 0, 0);									
-
-	//グリッドを描画
-	if (ImGuiManager::Instance().IsWriteGrid() && !_isInLoad)SpriteManager::Instance().GridDraw(_actorAndObjs);		
-
-	//ここにエフェクト上の描画処理
-	EffectAndUIDraw();																
-
-	//ゲーム画面描画後始末
-	Dx12Wrapper::Instance().EndGameDraw();															
-
-	//スワップチェーンのフリップ処理
-	Dx12Wrapper::Instance().Swapchain()->Present(Application::Instance().GetInterval(), 0);
-
-	//グラフィックスメモリを設定
-	SpriteManager::Instance().Commit();														
 }
 
 /// <summary>
@@ -521,7 +397,7 @@ void
 PlayScene::ModelDraw()
 {
 	//プレイヤーが読み込み完了している場合FBXBaseクラスを基盤とするオブジェクト全般に対し描画・更新処理を行う
-	if (!_isInLoad)									
+	if (BaseScene::_canInput)
 	{
 		//トゥーンテクスチャも描画する
 		Renderer::Instance().Draw();
@@ -544,16 +420,19 @@ void
 PlayScene::EffectAndUIDraw()
 {
 	//ロード中の場合
-	if (_isInLoad)						
+	if (!BaseScene::_canInput)
 	{
 		//ロード画面を描画
 		SpriteManager::Instance().LoadingDraw();	
 	}
 	else								
 	{
+		//グリッドを描画
+		if (ImGuiManager::Instance().IsWriteGrid())SpriteManager::Instance().GridDraw(_actorAndObjs);
+
 		//SceneからImGuiにFPSを渡す
 		ImGuiManager::Instance().SetFPS(_fps);	
 		//ImGuiのウィンドウを描画
-		ImGuiManager::Instance().ImGuiDraw();		
+		ImGuiManager::Instance().ImGuiDraw();	
 	}
 }

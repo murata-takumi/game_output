@@ -1,14 +1,10 @@
 #include "Functions.h"
+#include "Includes.h"
 
 #include "Scene/BaseScene.h"
 
-//更新回数を60FPSに固定する際の1フレームの秒数
-const float FRAME_TIME = 1.0f / 60.0f;	
-
 //各シーンでロード中かどうかを識別する真理値
-bool BaseScene::_isLoading = false;		
-//各シーンで操作可能かどうかを決める真理値
-bool BaseScene::_isPlaying = false;		
+bool BaseScene::_canInput = false;
 
 //現フレームの時間
 LARGE_INTEGER BaseScene::_currentTime;	
@@ -16,6 +12,8 @@ LARGE_INTEGER BaseScene::_currentTime;
 LARGE_INTEGER BaseScene::_updatedTime;	
 //前フレームの時間
 LARGE_INTEGER BaseScene::_beforeTime;	
+
+double BaseScene::_fps;
 
 /// <summary>
 /// コンストラクタ
@@ -40,15 +38,14 @@ void
 BaseScene::SceneStart()
 {
 	auto startFunc = [&]()
-	{
-		//フェードイン処理
+	{	//フェードイン処理
 		Dx12Wrapper::Instance().Fade(1.0f, 0.0f);		
-
-		//操作可能にする
-		_isPlaying = true;			
 	};
 	//上記の処理を並列処理する
 	ParallelProcess(startFunc);		
+
+	//操作可能にする
+	_canInput = true;
 }
 
 /// <summary>
@@ -70,7 +67,7 @@ BaseScene::ChangeScene(SceneNames name)
 	auto changeFunc = [&, name]()
 	{
 		//操作不可にする
-		_isPlaying = false;
+		_canInput = false;
 
 		//フェードアウト処理
 		Dx12Wrapper::Instance().Fade(0.0f, 1.0f);
@@ -80,12 +77,6 @@ BaseScene::ChangeScene(SceneNames name)
 	};
 	//並列処理
 	ParallelProcess(changeFunc);	
-}
-
-void
-BaseScene::BackGroundDraw()
-{
-
 }
 
 void
@@ -107,7 +98,10 @@ void
 BaseScene::PeraDraw()
 {
 	//ペラポリゴン描画準備
-	PeraRenderer::Instance().BeginPeraDraw();				
+	PeraRenderer::Instance().BeginPeraDraw();	
+
+	//背景を描画
+	SpriteManager::Instance().BackGroundDraw();
 
 	//ペラポリゴン用パイプラインをセット
 	Dx12Wrapper::Instance().SetPipelines(							
@@ -163,7 +157,7 @@ void
 BaseScene::DrawUpdate()
 {
 	//FPSを更新
-	UpdateFPS();			
+	FPSUpdate();
 
 	//ペラポリゴン描画処理
 	PeraDraw();				
@@ -186,7 +180,7 @@ BaseScene::InputUpdate()
 /// 現在のフレームレートを更新する関数
 /// </summary>
 void
-BaseScene::UpdateFPS()
+BaseScene::FPSUpdate()
 {
 	//現在フレームの時間を取得
 	QueryPerformanceCounter(&_currentTime);							
