@@ -5,11 +5,10 @@
 /// <summary>
 /// コンストラクタ
 /// </summary>
-/// <param name="dx12">Dx12Wrapperインスタンス</param>
 /// <param name="filePath">モデルパス</param>
 /// <param name="pos">初期座標</param>
-FBXObject::FBXObject(Dx12Wrapper& dx12, const wchar_t* filePath, XMFLOAT3 size, XMFLOAT3 pos)
-	:FBXBase(dx12, filePath, size, pos)
+FBXObject::FBXObject(const wchar_t* filePath, XMFLOAT3 size, XMFLOAT3 pos)
+	:FBXBase(filePath, size, pos)
 {
 	//座標変換用バッファー・ビュー作成
 	CreateTransformView();
@@ -37,30 +36,30 @@ FBXObject::CreateTransformView()
 	auto buffSize = sizeof(XMMATRIX);												
 	buffSize = (buffSize + 0xff) & ~0xff;
 	auto resDesc = CD3DX12_RESOURCE_DESC::Buffer(buffSize);
-	result = _dx12.Device()->CreateCommittedResource
+	result = Dx12Wrapper::Instance().Device()->CreateCommittedResource
 	(
 		&_uploadHeapProp,
 		D3D12_HEAP_FLAG_NONE,
 		&resDesc,
 		D3D12_RESOURCE_STATE_GENERIC_READ,
 		nullptr,
-		IID_PPV_ARGS(_transBuffer.ReleaseAndGetAddressOf())
+		IID_PPV_ARGS(FBXBase::_transBuffer.ReleaseAndGetAddressOf())
 	);
 	if (FAILED(result)) {
 		assert(0);
 		return result;
 	}
-	result = _transBuffer->Map(0, nullptr, (void**)&_mappedMats);
+	result = FBXBase::_transBuffer->Map(0, nullptr, (void**)&(FBXBase::_mappedMats));
 	if (FAILED(result))
 	{
 		assert(0);
 		return result;
 	}
-	_mappedMats[0] = XMMatrixIdentity();
+	FBXBase::_mappedMats[0] = XMMatrixIdentity();
 	//平行移動
-	_mappedMats[0] *= XMMatrixTranslationFromVector(_pos);		
+	FBXBase::_mappedMats[0] *= XMMatrixTranslationFromVector(_pos);
 
-	_collider->Update(_mappedMats[0]);
+	_collider->Update(FBXBase::_mappedMats[0]);
 
 	//ディスクリプタヒープの作成
 	D3D12_DESCRIPTOR_HEAP_DESC transformDescHeapDesc = {};							
@@ -69,8 +68,8 @@ FBXObject::CreateTransformView()
 	transformDescHeapDesc.NodeMask = 0;
 	transformDescHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
 
-	result = _dx12.Device()->CreateDescriptorHeap(&transformDescHeapDesc,
-		IID_PPV_ARGS(_transHeap.ReleaseAndGetAddressOf()));
+	result = Dx12Wrapper::Instance().Device()->CreateDescriptorHeap(&transformDescHeapDesc,
+		IID_PPV_ARGS(FBXBase::_transHeap.ReleaseAndGetAddressOf()));
 	if (FAILED(result)) {
 		assert(0);
 		return result;
@@ -78,10 +77,10 @@ FBXObject::CreateTransformView()
 
 	//ビューの作成
 	D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc = {};									
-	cbvDesc.BufferLocation = _transBuffer->GetGPUVirtualAddress();
-	cbvDesc.SizeInBytes = static_cast<UINT>(_transBuffer->GetDesc().Width);
+	cbvDesc.BufferLocation = FBXBase::_transBuffer->GetGPUVirtualAddress();
+	cbvDesc.SizeInBytes = static_cast<UINT>(FBXBase::_transBuffer->GetDesc().Width);
 
-	_dx12.Device()->CreateConstantBufferView(&cbvDesc,_transHeap->GetCPUDescriptorHandleForHeapStart());							
+	Dx12Wrapper::Instance().Device()->CreateConstantBufferView(&cbvDesc, FBXBase::_transHeap->GetCPUDescriptorHandleForHeapStart());
 
 	return result;
 }

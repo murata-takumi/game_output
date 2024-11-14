@@ -273,14 +273,13 @@ template<class className>
 void
 PlayScene::InstantiateObject(const wchar_t* path,string name, XMFLOAT3 size,XMFLOAT3 pos)
 {
-	lock_guard<mutex> lock(_mtx);
+	lock_guard<mutex> lock(BaseScene::_mtx);
 
 	auto f = [=]() {
 		shared_ptr<className> object;
 
-		object = make_shared<className>(Dx12Wrapper::Instance(), path, size, pos);
+		object = make_shared<className>(path, size, pos);
 
-		//_actorAndObjs.emplace_back(object);
 		_actorAndObjs[name] = object;
 	};
 

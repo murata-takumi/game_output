@@ -5,13 +5,12 @@
 /// <summary>
 /// コンストラクタ
 /// </summary>
-/// <param name="dx12">Dx12Wrapperインスタンス</param>
 /// <param name="filePath">モデル格納ファイル名</param>
 /// <param name="size">当たり判定の大きさ</param>
 /// <param name="pos">初期座標</param>
 /// <param name="diff">当たり判定の差分</param>
-FBXBase::FBXBase(Dx12Wrapper& dx12, const wchar_t* filePath, const XMFLOAT3& size, const XMFLOAT3& pos, const XMFLOAT3& diff)
-	:_dx12(dx12), _pos(XMLoadFloat3(&pos))
+FBXBase::FBXBase(const wchar_t* filePath, const XMFLOAT3& size, const XMFLOAT3& pos, const XMFLOAT3& diff)
+	:_pos(XMLoadFloat3(&pos))
 {
 	_collectNormal = true;
 
@@ -123,7 +122,7 @@ FBXBase::CreateVertexBufferView()
 		auto desc = CD3DX12_RESOURCE_DESC::Buffer(size);								
 
 		//バッファー作成
-		result = _dx12.Device()->CreateCommittedResource								
+		result = Dx12Wrapper::Instance().Device()->CreateCommittedResource								
 		(
 			&heapProp,
 			D3D12_HEAP_FLAG_NONE,
@@ -186,7 +185,7 @@ FBXBase::CreateIndexBufferView()
 		auto desc = CD3DX12_RESOURCE_DESC::Buffer(size);							
 
 		//バッファー作成
-		result = _dx12.Device()->CreateCommittedResource							
+		result = Dx12Wrapper::Instance().Device()->CreateCommittedResource							
 		(
 			&heapProp,
 			D3D12_HEAP_FLAG_NONE,
@@ -236,7 +235,7 @@ FBXBase::CreateShaderResourceView()
 	texHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
 	texHeapDesc.NumDescriptors = static_cast<UINT>(_meshes.size());
 	texHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
-	result = _dx12.Device()->CreateDescriptorHeap(&texHeapDesc,
+	result = Dx12Wrapper::Instance().Device()->CreateDescriptorHeap(&texHeapDesc,
 		IID_PPV_ARGS(_texHeap.ReleaseAndGetAddressOf()));
 
 	//SRV用構造体の作成
@@ -252,7 +251,7 @@ FBXBase::CreateShaderResourceView()
 	auto GPUHeapHandle = _texHeap->GetGPUDescriptorHandleForHeapStart();					
 	//先頭アドレスのずらす幅
 	auto incrementSize =	
-		_dx12.Device()->GetDescriptorHandleIncrementSize(texHeapDesc.Type);
+		Dx12Wrapper::Instance().Device()->GetDescriptorHandleIncrementSize(texHeapDesc.Type);
 
 	//テクスチャ読み込み用データ
 	TexMetadata meta = {};																		
@@ -302,7 +301,7 @@ FBXBase::CreateShaderResourceView()
 			}
 
 			//拡張子に応じて読み込み関数を変える
-			result = _dx12._loadLambdaTable[ToString(ext)](path, &meta, scratch);				
+			result = Dx12Wrapper::Instance()._loadLambdaTable[ToString(ext)](path, &meta, scratch);				
 			if (FAILED(result))
 			{
 				assert(0);
@@ -333,7 +332,7 @@ FBXBase::CreateShaderResourceView()
 			mipLevels);
 
 		//バッファーの作成
-		result = _dx12.Device()->CreateCommittedResource										
+		result = Dx12Wrapper::Instance().Device()->CreateCommittedResource										
 		(
 			&heapProp,
 			D3D12_HEAP_FLAG_NONE,
@@ -363,7 +362,7 @@ FBXBase::CreateShaderResourceView()
 
 		//ビューのフォーマットをテクスチャに合わせ、作成
 		srvDesc.Format = tmpTexBuffer->GetDesc().Format;										
-		_dx12.Device()->CreateShaderResourceView(tmpTexBuffer, &srvDesc, CPUHeapHandle);
+		Dx12Wrapper::Instance().Device()->CreateShaderResourceView(tmpTexBuffer, &srvDesc, CPUHeapHandle);
 
 		//GPUのアドレスを追加
 		_gpuHandles.push_back(GPUHeapHandle);													
@@ -384,25 +383,25 @@ FBXBase::Draw()
 {
 	//座標変換用ディスクリプタヒープをセット
 	ID3D12DescriptorHeap* transformHeaps[] = { _transHeap.Get() };
-	_dx12.CommandList()->SetDescriptorHeaps(1, transformHeaps);
+	Dx12Wrapper::Instance().CommandList()->SetDescriptorHeaps(1, transformHeaps);
 
 	//ルートパラメータとディスクリプタヒープのハンドルを関連付け
-	_dx12.CommandList()->SetGraphicsRootDescriptorTable(1, _transHeap->GetGPUDescriptorHandleForHeapStart());
+	Dx12Wrapper::Instance().CommandList()->SetGraphicsRootDescriptorTable(1, _transHeap->GetGPUDescriptorHandleForHeapStart());
 
 	//モデルを構成するメッシュ毎に以下の処理を行う
 	for (size_t i = 0; i < _meshes.size(); i++)
 	{
 		//頂点・インデックスバッファービューのセット
-		_dx12.CommandList()->IASetVertexBuffers(0, 1, &_vbViews[i]);
-		_dx12.CommandList()->IASetIndexBuffer(&_ibViews[i]);
+		Dx12Wrapper::Instance().CommandList()->IASetVertexBuffers(0, 1, &_vbViews[i]);
+		Dx12Wrapper::Instance().CommandList()->IASetIndexBuffer(&_ibViews[i]);
 
 		//テクスチャバッファービューのセット
 		ID3D12DescriptorHeap* SetTexHeap[] = { _texHeap.Get() };
-		_dx12.CommandList()->SetDescriptorHeaps(1, SetTexHeap);
-		_dx12.CommandList()->SetGraphicsRootDescriptorTable(2, _gpuHandles[i]);
+		Dx12Wrapper::Instance().CommandList()->SetDescriptorHeaps(1, SetTexHeap);
+		Dx12Wrapper::Instance().CommandList()->SetGraphicsRootDescriptorTable(2, _gpuHandles[i]);
 
 		//メッシュの描画
-		_dx12.CommandList()->DrawIndexedInstanced(static_cast<UINT>(_meshes[i].indices.size()), 1, 0, 0, 0);
+		Dx12Wrapper::Instance().CommandList()->DrawIndexedInstanced(static_cast<UINT>(_meshes[i].indices.size()), 1, 0, 0, 0);
 	}
 }
 

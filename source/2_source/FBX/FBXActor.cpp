@@ -18,10 +18,9 @@ const int COLLIDER_BONE = 0;
 /// <summary>
 /// コンストラクタ
 /// </summary>
-/// <param name="dx12">Dx12Wrapperインスタンス</param>
 /// <param name="filePath">モデルのパス</param>
-FBXActor::FBXActor(Dx12Wrapper& dx12, const wchar_t* filePath, XMFLOAT3 size, XMFLOAT3 pos)
-	:FBXBase(dx12,filePath, size, pos),
+FBXActor::FBXActor(const wchar_t* filePath, XMFLOAT3 size, XMFLOAT3 pos)
+	:FBXBase(filePath, size, pos),
 	_crntNode(nullptr), _frontVec(XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f)),
 	_canControll(false),_isInBlend(false),_isInLoop(true),_isOnGround(true),
 	_canChangeAnim(true),_blendWeight(0.0f), _animTime(0.0f),
@@ -88,14 +87,14 @@ FBXActor::InitAnimation()
 	}
 
 	//モデルが持つ全アニメーションに対し実行
-	for (UINT i = 0; i < _scene->mNumAnimations; i++)				
+	for (UINT i = 0; i < FBXBase::_scene->mNumAnimations; i++)				
 	{
 		//連想配列にアニメーション名とアニメーションデータを格納
-		_anims[_scene->mAnimations[i]->mName.C_Str()]				
-			= _scene->mAnimations[i];
+		_anims[FBXBase::_scene->mAnimations[i]->mName.C_Str()]
+			= FBXBase::_scene->mAnimations[i];
 
 		//アニメーション名を取得
-		string name = _scene->mAnimations[i]->mName.C_Str();		
+		string name = FBXBase::_scene->mAnimations[i]->mName.C_Str();
 
 		//余分な文字列を削除
 		name = name.erase(0, ANIM_STR_UNNECESSARY_IDX);									
@@ -121,7 +120,7 @@ FBXActor::BoneTransform(float timeInTicks)
 	//経過時間を基に階層構造から変換行列を読み込む
 	if (timeInTicks < GetAnimDuration(_currentActorAnim))									
 	{
-		ReadNodeHeirarchy(timeInTicks, _scene->mRootNode, XMMatrixIdentity());
+		ReadNodeHeirarchy(timeInTicks, FBXBase::_scene->mRootNode, XMMatrixIdentity());
 	}
 
 	//変換行列を更新する
@@ -225,14 +224,14 @@ FBXActor::CreateTransformView()
 	auto buffSize = sizeof(XMMATRIX) * (1 + _boneMats.size());						
 	buffSize = (buffSize + 0xff) & ~0xff;
 	auto resDesc = CD3DX12_RESOURCE_DESC::Buffer(buffSize);
-	result = _dx12.Device()->CreateCommittedResource
+	result = Dx12Wrapper::Instance().Device()->CreateCommittedResource
 	(
 		&_uploadHeapProp,
 		D3D12_HEAP_FLAG_NONE,
 		&resDesc,
 		D3D12_RESOURCE_STATE_GENERIC_READ,
 		nullptr,
-		IID_PPV_ARGS(_transBuffer.ReleaseAndGetAddressOf())
+		IID_PPV_ARGS(FBXBase::_transBuffer.ReleaseAndGetAddressOf())
 	);
 	if (FAILED(result)) {
 		assert(0);
@@ -240,15 +239,15 @@ FBXActor::CreateTransformView()
 	}
 
 	//座標変換用行列の書き込み、初期座標に位置するようにする
-	result = _transBuffer->Map(0, nullptr, (void**)&_mappedMats);					
+	result = FBXBase::_transBuffer->Map(0, nullptr, (void**)&(FBXBase::_mappedMats));
 	if (FAILED(result))
 	{
 		assert(0);
 		return result;
 	}
-	_mappedMats[0] = XMMatrixIdentity();
-	_mappedMats[0] *= XMMatrixTranslationFromVector(_pos);
-	copy(_boneMats.begin(), _boneMats.end(), _mappedMats + 1);
+	FBXBase::_mappedMats[0] = XMMatrixIdentity();
+	FBXBase::_mappedMats[0] *= XMMatrixTranslationFromVector(_pos);
+	copy(_boneMats.begin(), _boneMats.end(), FBXBase::_mappedMats + 1);
 
 	//ディスクリプタヒープの作成
 	D3D12_DESCRIPTOR_HEAP_DESC transformDescHeapDesc = {};							
@@ -256,8 +255,8 @@ FBXActor::CreateTransformView()
 	transformDescHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
 	transformDescHeapDesc.NodeMask = 0;
 	transformDescHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
-	result = _dx12.Device()->CreateDescriptorHeap(&transformDescHeapDesc,
-		IID_PPV_ARGS(_transHeap.ReleaseAndGetAddressOf()));
+	result = Dx12Wrapper::Instance().Device()->CreateDescriptorHeap(&transformDescHeapDesc,
+		IID_PPV_ARGS(FBXBase::_transHeap.ReleaseAndGetAddressOf()));
 	if (FAILED(result)) {
 		assert(0);
 		return result;
@@ -265,13 +264,13 @@ FBXActor::CreateTransformView()
 
 	//ビューの作成
 	D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc = {};
-	cbvDesc.BufferLocation = _transBuffer->GetGPUVirtualAddress();
-	cbvDesc.SizeInBytes = static_cast<UINT>(_transBuffer->GetDesc().Width);
-	_dx12.Device()->CreateConstantBufferView(&cbvDesc,								
-		_transHeap->GetCPUDescriptorHandleForHeapStart());
+	cbvDesc.BufferLocation = FBXBase::_transBuffer->GetGPUVirtualAddress();
+	cbvDesc.SizeInBytes = static_cast<UINT>(FBXBase::_transBuffer->GetDesc().Width);
+	Dx12Wrapper::Instance().Device()->CreateConstantBufferView(&cbvDesc,								
+		FBXBase::_transHeap->GetCPUDescriptorHandleForHeapStart());
 
 	//当たり判定を初期化
-	_collider->Update(_mappedMats[0]);												
+	FBXBase::_collider->Update(FBXBase::_mappedMats[0]);
 
 	return result;
 }
@@ -568,29 +567,29 @@ FBXActor::Update()
 		//アニメーションノードの更新
 		_crntNode->Update(_animTime);												
 
-		if (!_isOnGround && !IsAnimationEqual(JUMP00))_pos.m128_f32[1] -= _dx12.GetDeltaTime() * 45.0f * GRAVITY_ACCERALATION;
+		if (!_isOnGround && !IsAnimationEqual(JUMP00))_pos.m128_f32[1] -= Dx12Wrapper::Instance().GetDeltaTime() * 45.0f * GRAVITY_ACCERALATION;
 
 		//回転、平行移動
-		_mappedMats[0] = XMMatrixRotationY(_rotY);									
-		_mappedMats[0] *= XMMatrixTranslationFromVector(_pos);
+		FBXBase::_mappedMats[0] = XMMatrixRotationY(_rotY);
+		FBXBase::_mappedMats[0] *= XMMatrixTranslationFromVector(_pos);
 	}
 
 	//スケーリング、回転、平行移動成分を変換行列とボーン行列の積から取得し、回転要素を削除したうえで再度合成
 	XMVECTOR scale, trans, skew;													
 	XMMatrixDecompose(&scale, &skew, &trans, 
-		_invMats[COLLIDER_BONE] * _mappedMats[COLLIDER_BONE + 1]);
+		_invMats[COLLIDER_BONE] * FBXBase::_mappedMats[COLLIDER_BONE + 1]);
 	skew = XMVectorZero();
 	XMMATRIX newWorldMat = XMMatrixScalingFromVector(scale) * XMMatrixRotationQuaternion(skew) * XMMatrixTranslationFromVector(trans);
 
 	//当たり判定を更新
-	_collider->Update(newWorldMat *	_mappedMats[0]);
+	_collider->Update(newWorldMat * FBXBase::_mappedMats[0]);
 
 	//経過時間を渡し、ボーン行列を取得
 	BoneTransform(_animTime);														
 	
 	//ブレンド行列or普通の行列をシェーダーに渡し、アニメーションを実行
-	if (_isInBlend)	copy(_blendMats.begin(), _blendMats.end(), _mappedMats + 1);	
-	else copy(_boneMats.begin(), _boneMats.end(), _mappedMats + 1);
+	if (_isInBlend)	copy(_blendMats.begin(), _blendMats.end(), FBXBase::_mappedMats + 1);
+	else copy(_boneMats.begin(), _boneMats.end(), FBXBase::_mappedMats + 1);
 
 	//前フレームの時間を更新
 	_befFrameTime = _currFrameTime;
@@ -604,7 +603,7 @@ void
 FBXActor::Translate(const XMVECTOR& input)
 {
 	//座標に入力に応じたベクトルを加算
-	_pos += input * _dx12.GetDeltaTime() * MOVE_SPEED;
+	_pos += input * Dx12Wrapper::Instance().GetDeltaTime() * MOVE_SPEED;
 
 	//入力ベクトルと正面ベクトルの角度差を取得
 	auto diff = XMVector3AngleBetweenVectors(input, _frontVec).m128_f32[0];			
@@ -626,9 +625,9 @@ FBXActor::Translate(const XMVECTOR& input)
 
 	//正面ベクトルを取得・正規化
 	_frontVec = XMVectorSet(														
-		_mappedMats[0].r[2].m128_f32[0],
-		_mappedMats[0].r[2].m128_f32[1],
-		_mappedMats[0].r[2].m128_f32[2],
+		FBXBase::_mappedMats[0].r[2].m128_f32[0],
+		FBXBase::_mappedMats[0].r[2].m128_f32[1],
+		FBXBase::_mappedMats[0].r[2].m128_f32[2],
 		0.0f
 	);
 	_frontVec = XMVector3Normalize(_frontVec);
@@ -655,7 +654,7 @@ void
 FBXActor::EndControll()
 {
 	//単位行列を代入し、座標や正面ベクトルを初期化
-	_mappedMats[0] = XMMatrixIdentity();				
+	FBXBase::_mappedMats[0] = XMMatrixIdentity();
 	_pos = XMVectorZero();
 	_frontVec = XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
 
@@ -703,7 +702,7 @@ FBXActor::BlendAnimation(AnimEnum anim)
 				_blendMats[i] =
 					(_beforeMats[i] * _blendWeight) + (_boneMats[i] * (1 - _blendWeight));
 			}
-			t += _dx12.GetDeltaTime() / BLEND_SPEED;
+			t += Dx12Wrapper::Instance().GetDeltaTime() / BLEND_SPEED;
 
 			Sleep(1);
 		}
