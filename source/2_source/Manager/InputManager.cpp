@@ -58,17 +58,31 @@ InputManager::UpdateInput()
 }
 
 /// <summary>
+/// マウス座標を返す関数
+/// </summary>
+/// <returns>座標</returns>
+Pos2D
+InputManager::MousePos()const
+{
+	Pos2D ret;
+	ret._posX = _mouseState.x;
+	ret._posY = _mouseState.y;
+
+	return ret;
+}
+
+/// <summary>
 /// キー状態を返す関数
 /// </summary>
 /// <returns>キー状態</returns>
 Keyboard::State
-InputManager::KeyState()
+InputManager::KeyState()const
 {
 	return _keyState;
 }
 
 Keyboard::KeyboardStateTracker
-InputManager::KeyTracker()
+InputManager::KeyTracker()const
 {
 	return _keyTracker;
 }
@@ -78,7 +92,7 @@ InputManager::KeyTracker()
 /// </summary>
 /// <returns>マウス状態</returns>
 Mouse::State
-InputManager::MouseState()
+InputManager::MouseState()const
 {
 	return _mouseState;
 }
@@ -88,7 +102,7 @@ InputManager::MouseState()
 /// </summary>
 /// <returns>マウス状態</returns>
 Mouse::ButtonStateTracker
-InputManager::MouseTracker()
+InputManager::MouseTracker()const
 {
 	return _mouseTracker;
 }

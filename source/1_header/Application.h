@@ -35,20 +35,6 @@ enum SceneNames
 	Play,		//ゲームシーン
 };
 
-/// <summary>
-/// FBXモデルの頂点用構造体
-/// </summary>
-struct FBXVertex
-{
-	XMFLOAT3 position;					//座標
-	XMFLOAT3 normal;					//法線
-	XMFLOAT2 uv;						//UV座標
-	XMFLOAT3 tangent;					//正接
-	XMFLOAT4 color;						//頂点カラー
-	XMUINT4 ids;						//ボーンID
-	XMFLOAT4 weights;					//ボーンの影響値
-};
-
 class Dx12Wrapper;
 class EffectManager;
 class InputManager;

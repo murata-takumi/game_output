@@ -12,7 +12,6 @@ class FBXActor;
 class ImGuiManager
 {
 public:
-	bool _front1, _right1, _up1, _front2, _right2, _up2;
 	//‰Šú‰»ŠÖ”
 	void Init(HWND hwnd);
 

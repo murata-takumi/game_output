@@ -40,3 +40,26 @@ const float FRAME_TIME = 1.0f / 60.0f;
 
 const int DIFF = 15;
 const int ANIMATION_HEIGHT = 200;
+
+/// <summary>
+/// マウス座標をまとめた構造体
+/// </summary>
+struct Pos2D
+{
+	float _posX;
+	float _posY;
+};
+
+/// <summary>
+/// FBXモデルの頂点用構造体
+/// </summary>
+struct FBXVertex
+{
+	XMFLOAT3 position;					//座標
+	XMFLOAT3 normal;					//法線
+	XMFLOAT2 uv;						//UV座標
+	XMFLOAT3 tangent;					//正接
+	XMFLOAT4 color;						//頂点カラー
+	XMUINT4 ids;						//ボーンID
+	XMFLOAT4 weights;					//ボーンの影響値
+};

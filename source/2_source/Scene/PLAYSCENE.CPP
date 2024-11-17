@@ -311,7 +311,6 @@ PlayScene::CheckColliders(const BoxCollider& col1, const BoxCollider& col2)
 	float r = LenOnSeparateAxis(col1._frontDir, rightLen2, upLen2, frontLen2);
 	float lenBetCenter = fabs(XMVector3Dot(vecBetCenter,col1._frontDir ).m128_f32[0]);
 	bool a = lenBetCenter > r + col1._halfDepth;
-	ImGuiManager::Instance()._front1 = a;
 	if (a)
 	{
 		return false;
@@ -321,7 +320,6 @@ PlayScene::CheckColliders(const BoxCollider& col1, const BoxCollider& col2)
 	r = LenOnSeparateAxis(col1._rightDir, rightLen2, upLen2, frontLen2);
 	lenBetCenter = fabs(XMVector3Dot(vecBetCenter,col1._rightDir).m128_f32[0]);
 	a = lenBetCenter > r + col1._halfWidth;
-	ImGuiManager::Instance()._right1 = a;
 	if (a)
 	{
 		return false;
@@ -331,7 +329,6 @@ PlayScene::CheckColliders(const BoxCollider& col1, const BoxCollider& col2)
 	r = LenOnSeparateAxis(col1._upDir, rightLen2, upLen2, frontLen2);
 	lenBetCenter = fabs(XMVector3Dot(vecBetCenter,col1._upDir).m128_f32[0]);
 	a = lenBetCenter > r + col1._halfHeight;
-	ImGuiManager::Instance()._up1 = a;
 	if (a)
 	{
 		return false;
@@ -341,7 +338,6 @@ PlayScene::CheckColliders(const BoxCollider& col1, const BoxCollider& col2)
 	r = LenOnSeparateAxis(col2._frontDir, rightLen1, upLen1, frontLen1);
 	lenBetCenter = fabs(XMVector3Dot(vecBetCenter,col2._frontDir).m128_f32[0]);
 	a = lenBetCenter > r + col2._halfDepth;
-	ImGuiManager::Instance()._front2 = a;
 	if (a)
 	{
 		return false;
@@ -351,7 +347,6 @@ PlayScene::CheckColliders(const BoxCollider& col1, const BoxCollider& col2)
 	r = LenOnSeparateAxis(col2._rightDir, rightLen1, upLen1, frontLen1);
 	lenBetCenter = fabs(XMVector3Dot(vecBetCenter,col2._rightDir).m128_f32[0]);
 	a = lenBetCenter > r + col2._halfWidth;
-	ImGuiManager::Instance()._right2 = a;
 	if (a)
 	{
 		return false;
@@ -361,7 +356,6 @@ PlayScene::CheckColliders(const BoxCollider& col1, const BoxCollider& col2)
 	r = LenOnSeparateAxis(col2._upDir, rightLen1, upLen1, frontLen1);
 	lenBetCenter = fabs(XMVector3Dot(vecBetCenter,col2._upDir).m128_f32[0]);
 	a = lenBetCenter > r + col2._halfHeight;
-	ImGuiManager::Instance()._up2 = a;
 	if (a)
 	{
 		return false;

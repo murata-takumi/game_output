@@ -2,6 +2,7 @@
 #include "FBX/FBXActor.h"
 #include "FBX/FBXObject.h"
 #include "Manager/ImGuiManager.h"
+#include "Manager/InputManager.h"
 #include "Wrapper/Dx12Wrapper.h"
 
 //フォントを格納しているパス
@@ -155,14 +156,11 @@ ImGuiManager::ImGuiDraw()
 
 		ImGui::Checkbox("IsOnGround", &_actor->_isOnGround);
 
-		{
-			ImGui::Checkbox("Front1", &_front1);
-			ImGui::Checkbox("Right1", &_right1);
-			ImGui::Checkbox("Up1", &_up1);
-			ImGui::Checkbox("Front2", &_front2);
-			ImGui::Checkbox("Right2", &_right2);
-			ImGui::Checkbox("Up2", &_up2);
-		}
+		auto posX = InputManager::Instance().MousePos()._posX;
+		auto posY = InputManager::Instance().MousePos()._posY;
+
+		ImGui::DragFloat("MouseX", &posX);
+		ImGui::DragFloat("MouseY", &posY);
 		
 		ImGui::End();
 	}

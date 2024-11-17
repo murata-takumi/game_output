@@ -1,5 +1,6 @@
 #pragma once
 #include "Application.h"
+#include "Includes.h"
 
 #include <DirectXTK12-master/Inc/Keyboard.h>
 #include <DirectXTK12-master/Inc/Mouse.h>
@@ -39,17 +40,19 @@ public:
 	void Init();
 
 	//入力情報を更新する関数
-	void UpdateInput();									
+	void UpdateInput();		
+
+	Pos2D MousePos()const;
 
 	//キー状態を取得
-	Keyboard::State KeyState();							
+	Keyboard::State KeyState()const;							
 
 	//キー状態を取得（キーを押した・離した瞬間を取得）
-	Keyboard::KeyboardStateTracker KeyTracker();		
+	Keyboard::KeyboardStateTracker KeyTracker()const;
 
 	//マウス状態を取得
-	Mouse::State MouseState();							
+	Mouse::State MouseState()const;
 
 	//マウス状態を取得（ボタンを押した・離した瞬間を取得）
-	Mouse::ButtonStateTracker MouseTracker();			
+	Mouse::ButtonStateTracker MouseTracker()const;
 };
