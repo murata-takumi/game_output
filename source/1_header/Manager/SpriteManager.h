@@ -16,6 +16,7 @@
 /// 画像や文字フォントを管理するクラス
 /// </summary>
 class BoxCollider;
+class BoxCollider2D;
 class Dx12Wrapper;
 class FBXBase;
 class FBXActor;
@@ -63,6 +64,9 @@ private:
 	//ハンドル(GPU)のベクトル
 	map<string,D3D12_GPU_DESCRIPTOR_HANDLE> _GPUHandles;					
 
+	unique_ptr<BoxCollider2D> _startColl;
+	unique_ptr<BoxCollider2D> _exitColl;
+
 	//ロード中アイコン用矩形
 	RECT _loadingRect;
 	//背景用矩形
@@ -96,6 +100,9 @@ private:
 
 	//当たり判定を描画する関数
 	void ColliderDraw(const shared_ptr<BoxCollider> collider);
+
+	//マウスカーソルが矩形内にあるか確認する
+	bool IsCursorInRect(RECT rect);
 public:
 	static SpriteManager& Instance();
 
@@ -107,6 +114,9 @@ public:
 	//ロード画面での描画
 	void LoadingDraw();		
 
+	//タイトル画面でのボタンの描画
+	void ButtonDraw();
+
 	//背景の描画
 	void BackGroundDraw();
 
@@ -116,7 +126,9 @@ public:
 	//グラフィックスメモリをコマンドリストにセット
 	void Commit();
 
+	//カーソルがスタートボタン上にあるか
 	bool TitleIsOnStart();
 
-	bool TitleIsOnEnd();
+	//カーソルが終了ボタン上にあるか
+	bool TitleIsOnExit();
 };

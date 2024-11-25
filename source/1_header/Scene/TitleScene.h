@@ -20,5 +20,7 @@ public:
 	//ƒV[ƒ“I—¹‚Ìˆ—
 	void SceneEnd() override;		
 
+	//UI•`‰æˆ—
+	void ModelDraw() override;
 protected:
 };

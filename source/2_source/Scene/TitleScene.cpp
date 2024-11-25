@@ -50,7 +50,7 @@ TitleScene::Update()
 		}
 
 		//終了ボタンの上で左クリック
-		if (SpriteManager::Instance().TitleIsOnEnd())
+		if (SpriteManager::Instance().TitleIsOnExit())
 		{
 			//効果音
 			SoundManager::Instance().CallSound(Sounds::BUTTON);
@@ -88,4 +88,13 @@ void
 TitleScene::SceneEnd()
 {
 
+}
+
+/// <summary>
+/// UI描画処理
+/// </summary>
+void
+TitleScene::ModelDraw()
+{
+	SpriteManager::Instance().ButtonDraw();
 }

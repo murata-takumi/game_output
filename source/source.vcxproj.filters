@@ -144,6 +144,9 @@
     <ClInclude Include="1_header\FBX\AnimNodes\FallNode.h">
       <Filter>1_header\FBX\AnimNodes</Filter>
     </ClInclude>
+    <ClInclude Include="1_header\FBX\BoxCollider2D.h">
+      <Filter>1_header\FBX</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="2_source\Application.cpp">
@@ -223,6 +226,9 @@
     </ClCompile>
     <ClCompile Include="2_source\FBX\AnimNodes\FallNode.cpp">
       <Filter>2_source\FBX\AnimNodes</Filter>
+    </ClCompile>
+    <ClCompile Include="2_source\FBX\BoxCollider2D.cpp">
+      <Filter>2_source\FBX</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

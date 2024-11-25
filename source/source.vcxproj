@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -28,6 +28,7 @@
     <ClInclude Include="1_header\FBX\AnimNodes\WAIT00Node.h" />
     <ClInclude Include="1_header\FBX\AssimpLoader.h" />
     <ClInclude Include="1_header\FBX\BoxCollider.h" />
+    <ClInclude Include="1_header\FBX\BoxCollider2D.h" />
     <ClInclude Include="1_header\FBX\FBXActor.h" />
     <ClInclude Include="1_header\FBX\FBXBase.h" />
     <ClInclude Include="1_header\FBX\FBXObject.h" />
@@ -57,6 +58,7 @@
     <ClCompile Include="2_source\FBX\AnimNodes\WAIT00Node.cpp" />
     <ClCompile Include="2_source\FBX\AssimpLoader.cpp" />
     <ClCompile Include="2_source\FBX\BoxCollider.cpp" />
+    <ClCompile Include="2_source\FBX\BoxCollider2D.cpp" />
     <ClCompile Include="2_source\FBX\FBXActor.cpp" />
     <ClCompile Include="2_source\FBX\FBXBase.cpp" />
     <ClCompile Include="2_source\FBX\FBXObject.cpp" />

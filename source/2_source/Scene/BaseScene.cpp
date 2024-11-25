@@ -66,6 +66,8 @@ BaseScene::ChangeScene(SceneNames name)
 {
 	auto changeFunc = [&, name]()
 	{
+		lock_guard<mutex> lock(_mtx);
+
 		//‘€ì•s‰Â‚É‚·‚é
 		_canInput = false;
 

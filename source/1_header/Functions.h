@@ -8,9 +8,6 @@ namespace fs = std::filesystem;
 /// </summary>
 namespace
 {
-	//排他処理用オブジェクト
-	mutex _mtx;
-
 	const unsigned char _constSize = 0xff;	//定数バッファーのサイズを256の倍数に調整するためのデータ
 
 	//ヒープ設定用変数

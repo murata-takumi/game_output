@@ -319,8 +319,7 @@ PlayScene::CheckColliders(const BoxCollider& col1, const BoxCollider& col2)
 	//obb1_right
 	r = LenOnSeparateAxis(col1._rightDir, rightLen2, upLen2, frontLen2);
 	lenBetCenter = fabs(XMVector3Dot(vecBetCenter,col1._rightDir).m128_f32[0]);
-	a = lenBetCenter > r + col1._halfWidth;
-	if (a)
+	if (lenBetCenter > r + col1._halfWidth)
 	{
 		return false;
 	}

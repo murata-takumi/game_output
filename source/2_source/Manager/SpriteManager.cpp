@@ -1,5 +1,7 @@
 #include "Functions.h"
 #include "FBX/FBXActor.h"
+#include "FBX/BoxCollider2D.h"
+#include "Manager/InputManager.h"
 #include "Manager/SpriteManager.h"
 #include "Package/Package.h"
 #include "Wrapper/Dx12Wrapper.h"
@@ -54,6 +56,9 @@ SpriteManager::Init(LONG width, LONG height)
 	//Sprite用オブジェクトを初期化
 	InitSpriteDevices();
 
+	_startColl = make_unique<BoxCollider2D>(XMVectorSet(240, 60, 0, 0), XMVectorSet(610, 535, 0, 0));
+	_exitColl = make_unique<BoxCollider2D>(XMVectorSet(240, 60, 0, 0), XMVectorSet(610, 635, 0, 0));
+
 	//ロード画面用矩形を調整
 	AdjustSpriteRect();
 
@@ -70,6 +75,9 @@ SpriteManager::Init(LONG width, LONG height)
 	CreateUIBufferView(L"Asset/image/loading/6.png", "load_6");
 	CreateUIBufferView(L"Asset/image/loading/7.png", "load_7");
 	CreateUIBufferView(L"Asset/image/loading/8.png", "load_8");
+
+	CreateUIBufferView(L"Asset/image/button.png", "start");
+	CreateUIBufferView(L"Asset/image/button.png", "exit");
 
 	CreateUIBufferView(L"Asset/image/background.png", "background");
 }
@@ -243,6 +251,24 @@ SpriteManager::ColliderDraw(const shared_ptr<BoxCollider> collider)
 }
 
 /// <summary>
+/// マウスカーソルが矩形内にあるかどうか確認する
+/// </summary>
+/// <param name="rect">対象の矩形</param>
+/// <returns>矩形内にあるかどうか</returns>
+bool
+SpriteManager::IsCursorInRect(RECT rect)
+{
+	auto cursorPos = InputManager::Instance().MousePos();
+
+	if (cursorPos._posX < rect.left)return false;
+	if (rect.right < cursorPos._posX)return false;
+	if (cursorPos._posY < rect.top)return false;
+	if (rect.bottom < cursorPos._posY)return false;
+
+	return true;
+}
+
+/// <summary>
 /// 画像のバッファー・ビューを作成する関数
 /// </summary>
 /// <param name="path">画像のパス</param>
@@ -334,11 +360,13 @@ void
 SpriteManager::AdjustSpriteRect()
 {
 	//ロード画面の設定
-	_loadingRect = { LOADING_WIDTH,LOADING_HEIGHT,_width - LOADING_WIDTH,_height - LOADING_HEIGHT };	
+	_loadingRect = { LOADING_WIDTH,LOADING_HEIGHT,_width - LOADING_WIDTH,_height - LOADING_HEIGHT };
 	//背景用矩形の設定
 	_BGRect = *Dx12Wrapper::Instance().Rect();
 
 	AdjustWindowRect(&_loadingRect, WS_OVERLAPPEDWINDOW, false);		
+	AdjustWindowRect(&_startColl->_rect, WS_OVERLAPPEDWINDOW, false);
+	AdjustWindowRect(&_exitColl->_rect, WS_OVERLAPPEDWINDOW, false);
 	AdjustWindowRect(&_BGRect, WS_OVERLAPPEDWINDOW, false);		
 }
 
@@ -362,6 +390,31 @@ SpriteManager::LoadingDraw()
 
 	//バッチを解除
 	_spriteBatch->End();															
+}
+
+/// <summary>
+/// タイトル画面でのボタンの描画
+/// </summary>
+void
+SpriteManager::ButtonDraw()
+{
+	//ヒープをコマンドリストにセット
+	ID3D12DescriptorHeap* heap[] = { _heapForSpriteFont.Get() };
+	Dx12Wrapper::Instance().CommandList()->SetDescriptorHeaps(1, heap);
+
+	//バッチをセット
+	_spriteBatch->Begin(Dx12Wrapper::Instance().CommandList());
+
+	//背景用画像ビューをセット
+	_spriteBatch->Draw(_GPUHandles["start"], XMUINT2(1, 1),
+		_startColl->_rect, (TitleIsOnStart() ? Colors::White : Colors::LightGray));
+
+	//背景用画像ビューをセット
+	_spriteBatch->Draw(_GPUHandles["exit"], XMUINT2(1, 1),
+		_exitColl->_rect, (TitleIsOnExit() ? Colors::White : Colors::LightGray));
+
+	//バッチを解除
+	_spriteBatch->End();
 }
 
 /// <summary>
@@ -440,14 +493,22 @@ SpriteManager::Commit()
 	_gmemory->Commit(Dx12Wrapper::Instance().CommandQueue());
 }
 
+/// <summary>
+/// スタートボタンが押されているか判別
+/// </summary>
+/// <returns>スタートボタン上にカーソルがあるか</returns>
 bool
 SpriteManager::TitleIsOnStart()
 {
-	return true;
+	return IsCursorInRect(_startColl->_rect);
 }
 
+/// <summary>
+/// 終了ボタンが押されているか判別
+/// </summary>
+/// <returns>終了ボタン上にカーソルがあるか</returns>
 bool
-SpriteManager::TitleIsOnEnd()
+SpriteManager::TitleIsOnExit()
 {
-	return true;
+	return IsCursorInRect(_exitColl->_rect);
 }
