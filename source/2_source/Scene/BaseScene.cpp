@@ -66,8 +66,6 @@ BaseScene::ChangeScene(SceneNames name)
 {
 	auto changeFunc = [&, name]()
 	{
-		lock_guard<mutex> lock(_mtx);
-
 		//操作不可にする
 		_canInput = false;
 
@@ -146,7 +144,7 @@ BaseScene::GameDraw()
 	Dx12Wrapper::Instance().EndGameDraw();															
 
 	//スワップチェーンのフリップ処理
-	Dx12Wrapper::Instance().Swapchain()->Present(_interval, 0);										
+	Dx12Wrapper::Instance().Swapchain()->Present(Application::Instance().GetInterval(), 0);
 
 	//グラフィックスメモリを設定
 	SpriteManager::Instance().Commit();														

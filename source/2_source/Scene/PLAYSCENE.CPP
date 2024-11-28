@@ -273,14 +273,16 @@ template<class className>
 void
 PlayScene::InstantiateObject(const wchar_t* path,string name, XMFLOAT3 size,XMFLOAT3 pos)
 {
-	lock_guard<mutex> lock(BaseScene::_mtx);
-
 	auto f = [=]() {
+		//_mtx.lock();
+
 		shared_ptr<className> object;
 
 		object = make_shared<className>(path, size, pos);
 
 		_actorAndObjs[name] = object;
+
+		//_mtx.unlock();
 	};
 
 	//スレッドにアクターの作成処理を追加

@@ -60,8 +60,6 @@ TitleScene::Update()
 
 			auto exitFunc = ([&]()
 				{
-					lock_guard<mutex> lock(BaseScene::_mtx);
-
 					//フェードアウト
 					Dx12Wrapper::Instance().Fade(0.0f, 1.0f);
 

@@ -51,10 +51,7 @@ protected:
 	static double _fps;											
 
 	//並列処理を行う時、リソースを排他制御する為の変数
-	mutex _mtx;
-
-	//フリップ間隔
-	int _interval;											
+	mutex _mtx;										
 
 	//シーン遷移する為の関数
 	void ChangeScene(SceneNames name);						
