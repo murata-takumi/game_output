@@ -201,6 +201,12 @@ SpriteManager::InitSpriteDevices()
 	_tmpCPUHandle = _heapForSpriteFont->GetCPUDescriptorHandleForHeapStart();
 	_tmpGPUHandle = _heapForSpriteFont->GetGPUDescriptorHandleForHeapStart();
 
+	_spriteFont = make_unique<SpriteFont>(Dx12Wrapper::Instance().Device(),
+		resUploadBatch,
+		L"Asset/font/fonttest.spritefont",
+		_tmpCPUHandle,
+		_tmpGPUHandle);
+
 	//•`‰æ–½—ß‚ðGPU‘¤‚Ö“]‘—
 	auto future = resUploadBatch.End(Dx12Wrapper::Instance().CommandQueue());								
 
@@ -364,9 +370,12 @@ SpriteManager::AdjustSpriteRect()
 	//”wŒi—p‹éŒ`‚ÌÝ’è
 	_BGRect = *Dx12Wrapper::Instance().Rect();
 
+	auto startRect = _startColl->Rect();
+	auto exitRect = _exitColl->Rect();
+
 	AdjustWindowRect(&_loadingRect, WS_OVERLAPPEDWINDOW, false);		
-	AdjustWindowRect(&_startColl->_rect, WS_OVERLAPPEDWINDOW, false);
-	AdjustWindowRect(&_exitColl->_rect, WS_OVERLAPPEDWINDOW, false);
+	AdjustWindowRect(&startRect, WS_OVERLAPPEDWINDOW, false);
+	AdjustWindowRect(&exitRect, WS_OVERLAPPEDWINDOW, false);
 	AdjustWindowRect(&_BGRect, WS_OVERLAPPEDWINDOW, false);		
 }
 
@@ -407,11 +416,17 @@ SpriteManager::ButtonDraw()
 
 	//”wŒi—p‰æ‘œƒrƒ…[‚ðƒZƒbƒg
 	_spriteBatch->Draw(_GPUHandles["start"], XMUINT2(1, 1),
-		_startColl->_rect, (TitleIsOnStart() ? Colors::White : Colors::LightGray));
+		_startColl->Rect(), (TitleIsOnStart() ? Colors::White : Colors::LightGray));
 
 	//”wŒi—p‰æ‘œƒrƒ…[‚ðƒZƒbƒg
 	_spriteBatch->Draw(_GPUHandles["exit"], XMUINT2(1, 1),
-		_exitColl->_rect, (TitleIsOnExit() ? Colors::White : Colors::LightGray));
+		_exitColl->Rect(), (TitleIsOnExit() ? Colors::White : Colors::LightGray));
+
+	string start = "Start";
+	string exit = "Exit";
+
+	_spriteFont->DrawString(_spriteBatch.get(),start.c_str(),_startColl->StrCenterPos(start), DirectX::Colors::GhostWhite);
+	_spriteFont->DrawString(_spriteBatch.get(), exit.c_str(),_exitColl->StrCenterPos(exit), DirectX::Colors::GhostWhite);
 
 	//ƒoƒbƒ`‚ð‰ðœ
 	_spriteBatch->End();
@@ -500,7 +515,7 @@ SpriteManager::Commit()
 bool
 SpriteManager::TitleIsOnStart()
 {
-	return IsCursorInRect(_startColl->_rect);
+	return IsCursorInRect(_startColl->Rect());
 }
 
 /// <summary>
@@ -510,5 +525,5 @@ SpriteManager::TitleIsOnStart()
 bool
 SpriteManager::TitleIsOnExit()
 {
-	return IsCursorInRect(_exitColl->_rect);
+	return IsCursorInRect(_exitColl->Rect());
 }

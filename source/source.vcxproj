@@ -221,7 +221,7 @@
       <SDLCheck>false</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>.\include\imgui;.\include\EffekseerRendererDX12</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\include\DirectXTK12-master";.\include\imgui;.\include\EffekseerRendererDX12;</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <ShowIncludes>false</ShowIncludes>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -248,7 +248,7 @@
       <SDLCheck>false</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>.\include\imgui;.\include\EffekseerRendererDX12</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\include\DirectXTK12-master";.\include\imgui;.\include\EffekseerRendererDX12;</AdditionalIncludeDirectories>
       <SupportJustMyCode>true</SupportJustMyCode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>

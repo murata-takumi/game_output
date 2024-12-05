@@ -27,7 +27,9 @@ class SpriteManager
 
 private:	
 	//グラフィックスメモリ
-	unique_ptr<GraphicsMemory> _gmemory;									
+	unique_ptr<GraphicsMemory> _gmemory;		
+	//フォント表示用オブジェクト
+	unique_ptr<SpriteFont> _spriteFont;
 	//スプライト（画像）表示用オブジェクト
 	unique_ptr<SpriteBatch> _spriteBatch;
 
