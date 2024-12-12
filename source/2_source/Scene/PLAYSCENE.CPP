@@ -12,12 +12,13 @@ const wchar_t* COIN_PATH = L"Asset/model/Coin.fbx";
 
 //プレイヤーの当たり判定の大きさ
 const XMFLOAT3 ACTOR_COLL_SIZE = XMFLOAT3(60.0f, 170.0f, 60.0f);
+const XMFLOAT3 ACTOR_INIT_POS = XMFLOAT3(0.0f, 85.0f, 0.0f);
 //地面の当たり判定の大きさ
 const XMFLOAT3 GROUND_COLL_SIZE = XMFLOAT3(2000.0f, 1.0f, 2000.0f);
 //コインの当たり判定の大きさ
 const XMFLOAT3 COIN_COLL_SIZE = XMFLOAT3(25.0f, 25.0f, 25.0f);
 //コインの初期座標
-const XMFLOAT3 COIN_INIT_POS = XMFLOAT3(0.0f, 12.5f, 100.0f);
+const XMFLOAT3 COIN_INIT_POS = XMFLOAT3(0.0f, 0.0f, 100.0f);
 
 //オブジェクトの名前一覧
 const string ACTOR_NAME = "Actor";
@@ -62,7 +63,7 @@ PlayScene::SceneStart()
 		//スレッドに各オブジェクトの作成処理を追加
 		InstantiateObject<FBXActor>(ACTOR_PATH,ACTOR_NAME,ACTOR_COLL_SIZE);
 		InstantiateObject<FBXObject>(GROUND_PATH,GROUND_NAME,GROUND_COLL_SIZE);
-		InstantiateObject<FBXObject>(COIN_PATH,COIN_NAME,COIN_COLL_SIZE, COIN_INIT_POS);
+		InstantiateObject<FBXObject>(COIN_PATH,COIN_NAME,COIN_COLL_SIZE);
 
 		//スレッドが全て完了するまでここで待機
 		for (auto& th : _ths)							
@@ -114,12 +115,12 @@ PlayScene::Update()
 		ImGuiManager::Instance()._isCrossed = CheckColliders(*_actorAndObjs[GROUND_NAME]->Collider(), *_actor->Collider());
 
 		//コインとアクターが接触したらコインを削除
-		if (_actorAndObjs[COIN_NAME] && CheckColliders(*_actorAndObjs[COIN_NAME]->Collider(), *_actor->Collider()))
-		{
-			_actorAndObjs.erase(COIN_NAME);
+		//if (_actorAndObjs[COIN_NAME] && CheckColliders(*_actorAndObjs[COIN_NAME]->Collider(), *_actor->Collider()))
+		//{
+		//	_actorAndObjs.erase(COIN_NAME);
 
-			SoundManager::Instance().CallSound(Sounds::COIN);
-		}
+		//	SoundManager::Instance().CallSound(Sounds::COIN);
+		//}
 
 		//WASDキーの入力に応じて視点を移動させる
 		//注視点を中心に視点を回転

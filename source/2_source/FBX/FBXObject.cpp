@@ -91,6 +91,6 @@ FBXObject::CreateTransformView()
 void
 FBXObject::Update()
 {
-	//‚±‚ê‚ð‘‚©‚È‚¢‚Æ“–‚½‚è”»’è‚ª’†S‚Ì‚Ü‚Ü
-	_collider->Update(FBXBase::_mappedMats[0]);
+	//TODO:‚±‚±‚ÉˆÚ“®ˆ—“™‚ðŽÀ‘•‚µ‚½‚¢
+	_collider->Update(XMMatrixTranslation(0,12.5f,0) * FBXBase::_mappedMats[0]);
 }
