@@ -206,7 +206,7 @@ Application::Init()
 	_title.reset(new TitleScene());
 	_play.reset(new PlayScene());
 	
-	ChangeScene(SceneNames::Title);
+	ChangeScene(SceneNames::Play);
 
 	return true;
 }

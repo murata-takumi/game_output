@@ -6,7 +6,7 @@
 //プレイヤーデータが格納されているファイルパス
 const wchar_t* ACTOR_PATH = L"Asset/model/Unitychan.fbx";		
 //地面データが格納されているファイルパス
-const wchar_t* GROUND_PATH = L"Asset/model/Field.fbx";				
+const wchar_t* GROUND_PATH = L"Asset/model/Ground.fbx";				
 //コインのデータが格納されているファイルパス
 const wchar_t* COIN_PATH = L"Asset/model/Coin.fbx";				
 
