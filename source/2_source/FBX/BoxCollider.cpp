@@ -135,3 +135,13 @@ BoxCollider::Vertices()const
 {
 	return _verts;
 }
+
+/// <summary>
+/// 幅、高さ、奥行をまとめて返す関数
+/// </summary>
+/// <returns>幅、高さ、奥行</returns>
+XMFLOAT3
+BoxCollider::HalfLength()const
+{
+	return XMFLOAT3(_halfWidth,_halfHeight,_halfDepth);
+}

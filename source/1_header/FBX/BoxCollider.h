@@ -14,15 +14,15 @@ private:
 	//中心ベクトルの初期値
 	XMVECTOR _initCenter;
 
+	//それぞれ幅、高さ、奥行の長さの半分
+	float _halfWidth, _halfHeight, _halfDepth;
+
 	//当たり判定が持つ三方向のベクトルを設定する関数
 	void SetVec(const XMVECTOR& vec);
 
 public:
 	//それぞれ中心、正面、右、上ベクトル
 	XMVECTOR _center, _frontDir, _rightDir, _upDir;
-
-	//それぞれ幅、高さ、奥行の長さの半分
-	float _halfWidth, _halfHeight, _halfDepth;
 
 	//コンストラクタ
 	BoxCollider(const XMFLOAT3& size, const XMFLOAT3& center);	
@@ -34,4 +34,6 @@ public:
 
 	//頂点を返す関数
 	vector<XMVECTOR> Vertices()const;
+
+	XMFLOAT3 HalfLength()const;
 };

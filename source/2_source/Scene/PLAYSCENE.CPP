@@ -300,12 +300,12 @@ bool
 PlayScene::CheckColliders(const BoxCollider& col1, const BoxCollider& col2)
 {
 	//各OBBの右、上、正面ベクトル
-	XMVECTOR rightLen1 = col1._rightDir * col1._halfWidth;
-	XMVECTOR upLen1 = col1._upDir * col1._halfHeight;
-	XMVECTOR frontLen1 = col1._frontDir * col1._halfDepth;
-	XMVECTOR rightLen2 = col2._rightDir * col2._halfWidth;
-	XMVECTOR upLen2 = col2._upDir * col2._halfHeight;
-	XMVECTOR frontLen2 = col2._frontDir * col2._halfDepth;
+	XMVECTOR rightLen1 = col1._rightDir * col1.HalfLength().x;
+	XMVECTOR upLen1 = col1._upDir * col1.HalfLength().y;
+	XMVECTOR frontLen1 = col1._frontDir * col1.HalfLength().z;
+	XMVECTOR rightLen2 = col2._rightDir * col2.HalfLength().x;
+	XMVECTOR upLen2 = col2._upDir * col2.HalfLength().y;
+	XMVECTOR frontLen2 = col2._frontDir * col2.HalfLength().z;
 
 	//双方のOBBの中心を結ぶベクトル
 	XMVECTOR vecBetCenter = col1._center - col2._center;
@@ -313,7 +313,7 @@ PlayScene::CheckColliders(const BoxCollider& col1, const BoxCollider& col2)
 	//obb1_front
 	float r = LenOnSeparateAxis(col1._frontDir, rightLen2, upLen2, frontLen2);
 	float lenBetCenter = fabs(XMVector3Dot(vecBetCenter,col1._frontDir ).m128_f32[0]);
-	bool a = lenBetCenter > r + col1._halfDepth;
+	bool a = lenBetCenter > r + col1.HalfLength().z;
 	if (a)
 	{
 		return false;
@@ -322,7 +322,7 @@ PlayScene::CheckColliders(const BoxCollider& col1, const BoxCollider& col2)
 	//obb1_right
 	r = LenOnSeparateAxis(col1._rightDir, rightLen2, upLen2, frontLen2);
 	lenBetCenter = fabs(XMVector3Dot(vecBetCenter,col1._rightDir).m128_f32[0]);
-	if (lenBetCenter > r + col1._halfWidth)
+	if (lenBetCenter > r + col1.HalfLength().x)
 	{
 		return false;
 	}
@@ -330,7 +330,7 @@ PlayScene::CheckColliders(const BoxCollider& col1, const BoxCollider& col2)
 	//obb1_up
 	r = LenOnSeparateAxis(col1._upDir, rightLen2, upLen2, frontLen2);
 	lenBetCenter = fabs(XMVector3Dot(vecBetCenter,col1._upDir).m128_f32[0]);
-	a = lenBetCenter > r + col1._halfHeight;
+	a = lenBetCenter > r + col1.HalfLength().y;
 	if (a)
 	{
 		return false;
@@ -339,7 +339,7 @@ PlayScene::CheckColliders(const BoxCollider& col1, const BoxCollider& col2)
 	//obb2_front
 	r = LenOnSeparateAxis(col2._frontDir, rightLen1, upLen1, frontLen1);
 	lenBetCenter = fabs(XMVector3Dot(vecBetCenter,col2._frontDir).m128_f32[0]);
-	a = lenBetCenter > r + col2._halfDepth;
+	a = lenBetCenter > r + col2.HalfLength().z;
 	if (a)
 	{
 		return false;
@@ -348,7 +348,7 @@ PlayScene::CheckColliders(const BoxCollider& col1, const BoxCollider& col2)
 	//obb2_right
 	r = LenOnSeparateAxis(col2._rightDir, rightLen1, upLen1, frontLen1);
 	lenBetCenter = fabs(XMVector3Dot(vecBetCenter,col2._rightDir).m128_f32[0]);
-	a = lenBetCenter > r + col2._halfWidth;
+	a = lenBetCenter > r + col2.HalfLength().x;
 	if (a)
 	{
 		return false;
@@ -357,7 +357,7 @@ PlayScene::CheckColliders(const BoxCollider& col1, const BoxCollider& col2)
 	//obb2_up
 	r = LenOnSeparateAxis(col2._upDir, rightLen1, upLen1, frontLen1);
 	lenBetCenter = fabs(XMVector3Dot(vecBetCenter,col2._upDir).m128_f32[0]);
-	a = lenBetCenter > r + col2._halfHeight;
+	a = lenBetCenter > r + col2.HalfLength().y;
 	if (a)
 	{
 		return false;
