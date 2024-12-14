@@ -63,7 +63,7 @@ PlayScene::SceneStart()
 		//スレッドに各オブジェクトの作成処理を追加
 		InstantiateObject<FBXActor>(ACTOR_PATH,ACTOR_NAME,ACTOR_COLL_SIZE);
 		InstantiateObject<FBXObject>(GROUND_PATH,GROUND_NAME,GROUND_COLL_SIZE);
-		InstantiateObject<FBXObject>(COIN_PATH,COIN_NAME,COIN_COLL_SIZE);
+		InstantiateObject<FBXObject>(COIN_PATH,COIN_NAME,COIN_COLL_SIZE,COIN_INIT_POS);
 
 		//スレッドが全て完了するまでここで待機
 		for (auto& th : _ths)							
@@ -115,12 +115,12 @@ PlayScene::Update()
 		ImGuiManager::Instance()._isCrossed = CheckColliders(*_actorAndObjs[GROUND_NAME]->Collider(), *_actor->Collider());
 
 		//コインとアクターが接触したらコインを削除
-		//if (_actorAndObjs[COIN_NAME] && CheckColliders(*_actorAndObjs[COIN_NAME]->Collider(), *_actor->Collider()))
-		//{
-		//	_actorAndObjs.erase(COIN_NAME);
+		if (_actorAndObjs[COIN_NAME] && CheckColliders(*_actorAndObjs[COIN_NAME]->Collider(), *_actor->Collider()))
+		{
+			_actorAndObjs.erase(COIN_NAME);
 
-		//	SoundManager::Instance().CallSound(Sounds::COIN);
-		//}
+			SoundManager::Instance().CallSound(Sounds::COIN);
+		}
 
 		//WASDキーの入力に応じて視点を移動させる
 		//注視点を中心に視点を回転

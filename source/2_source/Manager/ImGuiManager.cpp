@@ -156,6 +156,10 @@ ImGuiManager::ImGuiDraw()
 		}
 
 		ImGui::Checkbox("IsOnGround", &_actor->_isOnGround);
+
+		ImGui::DragFloat("ActorCenterX", &_actor->Collider()->_center.m128_f32[0]);
+		ImGui::DragFloat("ActorCenterY", &_actor->Collider()->_center.m128_f32[1]);
+		ImGui::DragFloat("ActorCenterZ", &_actor->Collider()->_center.m128_f32[2]);
 		
 		ImGui::End();
 	}

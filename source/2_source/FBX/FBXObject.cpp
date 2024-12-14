@@ -92,5 +92,6 @@ void
 FBXObject::Update()
 {
 	//TODO:ここに移動処理等を実装したい
-	_collider->Update(XMMatrixTranslation(0,12.5f,0) * FBXBase::_mappedMats[0]);
+	//こう書かないと当たり判定の中心がオブジェクト下になってしまう
+	_collider->Update(XMMatrixTranslation(0,_collider->_halfHeight,0) * FBXBase::_mappedMats[0]);
 }
