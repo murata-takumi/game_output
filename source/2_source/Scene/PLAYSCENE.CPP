@@ -14,7 +14,7 @@ const wchar_t* COIN_PATH = L"Asset/model/Coin.fbx";
 const XMFLOAT3 ACTOR_COLL_SIZE = XMFLOAT3(60.0f, 170.0f, 60.0f);
 const XMFLOAT3 ACTOR_INIT_POS = XMFLOAT3(0.0f, 85.0f, 0.0f);
 //地面の当たり判定の大きさ
-const XMFLOAT3 GROUND_COLL_SIZE = XMFLOAT3(2000.0f, 1.0f, 2000.0f);
+const XMFLOAT3 GROUND_COLL_SIZE = XMFLOAT3(10000.0f, 1.0f, 10000.0f);
 //コインの当たり判定の大きさ
 const XMFLOAT3 COIN_COLL_SIZE = XMFLOAT3(25.0f, 25.0f, 25.0f);
 //コインの初期座標
@@ -330,11 +330,12 @@ PlayScene::CheckColliders(const BoxCollider& col1, const BoxCollider& col2)
 	//obb1_up
 	r = LenOnSeparateAxis(col1._upDir, rightLen2, upLen2, frontLen2);
 	lenBetCenter = fabs(XMVector3Dot(vecBetCenter,col1._upDir).m128_f32[0]);
-	a = lenBetCenter > r + col1.HalfLength().y;
-	if (a)
+	if (lenBetCenter > r + col1.HalfLength().y)
 	{
 		return false;
 	}
+
+	auto diff = r + col1.HalfLength().y - lenBetCenter;
 
 	//obb2_front
 	r = LenOnSeparateAxis(col2._frontDir, rightLen1, upLen1, frontLen1);
@@ -362,6 +363,9 @@ PlayScene::CheckColliders(const BoxCollider& col1, const BoxCollider& col2)
 	{
 		return false;
 	}
+
+	//ここにめり込みを戻す処理
+	//if(5.0f <= fabs(diff))_actor->_pos.m128_f32[1] += Dx12Wrapper::Instance().GetDeltaTime() * diff;
 
 	return true;
 }

@@ -18,8 +18,10 @@ cbuffer SceneData : register(b0)
 	matrix view;						
 	//プロジェクション行列
 	matrix proj;						
-	//カメラ座標
-	float3 light;							
+	//光源の座標
+	float3 light;	
+    //カメラ座標
+    float3 eye;
 };
 
 //座標変換用スロット

@@ -629,6 +629,7 @@ Dx12Wrapper::SetScene()
 	}
 
 	_mappedScene->light = _light;
+	_mappedScene->eye = _eye;
 
 	ID3D12DescriptorHeap* sceneHeaps[] = { _sceneDescHeap.Get() };				//ディスクリプタヒープをコマンドリストにセット
 	_cmdList->SetDescriptorHeaps(1, sceneHeaps);

@@ -115,6 +115,7 @@ private:
 		XMMATRIX view;
 		XMMATRIX proj;
 		XMFLOAT3 light;
+		XMFLOAT3 eye;
 	};
 	//マップ用ポインタ
 	SceneData* _mappedScene;									

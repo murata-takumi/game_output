@@ -49,12 +49,12 @@ protected:
 	vector<D3D12_GPU_DESCRIPTOR_HANDLE> _gpuHandles;						
 
 	//モデルの座標変換行列を格納する構造体のポインタ
-	XMMATRIX* _mappedMats = nullptr;										
+	XMMATRIX* _mappedMats = nullptr;
+
+	vector<FBXVertex> _normals;
 
 	//座標
 	XMVECTOR _pos;
-
-	vector<FBXVertex> _normals;
 
 	//法線を収集するかどうか
 	bool _collectNormal = false;

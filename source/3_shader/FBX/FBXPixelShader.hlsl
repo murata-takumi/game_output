@@ -11,7 +11,10 @@ float4 FBXPS(Output input) : SV_TARGET
 	
     float4 toonDif = toonTex.Sample(toonSmp, float2(0.0f,1.0f - diffuseB));
     
-    ret.a = 1.0f;
+    float dis = length(eye - input.pos);
+    dis -= 1000.0f;
+    
+    ret.a = (dis < 0.0f ? 1.0f : 1.0f - (dis / 50.0f));
     
 	return toonDif * ret;
 }
