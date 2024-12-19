@@ -615,7 +615,7 @@ Dx12Wrapper::SetScene()
 		_mappedScene->proj = XMMatrixPerspectiveFovLH(XM_PIDIV4,
 			static_cast<float>(_winSize.cx) / static_cast<float>(_winSize.cy),
 			0.1f,
-			1000.0f
+			2000.0f
 		);
 	}
 	else																		//•½s“Š‰e
@@ -625,7 +625,7 @@ Dx12Wrapper::SetScene()
 		_mappedScene->proj = XMMatrixOrthographicLH(
 			static_cast<float>(_winSize.cx) / (XM_PI * (INIT_RAD / _currentRad)),
 			static_cast<float>(_winSize.cy) / (XM_PI * (INIT_RAD / _currentRad)),
-			0.1f, 1000.0f);
+			0.1f, 2000.0f);
 	}
 
 	_mappedScene->light = _light;
