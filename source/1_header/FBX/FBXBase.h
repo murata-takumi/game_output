@@ -51,13 +51,15 @@ protected:
 	//モデルの座標変換行列を格納する構造体のポインタ
 	XMMATRIX* _mappedMats = nullptr;
 
+	XMMATRIX _motionMat;
+
 	vector<FBXVertex> _normals;
 
 	//座標
 	XMVECTOR _pos;
 
-	//法線を収集するかどうか
-	bool _collectNormal = false;
+	//当たり判定の更新からボーンの座標変換を排除するか
+	bool _rejectBone;
 
 	//モデルを初期化する関数
 	void InitModel(const wchar_t* filePath);								
@@ -79,10 +81,16 @@ public:
 	virtual ~FBXBase();													
 
 	//毎フレームの描画処理
-	void Draw();														
-	//毎フレームの座標変換処理（継承先で使用）
-	virtual void Update() = 0;											
+	void Draw();	
+
+	//毎フレームの座標変換処理
+	virtual void Update();											
 
 	//当たり判定のポインタを返す関数
-	shared_ptr<BoxCollider>Collider()const;								
+	shared_ptr<BoxCollider>Collider()const;		
+
+	XMVECTOR& Pos();
+
+	//ボーン変換を排除するか決める
+	void SetRejectBone(bool val);
 };

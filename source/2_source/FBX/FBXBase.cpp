@@ -10,10 +10,8 @@
 /// <param name="pos">初期座標</param>
 /// <param name="diff">当たり判定の差分</param>
 FBXBase::FBXBase(const wchar_t* filePath, const XMFLOAT3& size, const XMFLOAT3& pos, const XMFLOAT3& diff)
-	:_pos(XMLoadFloat3(&pos))
+	:_motionMat(XMMatrixIdentity()), _pos(XMLoadFloat3(&pos)),_rejectBone(true)
 {
-	_collectNormal = true;
-
 	//モデル関連の情報を初期化
 	InitModel(filePath);														
 
@@ -95,26 +93,6 @@ FBXBase::CreateVertexBufferView()
 
 		//頂点全体のデータサイズ
 		auto size = sizeof(FBXVertex) * _meshes[i].vertices.size();
-
-		if (_collectNormal)
-		{
-			for (auto& vert : _meshes[i].vertices)
-			{
-				_normals.emplace_back(vert);
-				auto vec = XMLoadFloat3(&vert.normal);
-
-				for (auto& a : _normals)
-				{
-					auto aVec = XMLoadFloat3(&a.normal);
-					auto b = fabs(1.0f - XMVector3Dot(vec, aVec).m128_f32[0]);
-					if (b <= FLT_EPSILON)
-					{
-						_normals.pop_back();
-						break;
-					}
-				}
-			}
-		}
 
 		//ヒーププロパティ
 		auto heapProp = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);				
@@ -406,6 +384,17 @@ FBXBase::Draw()
 }
 
 /// <summary>
+/// 毎フレームの座標変換を行う
+/// </summary>
+void
+FBXBase::Update()
+{
+	//こう書かないと当たり判定の中心がオブジェクト下になってしまう
+	if (_rejectBone) _motionMat = XMMatrixTranslation(0, _collider->HalfLength().y, 0);
+	_collider->Update(_motionMat * FBXBase::_mappedMats[0]);
+}
+
+/// <summary>
 /// 当たり判定を返す
 /// </summary>
 /// <returns>当たり判定</returns>
@@ -413,4 +402,24 @@ shared_ptr<BoxCollider>
 FBXBase::Collider()const
 {
 	return _collider;
+}
+
+/// <summary>
+/// 座標を返す
+/// </summary>
+/// <returns>座標</returns>
+XMVECTOR& 
+FBXBase::Pos()
+{
+	return _pos;
+}
+
+/// <summary>
+/// ボーン変換を排除するかどうかを決める
+/// </summary>
+/// <param name="val">ボーン変換を決める真理値</param>
+void
+FBXBase::SetRejectBone(bool val)
+{
+	_rejectBone = val;
 }

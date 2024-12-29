@@ -164,9 +164,12 @@ ImGuiManager::ImGuiDraw()
 	{
 		ImGui::Begin("Animation",0,_animFlag);
 
-		ImGui::SetWindowPos(ImVec2(DIFF, _windowHeight - (ANIMATION_HEIGHT + DIFF)));		//ウィンドウ座標を設定
-		ImGui::SetWindowSize(ImVec2(_windowWidth - (DIFF * 2),ANIMATION_HEIGHT));			//ウィンドウサイズを設定
-		ImGui::BeginDisabled(_canActorControll);											//アクターが移動可能なときはこのウィンドウを非活性化
+		//ウィンドウ座標を設定
+		ImGui::SetWindowPos(ImVec2(DIFF, _windowHeight - (ANIMATION_HEIGHT + DIFF)));		
+		//ウィンドウサイズを設定
+		ImGui::SetWindowSize(ImVec2(_windowWidth - (DIFF * 2),ANIMATION_HEIGHT));			
+		//アクターが移動可能なときはこのウィンドウを非活性化
+		ImGui::BeginDisabled(_canActorControll);											
 
 		ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.2f);
 		if (ImGui::BeginCombo("##", _currentImGuiAnim.c_str()))
@@ -200,12 +203,15 @@ ImGuiManager::ImGuiDraw()
 
 		if(ImGui::Button("Resume"))
 		{
-			QueryPerformanceCounter(&_beforeFrameTime);										//アニメーション開始時のフレームの時間を取得
+			//アニメーション開始時のフレームの時間を取得
+			QueryPerformanceCounter(&_beforeFrameTime);										
 
 			_animSliderValue = 0.0f;
 
-			_actor->SetAnimStr(_currentImGuiAnim);											//実行するアニメーションを指定
-			_actor->SetAnimationTime(_animSliderValue);										//実行するアニメーションを指定
+			//実行するアニメーションを指定
+			_actor->SetAnimStr(_currentImGuiAnim);											
+			//実行するアニメーションを指定
+			_actor->SetAnimationTime(_animSliderValue);										
 
 			_canCallAnim = true;
 		}
@@ -221,12 +227,13 @@ ImGuiManager::ImGuiDraw()
 
 			_canCallAnim = false;
 		}
+		//アニメーションの再生速度
+		ImGui::SliderFloat("###", &_speed, 0.1f, 2.0f);		
 
-		ImGui::SliderFloat("###", &_speed, 0.1f, 2.0f);										//アニメーションの再生速度
-		
 		ImGui::SameLine();
 
-		if (ImGui::Button("1.0"))															//再生速度を1に直す
+		//再生速度を1に直す
+		if (ImGui::Button("1.0"))															
 		{
 			_speed = 1.0f;
 		}
@@ -235,19 +242,23 @@ ImGuiManager::ImGuiDraw()
 		_animSliderValue = clamp(_animSliderValue,0.0f, _maxDur);
 		if (ImGui::SliderFloat("Animation", &_animSliderValue, 0.0f, _maxDur))
 		{
-			if (_canCallAnim)_canCallAnim = false;									//アニメーション実行中だったら止める
-			_actor->SetAnimationTime(_animSliderValue);								//スライダーの値をアクターに渡す
+			//アニメーション実行中だったら止める
+			if (_canCallAnim)_canCallAnim = false;									
+			//スライダーの値をアクターに渡す
+			_actor->SetAnimationTime(_animSliderValue);								
 		}
 
 		ImGui::EndDisabled();
 		ImGui::End();
 	}
 
-	Update();																		//描画以外の処理
+	//描画以外の処理
+	Update();																		
 
 	ImGui::Render();
 
-	ID3D12DescriptorHeap* heap[] = { _heapForImgui.Get()};							//ImGui用ヒープをセット
+	//ImGui用ヒープをセット
+	ID3D12DescriptorHeap* heap[] = { _heapForImgui.Get()};							
 	Dx12Wrapper::Instance().CommandList()->SetDescriptorHeaps(1, heap);
 	ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), Dx12Wrapper::Instance().CommandList());
 }

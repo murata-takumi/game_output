@@ -549,6 +549,8 @@ FBXActor::InitPose()
 void
 FBXActor::Update()
 {
+	FBXBase::Update();
+
 	//操作可能な場合
 	if (_canControll)			
 	{
@@ -579,10 +581,7 @@ FBXActor::Update()
 	XMMatrixDecompose(&scale, &skew, &trans, 
 		_invMats[COLLIDER_BONE] * FBXBase::_mappedMats[COLLIDER_BONE + 1]);
 	skew = XMVectorZero();
-	XMMATRIX newWorldMat = XMMatrixScalingFromVector(scale) * XMMatrixRotationQuaternion(skew) * XMMatrixTranslationFromVector(trans);
-
-	//当たり判定を更新
-	_collider->Update(newWorldMat * FBXBase::_mappedMats[0]);
+	_motionMat = XMMatrixScalingFromVector(scale) * XMMatrixRotationQuaternion(skew) * XMMatrixTranslationFromVector(trans);
 
 	//経過時間を渡し、ボーン行列を取得
 	BoneTransform(_animTime);														

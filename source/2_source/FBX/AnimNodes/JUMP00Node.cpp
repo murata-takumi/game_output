@@ -32,6 +32,8 @@ JUMP00Node::StartAnimation()
 	_actor->SetCanChangeAnim(false);
 	//ループしないようにする
 	_actor->SetIsInLoop(false);
+	//当たり判定がボーン変換の影響を受けるようにする
+	_actor->SetRejectBone(false);
 }
 
 /// <summary>
@@ -58,4 +60,6 @@ JUMP00Node::EndAnimation()
 {
 	//ループできるようにする
 	_actor->SetIsInLoop(true);
+	//当たり判定がボーン変換の影響を受けないようにする
+	_actor->SetRejectBone(true);
 }

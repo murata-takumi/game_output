@@ -91,7 +91,5 @@ FBXObject::CreateTransformView()
 void
 FBXObject::Update()
 {
-	//TODO:ここに移動処理等を実装したい
-	//こう書かないと当たり判定の中心がオブジェクト下になってしまう
-	_collider->Update(XMMatrixTranslation(0,_collider->HalfLength().y, 0) * FBXBase::_mappedMats[0]);
+	FBXBase::Update();
 }
