@@ -365,7 +365,7 @@ PlayScene::CheckColliders(const BoxCollider& col1, const BoxCollider& col2)
 	}
 
 	//‚±‚±‚É‚ß‚è‚İ‚ğ–ß‚·ˆ—
-	if(2.0f <=fabs(diff))_actor->Pos().m128_f32[1] += diff * Dx12Wrapper::Instance().GetDeltaTime() * 2.0f;
+	if(1.0f <=fabs(diff))col2.Object().Pos().m128_f32[1] += diff * Dx12Wrapper::Instance().GetDeltaTime() * 6.0f;
 
 	return true;
 }

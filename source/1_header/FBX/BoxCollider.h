@@ -4,9 +4,13 @@
 /// <summary>
 /// 矩形の当たり判定を実装するクラス
 /// </summary>
+class FBXBase;
 class BoxCollider
 {
 private:
+	//この当たり判定を持つオブジェクト
+	FBXBase& _object;
+
 	//頂点の初期値
 	vector<XMVECTOR> _initVerts;
 	//画面に表示する頂点
@@ -25,7 +29,7 @@ public:
 	XMVECTOR _center, _frontDir, _rightDir, _upDir;
 
 	//コンストラクタ
-	BoxCollider(const XMFLOAT3& size, const XMFLOAT3& center);	
+	BoxCollider(FBXBase& object, const XMFLOAT3& size, const XMFLOAT3& center);	
 	//デストラクタ
 	~BoxCollider();
 
@@ -35,5 +39,9 @@ public:
 	//頂点を返す関数
 	vector<XMVECTOR> Vertices()const;
 
+	//幅、高さ、奥行を返す
 	XMFLOAT3 HalfLength()const;
+
+	//オブジェクトを返す
+	FBXBase& Object()const;
 };

@@ -23,7 +23,7 @@ FBXBase::FBXBase(const wchar_t* filePath, const XMFLOAT3& size, const XMFLOAT3& 
 	CreateShaderResourceView();													
 
 	//“–‚½‚è”»’è‚ğì¬
-	_collider = make_shared<BoxCollider>(size, diff);
+	_collider = make_shared<BoxCollider>(*this,size, diff);
 }
 
 /// <summary>

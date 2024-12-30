@@ -19,7 +19,8 @@ const float THRESHOLD_BETWEEN_LEFT_AND_FRONT = 315.0f;
 /// </summary>
 /// <param name="size">当たり判定の幅、高さ、奥行のサイズ</param>
 /// <param name="center">当たり判定の中心ベクトル</param>
-BoxCollider::BoxCollider(const XMFLOAT3& size, const XMFLOAT3& center)
+BoxCollider::BoxCollider(FBXBase& object, const XMFLOAT3& size, const XMFLOAT3& center)
+	:_object(object)
 {
 	//ベクトルを初期化
 	SetVec(INITIAL_FRONT);
@@ -144,4 +145,14 @@ XMFLOAT3
 BoxCollider::HalfLength()const
 {
 	return XMFLOAT3(_halfWidth,_halfHeight,_halfDepth);
+}
+
+/// <summary>
+/// 当たり判定を持つオブジェクトを返す
+/// </summary>
+/// <returns>オブジェクト</returns>
+FBXBase&
+BoxCollider::Object()const
+{
+	return _object;
 }
