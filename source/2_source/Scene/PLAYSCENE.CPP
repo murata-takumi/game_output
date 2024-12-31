@@ -12,7 +12,6 @@ const wchar_t* COIN_PATH = L"Asset/model/Coin.fbx";
 
 //プレイヤーの当たり判定の大きさ
 const XMFLOAT3 ACTOR_COLL_SIZE = XMFLOAT3(60.0f, 170.0f, 60.0f);
-const XMFLOAT3 ACTOR_INIT_POS = XMFLOAT3(0.0f, 85.0f, 0.0f);
 //地面の当たり判定の大きさ
 const XMFLOAT3 GROUND_COLL_SIZE = XMFLOAT3(1000.0f, 1.0f, 1000.0f);
 //コインの当たり判定の大きさ
@@ -365,7 +364,7 @@ PlayScene::CheckColliders(const BoxCollider& col1, const BoxCollider& col2)
 	}
 
 	//ここにめり込みを戻す処理
-	if(1.0f <=fabs(diff))col2.Object().Pos().m128_f32[1] += diff * Dx12Wrapper::Instance().GetDeltaTime() * 6.0f;
+	if(1.0f <=fabs(diff))col2.Object().Pos().m128_f32[1] += diff * Dx12Wrapper::Instance().GetDeltaTime() * 5.0f;
 
 	return true;
 }

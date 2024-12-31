@@ -180,7 +180,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>.\1_header;.\include;$(IncludePath)</IncludePath>
+    <IncludePath>.\include;.\include\EffekseerRendererDX12;.\include\imgui;.\include\DirectXTK12-master;$(IncludePath)</IncludePath>
     <LibraryPath>.\lib\Release;$(LibraryPath)</LibraryPath>
     <CopyLocalDeploymentContent>false</CopyLocalDeploymentContent>
     <CopyLocalProjectReference>false</CopyLocalProjectReference>
@@ -248,7 +248,7 @@
       <SDLCheck>false</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>.\include\DirectXTK12-master";.\include\imgui;.\include\EffekseerRendererDX12;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\1_header;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <SupportJustMyCode>true</SupportJustMyCode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -258,6 +258,8 @@
       <DiagnosticsFormat>Classic</DiagnosticsFormat>
       <Optimization>MaxSpeed</Optimization>
       <MinimalRebuild>false</MinimalRebuild>
+      <AdditionalUsingDirectories>
+      </AdditionalUsingDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
