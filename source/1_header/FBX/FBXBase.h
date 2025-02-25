@@ -75,8 +75,7 @@ protected:
 
 public:
 	//コンストラクタ
-	FBXBase(const wchar_t* filePath,const XMFLOAT3& size,const XMFLOAT3& pos,
-		const XMFLOAT3& diff = XMFLOAT3(0.0f,0.0f,0.0f));
+	FBXBase(const wchar_t* filePath,const XMFLOAT3& size,const XMFLOAT3& pos);
 	//デストラクタ
 	virtual ~FBXBase();													
 

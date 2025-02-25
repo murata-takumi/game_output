@@ -9,7 +9,7 @@
 /// <param name="size">“–‚½‚è”»’è‚Ì‘å‚«‚³</param>
 /// <param name="pos">‰ŠúÀ•W</param>
 /// <param name="diff">“–‚½‚è”»’è‚Ì·•ª</param>
-FBXBase::FBXBase(const wchar_t* filePath, const XMFLOAT3& size, const XMFLOAT3& pos, const XMFLOAT3& diff)
+FBXBase::FBXBase(const wchar_t* filePath, const XMFLOAT3& size, const XMFLOAT3& pos)
 	:_motionMat(XMMatrixIdentity()), _pos(XMLoadFloat3(&pos)),_rejectBone(true)
 {
 	//ƒ‚ƒfƒ‹ŠÖ˜A‚Ìî•ñ‚ğ‰Šú‰»
@@ -23,7 +23,7 @@ FBXBase::FBXBase(const wchar_t* filePath, const XMFLOAT3& size, const XMFLOAT3& 
 	CreateShaderResourceView();													
 
 	//“–‚½‚è”»’è‚ğì¬
-	_collider = make_shared<BoxCollider>(*this,size, diff);
+	_collider = make_shared<BoxCollider>(*this,size);
 }
 
 /// <summary>

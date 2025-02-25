@@ -229,20 +229,20 @@ SpriteManager::ColliderDraw(const shared_ptr<BoxCollider> collider)
 {
 	if (collider != nullptr)
 	{
-		auto v_d1 = VertexPositionColor(collider->Vertices()[0], { 0.f,1.0f,0.0f,.10f });
-		auto v_d2 = VertexPositionColor(collider->Vertices()[1], { 0.f,1.0f,0.0f,.10f });
-		auto v_d3 = VertexPositionColor(collider->Vertices()[2], { 0.f,1.0f,0.0f,.10f });
-		auto v_d4 = VertexPositionColor(collider->Vertices()[3], { 0.f,1.0f,0.0f,.10f });
+		auto v_d1 = VertexPositionColor(RightPosToLeftPos(collider->Vertices()[0]), { 0.f,1.0f,0.0f,.10f });
+		auto v_d2 = VertexPositionColor(RightPosToLeftPos(collider->Vertices()[1]), { 0.f,1.0f,0.0f,.10f });
+		auto v_d3 = VertexPositionColor(RightPosToLeftPos(collider->Vertices()[2]), { 0.f,1.0f,0.0f,.10f });
+		auto v_d4 = VertexPositionColor(RightPosToLeftPos(collider->Vertices()[3]), { 0.f,1.0f,0.0f,.10f });
 
 		_batch->DrawLine(v_d1, v_d2);
 		_batch->DrawLine(v_d2, v_d3);
 		_batch->DrawLine(v_d3, v_d4);
 		_batch->DrawLine(v_d4, v_d1);
 
-		auto v_u1 = VertexPositionColor(collider->Vertices()[4], { 0.f,1.0f,0.0f,.10f });
-		auto v_u2 = VertexPositionColor(collider->Vertices()[5], { 0.f,1.0f,0.0f,.10f });
-		auto v_u3 = VertexPositionColor(collider->Vertices()[6], { 0.f,1.0f,0.0f,.10f });
-		auto v_u4 = VertexPositionColor(collider->Vertices()[7], { 0.f,1.0f,0.0f,.10f });
+		auto v_u1 = VertexPositionColor(RightPosToLeftPos(collider->Vertices()[4]), { 0.f,1.0f,0.0f,.10f });
+		auto v_u2 = VertexPositionColor(RightPosToLeftPos(collider->Vertices()[5]), { 0.f,1.0f,0.0f,.10f });
+		auto v_u3 = VertexPositionColor(RightPosToLeftPos(collider->Vertices()[6]), { 0.f,1.0f,0.0f,.10f });
+		auto v_u4 = VertexPositionColor(RightPosToLeftPos(collider->Vertices()[7]), { 0.f,1.0f,0.0f,.10f });
 
 		_batch->DrawLine(v_u1, v_u2);
 		_batch->DrawLine(v_u2, v_u3);
@@ -357,6 +357,17 @@ SpriteManager::CreateUIBufferView(const wchar_t* path,string key)
 	_GPUHandles[key] = _tmpGPUHandle;												
 
 	return result;
+}
+
+/// <summary>
+/// 右手座標を左手座標に変換する関数
+/// </summary>
+/// <param name="rightPos">右手座標</param>
+/// <returns>左手座標</returns>
+XMVECTOR
+SpriteManager::RightPosToLeftPos(const XMVECTOR& rightPos)
+{
+	return XMVectorSet(rightPos.m128_f32[0] * -1, rightPos.m128_f32[1], rightPos.m128_f32[2], 0.0f);
 }
 
 /// <summary>

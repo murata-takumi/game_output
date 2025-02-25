@@ -95,7 +95,10 @@ private:
 	//SpriteBatch用ルートシグネチャを作成する関数
 	HRESULT CreateSpriteRS();												
 	//UI用の画像のバッファー・ビューを作成する関数
-	HRESULT CreateUIBufferView(const wchar_t* path, string key);			
+	HRESULT CreateUIBufferView(const wchar_t* path, string key);
+
+	//右手座標を左手座標に変換する関数
+	XMVECTOR RightPosToLeftPos(const XMVECTOR& rightPos);
 
 	//スプライト・文字列表示用オブジェクトを初期化する関数
 	void InitSpriteDevices();												

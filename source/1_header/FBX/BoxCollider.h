@@ -17,6 +17,8 @@ private:
 	vector<XMVECTOR> _verts;
 	//中心ベクトルの初期値
 	XMVECTOR _initCenter;
+	//中心ベクトル
+	XMVECTOR _center;
 
 	//それぞれ幅、高さ、奥行の長さの半分
 	float _halfWidth, _halfHeight, _halfDepth;
@@ -26,10 +28,10 @@ private:
 
 public:
 	//それぞれ中心、正面、右、上ベクトル
-	XMVECTOR _center, _frontDir, _rightDir, _upDir;
+	XMVECTOR _frontDir, _rightDir, _upDir;
 
 	//コンストラクタ
-	BoxCollider(FBXBase& object, const XMFLOAT3& size, const XMFLOAT3& center);	
+	BoxCollider(FBXBase& object, const XMFLOAT3& size);	
 	//デストラクタ
 	~BoxCollider();
 
@@ -41,6 +43,9 @@ public:
 
 	//幅、高さ、奥行を返す
 	XMFLOAT3 HalfLength()const;
+
+	//中心座標を返す
+	XMVECTOR Center()const;
 
 	//オブジェクトを返す
 	FBXBase& Object()const;
