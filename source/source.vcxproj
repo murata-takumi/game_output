@@ -22,10 +22,6 @@
     <ClInclude Include="1_header\Application.h" />
     <ClInclude Include="1_header\FBX\AnimNodes\Animations.h" />
     <ClInclude Include="1_header\FBX\AnimNodes\AnimNode.h" />
-    <ClInclude Include="1_header\FBX\AnimNodes\FallNode.h" />
-    <ClInclude Include="1_header\FBX\AnimNodes\JUMP00Node.h" />
-    <ClInclude Include="1_header\FBX\AnimNodes\RUN00_FNode.h" />
-    <ClInclude Include="1_header\FBX\AnimNodes\WAIT00Node.h" />
     <ClInclude Include="1_header\FBX\AssimpLoader.h" />
     <ClInclude Include="1_header\FBX\BoxCollider.h" />
     <ClInclude Include="1_header\FBX\BoxCollider2D.h" />
@@ -52,10 +48,6 @@
   <ItemGroup>
     <ClCompile Include="2_source\Application.cpp" />
     <ClCompile Include="2_source\FBX\AnimNodes\AnimNode.cpp" />
-    <ClCompile Include="2_source\FBX\AnimNodes\FallNode.cpp" />
-    <ClCompile Include="2_source\FBX\AnimNodes\JUMP00Node.cpp" />
-    <ClCompile Include="2_source\FBX\AnimNodes\RUN00_FNode.cpp" />
-    <ClCompile Include="2_source\FBX\AnimNodes\WAIT00Node.cpp" />
     <ClCompile Include="2_source\FBX\AssimpLoader.cpp" />
     <ClCompile Include="2_source\FBX\BoxCollider.cpp" />
     <ClCompile Include="2_source\FBX\BoxCollider2D.cpp" />
@@ -175,7 +167,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>.\1_header;.\include;$(IncludePath)</IncludePath>
+    <IncludePath>.\include;.\include\EffekseerRendererDX12;.\include\imgui;.\include\DirectXTK12-master;$(IncludePath)</IncludePath>
     <LibraryPath>.\lib\Debug;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -221,7 +213,7 @@
       <SDLCheck>false</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>.\include\DirectXTK12-master";.\include\imgui;.\include\EffekseerRendererDX12;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\1_header;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <ShowIncludes>false</ShowIncludes>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -258,8 +250,6 @@
       <DiagnosticsFormat>Classic</DiagnosticsFormat>
       <Optimization>MaxSpeed</Optimization>
       <MinimalRebuild>false</MinimalRebuild>
-      <AdditionalUsingDirectories>
-      </AdditionalUsingDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

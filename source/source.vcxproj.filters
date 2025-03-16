@@ -120,18 +120,6 @@
     <ClInclude Include="1_header\FBX\AnimNodes\Animations.h">
       <Filter>1_header\FBX\AnimNodes</Filter>
     </ClInclude>
-    <ClInclude Include="1_header\FBX\AnimNodes\AnimNode.h">
-      <Filter>1_header\FBX\AnimNodes</Filter>
-    </ClInclude>
-    <ClInclude Include="1_header\FBX\AnimNodes\JUMP00Node.h">
-      <Filter>1_header\FBX\AnimNodes</Filter>
-    </ClInclude>
-    <ClInclude Include="1_header\FBX\AnimNodes\RUN00_FNode.h">
-      <Filter>1_header\FBX\AnimNodes</Filter>
-    </ClInclude>
-    <ClInclude Include="1_header\FBX\AnimNodes\WAIT00Node.h">
-      <Filter>1_header\FBX\AnimNodes</Filter>
-    </ClInclude>
     <ClInclude Include="1_header\Includes.h">
       <Filter>1_header</Filter>
     </ClInclude>
@@ -141,11 +129,11 @@
     <ClInclude Include="1_header\Scene\BaseScene.h">
       <Filter>1_header\Scene</Filter>
     </ClInclude>
-    <ClInclude Include="1_header\FBX\AnimNodes\FallNode.h">
-      <Filter>1_header\FBX\AnimNodes</Filter>
-    </ClInclude>
     <ClInclude Include="1_header\FBX\BoxCollider2D.h">
       <Filter>1_header\FBX</Filter>
+    </ClInclude>
+    <ClInclude Include="1_header\FBX\AnimNodes\AnimNode.h">
+      <Filter>1_header\FBX\AnimNodes</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -206,16 +194,7 @@
     <ClCompile Include="2_source\FBX\BoxCollider.cpp">
       <Filter>2_source\FBX</Filter>
     </ClCompile>
-    <ClCompile Include="2_source\FBX\AnimNodes\RUN00_FNode.cpp">
-      <Filter>2_source\FBX\AnimNodes</Filter>
-    </ClCompile>
-    <ClCompile Include="2_source\FBX\AnimNodes\WAIT00Node.cpp">
-      <Filter>2_source\FBX\AnimNodes</Filter>
-    </ClCompile>
     <ClCompile Include="2_source\FBX\AnimNodes\AnimNode.cpp">
-      <Filter>2_source\FBX\AnimNodes</Filter>
-    </ClCompile>
-    <ClCompile Include="2_source\FBX\AnimNodes\JUMP00Node.cpp">
       <Filter>2_source\FBX\AnimNodes</Filter>
     </ClCompile>
     <ClCompile Include="2_source\Scene\TitleScene.cpp">
@@ -223,9 +202,6 @@
     </ClCompile>
     <ClCompile Include="2_source\Scene\BaseScene.cpp">
       <Filter>2_source\Scene</Filter>
-    </ClCompile>
-    <ClCompile Include="2_source\FBX\AnimNodes\FallNode.cpp">
-      <Filter>2_source\FBX\AnimNodes</Filter>
     </ClCompile>
     <ClCompile Include="2_source\FBX\BoxCollider2D.cpp">
       <Filter>2_source\FBX</Filter>

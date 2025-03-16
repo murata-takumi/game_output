@@ -4,12 +4,24 @@
 
 //アニメーション名に付与する文字列リテラル
 const char* CHARA_REF = "Character1_Reference|";
+
 //移動速度
 const float MOVE_SPEED = 300.0f;
 //重力加速度
 const float GRAVITY_ACCERALATION = 9.8f;
 //アニメーションのブレンドに掛ける秒数
 const float BLEND_SPEED = 0.2f;
+//アニメーションの開始時間
+const float START_TIME = 8.5f;
+//別アニメーションへの遷移が出来るようになる時間
+const float TRANSITION_TIME = 35.0f;
+
+//ループの開始、終了時間
+const float LOOP_BEGIN_TIME = 30.0f;
+const float LOOP_END_TIME = 31.0f;
+//アニメーション速度
+const float ANIM_SPEED = 0.1f;
+
 //アニメーション名の不要な文字列を削除するためのインデックス
 const int ANIM_STR_UNNECESSARY_IDX = 21;
 //当たり判定を付与するボーンのインデックス
@@ -26,11 +38,71 @@ FBXActor::FBXActor(const wchar_t* filePath, XMFLOAT3 size, XMFLOAT3 pos)
 	_canChangeAnim(true),_blendWeight(0.0f), _animTime(0.0f),
 	_destRad(0.0f), _rotY(0.0f)
 {
+	auto jumpStart = [&]()
+	{
+		//開始時間を少し後に設定
+		SetAnimationTime(START_TIME);
+
+		//別アニメーションに遷移しないようにする
+		SetCanChangeAnim(false);
+		//ループしないようにする
+		SetIsInLoop(false);
+		//当たり判定がボーン変換の影響を受けるようにする
+		SetRejectBone(false);
+	};
+	auto jumpUpdate = [&](float animTime)
+	{
+		if (animTime > TRANSITION_TIME)
+		{
+			SetCanChangeAnim(true);
+		}
+	};
+	auto jumpEnd = [&]()
+	{		
+		//ループできるようにする
+		SetIsInLoop(true);
+		//当たり判定がボーン変換の影響を受けないようにする
+		SetRejectBone(true);
+	};
+
+	auto fallStart = [&]()
+	{
+		//別アニメーションに遷移しないようにする
+		SetCanChangeAnim(false);
+		SetAnimationSpeed(ANIM_SPEED);
+	};
+	auto fallUpdate = [&](float animTime)
+	{
+		//ループしているように見せる為の苦肉の策
+		if (animTime <= LOOP_BEGIN_TIME)
+		{
+			animTime = LOOP_BEGIN_TIME;
+			SetAnimationSpeed(ANIM_SPEED);
+		}
+		else if (LOOP_END_TIME < animTime)
+		{
+			animTime = LOOP_END_TIME;
+			SetAnimationSpeed(-ANIM_SPEED);
+		}
+
+		//地面に着いたら別アニメーションに遷移できるようにする
+		if (GetOnGround())
+		{
+			SetCanChangeAnim(true);
+		}
+	};
+	auto fallEnd = [&]()
+	{
+		//アニメーション速度を元に戻す
+		SetAnimationSpeed(1.0f);
+	};
+	
+
 	//アニメーションノードを初期化
-	_animNodes[WAIT00] = make_unique<WAIT00Node>(this,WAIT00);
-	_animNodes[RUN00_F] = make_unique<RUN00_FNode>(this, RUN00_F);
-	_animNodes[JUMP00] = make_unique<JUMP00Node>(this, JUMP00);
-	_animNodes[FALL] = make_unique<FallNode>(this, FALL);
+	_animNodes[WAIT00] = make_unique<AnimNode>(WAIT00);
+	_animNodes[RUN00_F] = make_unique<AnimNode>(RUN00_F);
+	_animNodes[JUMP00] = make_unique<AnimNode>(JUMP00,jumpStart,jumpUpdate,jumpEnd);
+	_animNodes[FALL] = make_unique<AnimNode>(FALL, fallStart, fallUpdate, fallEnd);
 
 	//アニメーションに関するデータを初期化
 	InitAnimation();															
@@ -149,6 +221,7 @@ FBXActor::SetAnimationNode(AnimEnum anim)
 
 	//ノード更新
 	_crntNode = _animNodes[anim].get();
+	BlendAnimation(_crntNode->GetAnimEnum());
 	//現ノードの開始処理
 	_crntNode->StartAnimation();
 }
@@ -581,7 +654,7 @@ FBXActor::Update()
 	XMMatrixDecompose(&scale, &skew, &trans, 
 		_invMats[COLLIDER_BONE] * FBXBase::_mappedMats[COLLIDER_BONE + 1]);
 	skew = XMVectorZero();
-	_motionMat = XMMatrixScalingFromVector(scale) * XMMatrixRotationQuaternion(skew) * XMMatrixTranslationFromVector(trans);
+	if(!_rejectBone)_motionMat = XMMatrixScalingFromVector(scale) * XMMatrixRotationQuaternion(skew) * XMMatrixTranslationFromVector(trans);
 
 	//経過時間を渡し、ボーン行列を取得
 	BoneTransform(_animTime);														
@@ -603,6 +676,18 @@ FBXActor::Translate(const XMVECTOR& input)
 {
 	//座標に入力に応じたベクトルを加算
 	_pos += input * Dx12Wrapper::Instance().GetDeltaTime() * MOVE_SPEED;
+
+	//入力されているかどうかに応じて再生するアニメーションを決める
+	if (XMVector3Length(input).m128_f32[0] > 0.0f)
+	{
+		//移動アニメーション
+		SetAnimationNode(RUN00_F);
+	}
+	else
+	{
+		//待機アニメーション
+		SetAnimationNode(WAIT00);
+	}
 
 	//入力ベクトルと正面ベクトルの角度差を取得
 	auto diff = XMVector3AngleBetweenVectors(input, _frontVec).m128_f32[0];			

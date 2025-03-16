@@ -9,8 +9,8 @@
 /// </summary>
 /// <param name="actor">ポインタ</param>
 /// <param name="anim">列挙体</param>
-AnimNode::AnimNode(FBXActor* actor, AnimEnum anim)
-	:_actor(actor), _anim(anim)
+AnimNode::AnimNode(AnimEnum anim, const function<void(void)>& startFunc, const function<void(float)>& updateFunc, const function<void(void)>& endFunc)
+	:_anim(anim),_startFunc(startFunc),_updateFunc(updateFunc),_endFunc(endFunc)
 {
 
 }
@@ -22,7 +22,11 @@ AnimNode::AnimNode(FBXActor* actor, AnimEnum anim)
 void
 AnimNode::StartAnimation()
 {
-	_actor->BlendAnimation(_anim);
+	//コールバック実行
+	if (_startFunc != nullptr)
+	{
+		_startFunc();
+	}
 };
 
 /// <summary>
@@ -32,7 +36,11 @@ AnimNode::StartAnimation()
 void 
 AnimNode::Update(float& animTime)
 {
-
+	//コールバック実行
+	if (_updateFunc != nullptr)
+	{
+		_updateFunc(animTime);
+	}
 };
 
 /// <summary>
@@ -41,7 +49,11 @@ AnimNode::Update(float& animTime)
 void 
 AnimNode::EndAnimation()
 {
-
+	//コールバック実行
+	if (_endFunc != nullptr)
+	{
+		_endFunc();
+	}
 };
 
 /// <summary>

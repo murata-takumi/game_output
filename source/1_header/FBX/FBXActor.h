@@ -1,10 +1,6 @@
 #pragma once
 #include "FBX/AnimNodes/Animations.h"
 #include "FBX/AnimNodes/AnimNode.h"
-#include "FBX/AnimNodes/WAIT00Node.h"
-#include "FBX/AnimNodes/RUN00_FNode.h"
-#include "FBX/AnimNodes/JUMP00Node.h"
-#include "FBX/AnimNodes/FallNode.h"
 #include "FBX/FBXBase.h"
 
 /// <summary>
@@ -12,21 +8,10 @@
 /// </summary>
 class Dx12Wrapper;
 class AssimpLoader;
-class ImGuiManager;
 class AnimNode;
-class WAIT00Node;
-class RUN00_FNode;
-class JUMP00Node;
-class FallNode;
 class FBXActor : public FBXBase
 {	
 	template<typename T>using ComPtr = ComPtr<T>;
-
-	friend ImGuiManager;
-	friend AnimNode;
-	friend WAIT00Node;
-	friend RUN00_FNode;
-	friend JUMP00Node;
 
 private:
 

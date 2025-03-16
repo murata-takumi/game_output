@@ -8,7 +8,10 @@ const wchar_t* ACTOR_PATH = L"Asset/model/Unitychan.fbx";
 //地面データが格納されているファイルパス
 const wchar_t* GROUND_PATH = L"Asset/model/Ground.fbx";				
 //コインのデータが格納されているファイルパス
-const wchar_t* COIN_PATH = L"Asset/model/Coin.fbx";				
+const wchar_t* COIN_PATH = L"Asset/model/Coin.fbx";			
+
+//箱のデータが格納されているファイルパス
+const wchar_t* BOX_PATH = L"Asset/model/Box.fbx";				
 
 //プレイヤーの当たり判定の大きさ
 const XMFLOAT3 ACTOR_COLL_SIZE = XMFLOAT3(60.0f, 170.0f, 60.0f);
@@ -16,13 +19,20 @@ const XMFLOAT3 ACTOR_COLL_SIZE = XMFLOAT3(60.0f, 170.0f, 60.0f);
 const XMFLOAT3 GROUND_COLL_SIZE = XMFLOAT3(1000.0f, 1.0f, 1000.0f);
 //コインの当たり判定の大きさ
 const XMFLOAT3 COIN_COLL_SIZE = XMFLOAT3(25.0f, 25.0f, 25.0f);
+//箱の当たり判定
+const XMFLOAT3 BOX_COLL_SIZE = XMFLOAT3(200.0f, 200.0f, 200.0f);
+//プレイヤーの初期座標
+const XMFLOAT3 ACTOR_INIT_POS = XMFLOAT3(0.0f, 0.0f, 0.0f);
 //コインの初期座標
 const XMFLOAT3 COIN_INIT_POS = XMFLOAT3(0.0f, 0.0f, 100.0f);
+//箱の初期座標
+const XMFLOAT3 BOX_INIT_POS = XMFLOAT3(200.0f, 0.0f, 0.0f);
 
 //オブジェクトの名前一覧
 const string ACTOR_NAME = "Actor";
 const string GROUND_NAME = "Ground";
 const string COIN_NAME = "Coin";
+const string BOX_NAME = "Box";
 
 /// <summary>
 /// コンストラクタ
@@ -62,7 +72,8 @@ PlayScene::SceneStart()
 		//スレッドに各オブジェクトの作成処理を追加
 		InstantiateObject<FBXActor>(ACTOR_PATH,ACTOR_NAME,ACTOR_COLL_SIZE);
 		InstantiateObject<FBXObject>(GROUND_PATH,GROUND_NAME,GROUND_COLL_SIZE);
-		InstantiateObject<FBXObject>(COIN_PATH,COIN_NAME,COIN_COLL_SIZE,COIN_INIT_POS);
+		//InstantiateObject<FBXObject>(COIN_PATH,COIN_NAME,COIN_COLL_SIZE,COIN_INIT_POS);
+		InstantiateObject<FBXObject>(BOX_PATH,BOX_NAME,BOX_COLL_SIZE,BOX_INIT_POS);
 
 		//スレッドが全て完了するまでここで待機
 		for (auto& th : _ths)							
@@ -110,16 +121,13 @@ PlayScene::Update()
 	//操作可能な場合入力を反映する
 	if (BaseScene::_canInput)
 	{
-		_actor->SetOnGround(CheckColliders(*_actorAndObjs[GROUND_NAME]->Collider(), *_actor->Collider()));
-		ImGuiManager::Instance()._isCrossed = CheckColliders(*_actorAndObjs[GROUND_NAME]->Collider(), *_actor->Collider());
-
 		//コインとアクターが接触したらコインを削除
-		if (_actorAndObjs[COIN_NAME] && CheckColliders(*_actorAndObjs[COIN_NAME]->Collider(), *_actor->Collider()))
-		{
-			_actorAndObjs.erase(COIN_NAME);
+		//if (_actorAndObjs[COIN_NAME] && CheckColliders(*_actorAndObjs[COIN_NAME]->Collider(), *_actor->Collider()))
+		//{
+		//	_actorAndObjs.erase(COIN_NAME);
 
-			SoundManager::Instance().CallSound(Sounds::COIN);
-		}
+		//	SoundManager::Instance().CallSound(Sounds::COIN);
+		//}
 
 		//WASDキーの入力に応じて視点を移動させる
 		//注視点を中心に視点を回転
@@ -146,7 +154,7 @@ PlayScene::Update()
 		{
 			if (InputManager::Instance().KeyState().LeftShift)
 			{
-				Dx12Wrapper::Instance().TranslateCoordinates(Y_VECTOR * 0.1f);
+				//Dx12Wrapper::Instance().SetCoordinatesCenter(Y_VECTOR * 0.1f);
 			}
 			else
 			{
@@ -157,7 +165,7 @@ PlayScene::Update()
 		{
 			if (InputManager::Instance().KeyState().LeftShift)
 			{
-				Dx12Wrapper::Instance().TranslateCoordinates(Y_VECTOR * -1 * 0.1f);
+				//Dx12Wrapper::Instance().SetCoordinatesCenter(Y_VECTOR * -1 * 0.1f);
 			}
 			else
 			{
@@ -186,37 +194,26 @@ PlayScene::Update()
 				_direction += Dx12Wrapper::Instance().GetXZVecEyeToTarget() * -1;
 			}
 
-			//どれか入力されていれば移動処理
-			if (XMVector3Length(_direction).m128_f32[0] > 0.0f)
-			{
-				//移動ベクトルを正規化
-				_direction = XMVector3Normalize(_direction);
-				//アクターを移動
-				_actor->Translate(_direction);
-				//カメラも移動
-				Dx12Wrapper::Instance().TranslateCoordinates(_direction);
+			//移動ベクトルを正規化
+			_direction = XMVector3Normalize(_direction);
 
-				//移動アニメーション
-				_actor->SetAnimationNode(RUN00_F);
+			//当たり判定をチェック
+			_actor->SetOnGround(CheckColliders(*_actorAndObjs[GROUND_NAME]->Collider(), *_actor->Collider()));
+			//CheckColliders(*_actorAndObjs[BOX_NAME]->Collider(), *_actor->Collider());
 
-				//移動ベクトルを初期化
-				_direction = XMVectorZero();
-			}
-			//入力されていなければ待機アニメーション
-			else
-			{
-				_actor->SetAnimationNode(WAIT00);
-			}
+			//アクターを移動
+			_actor->Translate(_direction);
+
+			//移動ベクトルを初期化
+			_direction = XMVectorZero();
+
+			//カメラを移動
+			Dx12Wrapper::Instance().SetCoordinatesCenter(_actor->Pos());
 
 			//スペースキーが押されたらジャンプ処理
 			if (InputManager::Instance().KeyTracker().IsKeyPressed(Keyboard::Space) && _actor->GetOnGround())
 			{
 				_actor->SetAnimationNode(JUMP00);
-			}
-
-			if (!_actor->GetOnGround())
-			{
-				_actor->SetAnimationNode(FALL);
 			}
 		}
 
@@ -274,15 +271,11 @@ void
 PlayScene::InstantiateObject(const wchar_t* path,string name, XMFLOAT3 size,XMFLOAT3 pos)
 {
 	auto f = [=]() {
-		//_mtx.lock();
-
 		shared_ptr<className> object;
 
 		object = make_shared<className>(path, size, pos);
 
 		_actorAndObjs[name] = object;
-
-		//_mtx.unlock();
 	};
 
 	//スレッドにアクターの作成処理を追加
@@ -293,12 +286,14 @@ PlayScene::InstantiateObject(const wchar_t* path,string name, XMFLOAT3 size,XMFL
 /// 二つの当たり判定が衝突しているか確認する関数
 /// </summary>
 /// <param name="col1">当たり判定その1</param>
-/// <param name="col22">当たり判定その2</param>
+/// <param name="col2">当たり判定その2</param>
 /// <returns>衝突しているかどうか</returns>
 bool
 PlayScene::CheckColliders(const BoxCollider& col1, const BoxCollider& col2)
 {
 	//各OBBの右、上、正面ベクトル
+	XMVECTOR center1 = col1.Center();
+	XMVECTOR center2 = col2.Center();
 	XMVECTOR rightLen1 = col1._rightDir * col1.HalfLength().x;
 	XMVECTOR upLen1 = col1._upDir * col1.HalfLength().y;
 	XMVECTOR frontLen1 = col1._frontDir * col1.HalfLength().z;
@@ -307,40 +302,45 @@ PlayScene::CheckColliders(const BoxCollider& col1, const BoxCollider& col2)
 	XMVECTOR frontLen2 = col2._frontDir * col2.HalfLength().z;
 
 	//双方のOBBの中心を結ぶベクトル
-	XMVECTOR vecBetCenter = col1._center - col2._center;
+	XMVECTOR vecBetCenter = center1 - center2;
+
+	auto degX = XMVector3Dot(XMVector3Normalize(vecBetCenter), _direction).m128_f32[0];
+	auto degZ = XMVector3Dot(XMVector3Normalize(vecBetCenter), col1._frontDir).m128_f32[0];
 
 	//obb1_front
 	float r = LenOnSeparateAxis(col1._frontDir, rightLen2, upLen2, frontLen2);
-	float lenBetCenter = fabs(XMVector3Dot(vecBetCenter,col1._frontDir ).m128_f32[0]);
-	bool a = lenBetCenter > r + col1.HalfLength().z;
-	if (a)
+	float lenBetCenter = XMVector3Dot(vecBetCenter,col1._frontDir ).m128_f32[0];
+	if (fabs(lenBetCenter) > r + col1.HalfLength().z)
 	{
 		return false;
 	}
+
+	auto diffZ = r + col1.HalfLength().z - fabs(lenBetCenter);
 
 	//obb1_right
 	r = LenOnSeparateAxis(col1._rightDir, rightLen2, upLen2, frontLen2);
-	lenBetCenter = fabs(XMVector3Dot(vecBetCenter,col1._rightDir).m128_f32[0]);
-	if (lenBetCenter > r + col1.HalfLength().x)
+	lenBetCenter = XMVector3Dot(vecBetCenter,col1._rightDir).m128_f32[0];
+	if (fabs(lenBetCenter) > r + col1.HalfLength().x)
 	{
 		return false;
 	}
+
+	auto diffX = r + col1.HalfLength().x - fabs(lenBetCenter);
 
 	//obb1_up
 	r = LenOnSeparateAxis(col1._upDir, rightLen2, upLen2, frontLen2);
-	lenBetCenter = fabs(XMVector3Dot(vecBetCenter,col1._upDir).m128_f32[0]);
-	if (lenBetCenter > r + col1.HalfLength().y)
+	lenBetCenter = XMVector3Dot(vecBetCenter,col1._upDir).m128_f32[0];
+	if (fabs(lenBetCenter) > r + col1.HalfLength().y)
 	{
 		return false;
 	}
 
-	auto diff = r + col1.HalfLength().y - lenBetCenter;
+	auto diffY = r + col1.HalfLength().y - fabs(lenBetCenter);
 
 	//obb2_front
 	r = LenOnSeparateAxis(col2._frontDir, rightLen1, upLen1, frontLen1);
 	lenBetCenter = fabs(XMVector3Dot(vecBetCenter,col2._frontDir).m128_f32[0]);
-	a = lenBetCenter > r + col2.HalfLength().z;
-	if (a)
+	if (lenBetCenter > r + col2.HalfLength().z)
 	{
 		return false;
 	}
@@ -348,8 +348,7 @@ PlayScene::CheckColliders(const BoxCollider& col1, const BoxCollider& col2)
 	//obb2_right
 	r = LenOnSeparateAxis(col2._rightDir, rightLen1, upLen1, frontLen1);
 	lenBetCenter = fabs(XMVector3Dot(vecBetCenter,col2._rightDir).m128_f32[0]);
-	a = lenBetCenter > r + col2.HalfLength().x;
-	if (a)
+	if (lenBetCenter > r + col2.HalfLength().x)
 	{
 		return false;
 	}
@@ -357,14 +356,33 @@ PlayScene::CheckColliders(const BoxCollider& col1, const BoxCollider& col2)
 	//obb2_up
 	r = LenOnSeparateAxis(col2._upDir, rightLen1, upLen1, frontLen1);
 	lenBetCenter = fabs(XMVector3Dot(vecBetCenter,col2._upDir).m128_f32[0]);
-	a = lenBetCenter > r + col2.HalfLength().y;
-	if (a)
+	if (lenBetCenter > r + col2.HalfLength().y)
 	{
 		return false;
 	}
 
+	float d[3] = { diffX,diffY,diffZ };
+
+	ImGuiManager::Instance().SetDiffs(d);
+
 	//ここにめり込みを戻す処理
-	if(1.0f <=fabs(diff))col2.Object().Pos().m128_f32[1] += diff * Dx12Wrapper::Instance().GetDeltaTime() * 5.0f;
+	if (1.0f < fabs(diffX) && 1.0f < fabs(diffY) && 1.0f < fabs(diffZ))
+	{
+		auto diff = min(fabs(diffX), fabs(diffY), fabs(diffZ));
+		auto sign = copysign(1.0f,diff);
+		if (fabs(diff - fabs(diffX)) <= FLT_EPSILON)
+		{
+			col2.Object().Pos().m128_f32[0] += sign * Dx12Wrapper::Instance().GetDeltaTime() * 10.0f;
+		}
+		else if (fabs(diff - fabs(diffY)) <= FLT_EPSILON)
+		{
+			col2.Object().Pos().m128_f32[1] += diffY * Dx12Wrapper::Instance().GetDeltaTime() * 10.0f;
+		}
+		else
+		{
+			col2.Object().Pos().m128_f32[2] += sign * Dx12Wrapper::Instance().GetDeltaTime() * 10.0f;
+		}
+	}
 
 	return true;
 }
