@@ -58,6 +58,9 @@ protected:
 	//座標
 	XMVECTOR _pos;
 
+	//足元判定に使用
+	XMVECTOR _footVec;
+
 	//当たり判定の更新からボーンの座標変換を排除するか
 	bool _rejectBone;
 
@@ -89,6 +92,8 @@ public:
 	shared_ptr<BoxCollider>Collider()const;		
 
 	XMVECTOR& Pos();
+
+	XMVECTOR FootVec()const;
 
 	//ボーン変換を排除するか決める
 	void SetRejectBone(bool val);

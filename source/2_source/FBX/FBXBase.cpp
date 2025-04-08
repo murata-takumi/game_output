@@ -392,6 +392,9 @@ FBXBase::Update()
 	//こう書かないと当たり判定の中心がオブジェクト下になってしまう
 	if (_rejectBone) _motionMat = XMMatrixTranslation(0, _collider->HalfLength().y, 0);
 	_collider->Update(_motionMat * FBXBase::_mappedMats[0]);
+
+	//足元ベクトルも設定
+	_footVec = XMVectorSet(0, -5.0f, 0, 0);
 }
 
 /// <summary>
@@ -412,6 +415,16 @@ XMVECTOR&
 FBXBase::Pos()
 {
 	return _pos;
+}
+
+/// <summary>
+/// 足元ベクトルを返す
+/// </summary>
+/// <returns>足元ベクトル</returns>
+XMVECTOR
+FBXBase::FootVec()const
+{
+	return _footVec;
 }
 
 /// <summary>

@@ -14,7 +14,7 @@ const float BLEND_SPEED = 0.2f;
 //アニメーションの開始時間
 const float START_TIME = 8.5f;
 //別アニメーションへの遷移が出来るようになる時間
-const float TRANSITION_TIME = 35.0f;
+const float TRANSITION_TIME = 30.0f;
 
 //ループの開始、終了時間
 const float LOOP_BEGIN_TIME = 30.0f;
@@ -34,7 +34,7 @@ const int COLLIDER_BONE = 0;
 FBXActor::FBXActor(const wchar_t* filePath, XMFLOAT3 size, XMFLOAT3 pos)
 	:FBXBase(filePath, size, pos),
 	_crntNode(nullptr), _frontVec(XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f)),
-	_canControll(false),_isInBlend(false),_isInLoop(true),_isOnGround(true),
+	_canControll(false),_isInBlend(false),_isInLoop(true),
 	_canChangeAnim(true),_blendWeight(0.0f), _animTime(0.0f),
 	_destRad(0.0f), _rotY(0.0f)
 {
@@ -52,21 +52,53 @@ FBXActor::FBXActor(const wchar_t* filePath, XMFLOAT3 size, XMFLOAT3 pos)
 	};
 	auto jumpUpdate = [&](float animTime)
 	{
+		//アニメーション時間が30秒の時点で足元に当たり判定があるかどうか判別
+		AnimEnum nextAnimName;
 		if (animTime > TRANSITION_TIME)
 		{
+			if (GetOnGround())
+			{
+				//入力されているかどうかで遷移先のアニメーションを決める
+				if (XMVector3Length(_inputVec).m128_f32[0] > 0.0f)
+				{
+					//移動アニメーション
+					//SetAnimationNode(RUN00_F);
+					nextAnimName = RUN00_F;
+				}
+				else
+				{
+					//待機アニメーション
+					//SetAnimationNode(WAIT00);
+					nextAnimName = WAIT00;
+				}
+			}
+			else
+			{
+				//SetAnimationNode(FALL);
+				nextAnimName = FALL;
+			}
+
+		}
+		if (animTime > 35.0f)
+		{
 			SetCanChangeAnim(true);
+			//当たり判定がボーン変換の影響を受けないようにする
+			SetRejectBone(true);
+
+			SetAnimationNode(nextAnimName);
 		}
 	};
 	auto jumpEnd = [&]()
 	{		
 		//ループできるようにする
 		SetIsInLoop(true);
-		//当たり判定がボーン変換の影響を受けないようにする
-		SetRejectBone(true);
 	};
 
 	auto fallStart = [&]()
 	{
+		//開始時間を少し後に設定
+		SetAnimationTime(LOOP_BEGIN_TIME);
+
 		//別アニメーションに遷移しないようにする
 		SetCanChangeAnim(false);
 		SetAnimationSpeed(ANIM_SPEED);
@@ -642,7 +674,7 @@ FBXActor::Update()
 		//アニメーションノードの更新
 		_crntNode->Update(_animTime);												
 
-		if (!_isOnGround && !IsAnimationEqual(JUMP00))_pos.m128_f32[1] -= Dx12Wrapper::Instance().GetDeltaTime() * 45.0f * GRAVITY_ACCERALATION;
+		if (!GetOnGround() && !IsAnimationEqual(JUMP00))_pos.m128_f32[1] -= Dx12Wrapper::Instance().GetDeltaTime() * 45.0f * GRAVITY_ACCERALATION;
 
 		//回転、平行移動
 		FBXBase::_mappedMats[0] = XMMatrixRotationY(_rotY);
@@ -674,9 +706,6 @@ FBXActor::Update()
 void
 FBXActor::Translate(const XMVECTOR& input)
 {
-	//座標に入力に応じたベクトルを加算
-	_pos += input * Dx12Wrapper::Instance().GetDeltaTime() * MOVE_SPEED;
-
 	//入力されているかどうかに応じて再生するアニメーションを決める
 	if (XMVector3Length(input).m128_f32[0] > 0.0f)
 	{
@@ -688,6 +717,11 @@ FBXActor::Translate(const XMVECTOR& input)
 		//待機アニメーション
 		SetAnimationNode(WAIT00);
 	}
+
+	//入力ベクトルを更新
+	_inputVec = input;
+	//座標に入力に応じたベクトルを加算
+	_pos += input * Dx12Wrapper::Instance().GetDeltaTime() * MOVE_SPEED;
 
 	//入力ベクトルと正面ベクトルの角度差を取得
 	auto diff = XMVector3AngleBetweenVectors(input, _frontVec).m128_f32[0];			
@@ -900,16 +934,6 @@ FBXActor::SetCanChangeAnim(bool val)
 }
 
 /// <summary>
-/// 地面と触れているか決める関数
-/// </summary>
-/// <param name="val">真理値</param>
-void
-FBXActor::SetOnGround(bool val)
-{
-	_isOnGround = val;
-}
-
-/// <summary>
 /// アニメーションをループするか決める関数
 /// </summary>
 /// <param name="val">真理値</param>
@@ -926,7 +950,7 @@ FBXActor::SetIsInLoop(bool val)
 bool
 FBXActor::GetOnGround()const
 {
-	return _isOnGround;
+	return _isOnGround(_footVec);
 }
 
 /// <summary>

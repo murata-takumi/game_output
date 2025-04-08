@@ -39,13 +39,13 @@ private:
 	//正面ベクトル
 	XMVECTOR _frontVec = XMVectorSet(0.0f,0.0f,1.0f,0.0f);
 
+	//入力ベクトル
+	XMVECTOR _inputVec;
+
 	//操作可能かを判別する真理値
 	bool _canControll = false;			
 	//ブレンド中かを判別する真理値
-	bool _isInBlend = false;														
-
-	//地面の上にいるかを判別する真理値
-	bool _isOnGround = true;														
+	bool _isInBlend = false;												
 
 	//アニメーションをループさせるか決める真理値
 	bool _isInLoop = true;	
@@ -101,6 +101,9 @@ private:
 	//座標変換用バッファー・ビュー作成関数
 	HRESULT CreateTransformView()override;									
 public:	
+	//アクターが地面の上にいるか判別するためのコールバック
+	function<bool(const XMVECTOR&)> _isOnGround;
+
 	//コンストラクタ
 	FBXActor(const wchar_t* filePath, XMFLOAT3 size, XMFLOAT3 pos = XMFLOAT3(0.0f, 0.0f, 0.0f));
 	//デストラクタ
@@ -109,7 +112,7 @@ public:
 	//アニメーション名のベクトルを返す関数
 	vector<string> GetAnimstr()const;
 	//現在実行しているアニメーション名を返す関数
-	string GetCurentAnimStr()const;										
+	string GetCurentAnimStr()const;
 
 	//アニメーションの総時間を返す関数
 	float GetAnimDuration(string animation);	
@@ -149,8 +152,6 @@ public:
 
 	//アニメーション実行可能か設定する
 	void SetCanChangeAnim(bool val);
-	//地面に触れているか設定する
-	void SetOnGround(bool val);
 	//アニメーションループ可能か設定する
 	void SetIsInLoop(bool val);
 	//地面に接しているかどうかを返す

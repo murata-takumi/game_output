@@ -73,7 +73,7 @@ PlayScene::SceneStart()
 		InstantiateObject<FBXActor>(ACTOR_PATH,ACTOR_NAME,ACTOR_COLL_SIZE);
 		InstantiateObject<FBXObject>(GROUND_PATH,GROUND_NAME,GROUND_COLL_SIZE);
 		//InstantiateObject<FBXObject>(COIN_PATH,COIN_NAME,COIN_COLL_SIZE,COIN_INIT_POS);
-		InstantiateObject<FBXObject>(BOX_PATH,BOX_NAME,BOX_COLL_SIZE,BOX_INIT_POS);
+		//InstantiateObject<FBXObject>(BOX_PATH,BOX_NAME,BOX_COLL_SIZE,BOX_INIT_POS);
 
 		//スレッドが全て完了するまでここで待機
 		for (auto& th : _ths)							
@@ -86,6 +86,83 @@ PlayScene::SceneStart()
 		{
 			if (_actor = dynamic_pointer_cast<FBXActor>(object.second))
 			{
+				//コールバックを設定
+				_actor->_isOnGround = [&](const XMVECTOR& footVec)
+				{
+					//OBBの中心、右、上、正面ベクトル
+					XMVECTOR center = _actorAndObjs[GROUND_NAME]->Collider()->Center();
+					XMVECTOR axis[3] = {_actorAndObjs[GROUND_NAME]->Collider()->_rightDir,_actorAndObjs[GROUND_NAME]->Collider()->_upDir,_actorAndObjs[GROUND_NAME]->Collider()->_frontDir};
+
+					//アクターとOBBの中心を結ぶベクトル
+					XMVECTOR vecBetCenter = center - _actor->Collider()->Center();
+
+					float tMin = 0.0f;
+					float tMax = FLT_MAX;
+
+					//各軸に対し行う
+					for (int i = 0; i < 3; i++)
+					{
+						//中心間ベクトルの軸への投影
+						float e = XMVector3Dot(axis[i], vecBetCenter).m128_f32[0];
+						//足元ベクトルの軸への投影
+						float f = XMVector3Dot(axis[i], footVec).m128_f32[0];
+
+						float half = 0;
+
+						switch (i)
+						{
+						case 0:
+							half = _actorAndObjs[GROUND_NAME]->Collider()->HalfLength().x;
+							break;
+						case 1:
+							half = _actorAndObjs[GROUND_NAME]->Collider()->HalfLength().y;
+							break;
+						case 2:
+							half = _actorAndObjs[GROUND_NAME]->Collider()->HalfLength().z;
+							break;
+						default:
+							assert(0);
+							break;
+						}
+
+						//足元ベクトルの投影が少しでもあったら
+						//足元ベクトルと軸ベクトルが並行でない場合
+						if (fabs(f) > FLT_EPSILON) {
+							//中心間投影とOBBの半分長さの和を足元投影で割る
+							//これはOBBと足元ベクトルの最初の交差座標
+							float t1 = (e + half);
+							//中心間投影とOBBの半分長さの差を足元投影で割る
+							//こちらはOBBと足元ベクトルの最後の交差座標
+							float t2 = (e - half);
+							//和が差より大きければ入れ替える
+							//普通和の方が大きくなるのでは？
+							if (t1 > t2)
+							{
+								std::swap(t1, t2);
+							}
+							//比較し、最小値を更新
+							tMin = max(tMin, t1);
+							//最大値も更新
+							tMax = min(tMax, t2);
+							//最小値が最大値を上回ってしまったら接してない
+							if (tMin > tMax)
+							{
+								return false;
+							}
+						}
+						//なければ
+						//足元ベクトルと軸ベクトルが並行な場合
+						else {
+							//負の中心間投影とOBB半分長さの差が0より大きいか負の中心間投影とOBB半分長さの和が0より小さければ接してない
+							if (-e - half > 0.0f || -e + half < 0.0f)
+							{
+								return false;
+							}
+						}
+					}
+
+					return true;
+				};
 				break;
 			}
 		}
@@ -128,6 +205,10 @@ PlayScene::Update()
 
 		//	SoundManager::Instance().CallSound(Sounds::COIN);
 		//}
+
+		float d[3] = { _actor->FootVec().m128_f32[0],_actor->FootVec().m128_f32[1],_actor->FootVec().m128_f32[2] };
+
+		ImGuiManager::Instance().SetDiffs(d);
 
 		//WASDキーの入力に応じて視点を移動させる
 		//注視点を中心に視点を回転
@@ -198,7 +279,6 @@ PlayScene::Update()
 			_direction = XMVector3Normalize(_direction);
 
 			//当たり判定をチェック
-			_actor->SetOnGround(CheckColliders(*_actorAndObjs[GROUND_NAME]->Collider(), *_actor->Collider()));
 			//CheckColliders(*_actorAndObjs[BOX_NAME]->Collider(), *_actor->Collider());
 
 			//アクターを移動
@@ -304,9 +384,6 @@ PlayScene::CheckColliders(const BoxCollider& col1, const BoxCollider& col2)
 	//双方のOBBの中心を結ぶベクトル
 	XMVECTOR vecBetCenter = center1 - center2;
 
-	auto degX = XMVector3Dot(XMVector3Normalize(vecBetCenter), _direction).m128_f32[0];
-	auto degZ = XMVector3Dot(XMVector3Normalize(vecBetCenter), col1._frontDir).m128_f32[0];
-
 	//obb1_front
 	float r = LenOnSeparateAxis(col1._frontDir, rightLen2, upLen2, frontLen2);
 	float lenBetCenter = XMVector3Dot(vecBetCenter,col1._frontDir ).m128_f32[0];
@@ -360,10 +437,6 @@ PlayScene::CheckColliders(const BoxCollider& col1, const BoxCollider& col2)
 	{
 		return false;
 	}
-
-	float d[3] = { diffX,diffY,diffZ };
-
-	ImGuiManager::Instance().SetDiffs(d);
 
 	//ここにめり込みを戻す処理
 	if (1.0f < fabs(diffX) && 1.0f < fabs(diffY) && 1.0f < fabs(diffZ))
