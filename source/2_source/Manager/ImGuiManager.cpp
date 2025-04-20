@@ -155,7 +155,23 @@ ImGuiManager::ImGuiDraw()
 			}
 		}
 
-		ImGui::Checkbox("IsOnGround", &_actor->_isOnGround);
+		auto a = _actor->GetOnGround();
+		ImGui::Checkbox("IsOnGround", &a);
+
+		ImGui::DragFloat("ColX", &_actor->Collider()->Center().m128_f32[0]);
+		ImGui::DragFloat("ColY", &_actor->Collider()->Center().m128_f32[1]);
+		ImGui::DragFloat("ColZ", &_actor->Collider()->Center().m128_f32[2]);
+		ImGui::DragFloat("PlayerX", &_actor->Pos().m128_f32[0]);
+		ImGui::DragFloat("PlayerY", &_actor->Pos().m128_f32[1]);
+		ImGui::DragFloat("PlayerZ", &_actor->Pos().m128_f32[2]);
+
+		//追加された値を表示
+		for (auto pair : labelAndValues)
+		{
+			ImGui::DragFloat(pair.first, &pair.second);
+		}
+
+		ImGui::Text(_actor->GetCurentAnimStr().c_str());
 		
 		ImGui::End();
 	}
@@ -335,6 +351,17 @@ void
 ImGuiManager::ResetAnimStr()
 {
 	_animStr.clear();
+}
+
+/// <summary>
+/// float値を表示する関数
+/// </summary>
+/// <param name="label">変数名</param>
+/// <param name="value">値</param>
+void
+ImGuiManager::AddLabelAndValue(const char* label, float value)
+{
+	labelAndValues[label] = value;
 }
 
 /// <summary>

@@ -73,7 +73,7 @@ PlayScene::SceneStart()
 		InstantiateObject<FBXActor>(ACTOR_PATH,ACTOR_NAME,ACTOR_COLL_SIZE);
 		InstantiateObject<FBXObject>(GROUND_PATH,GROUND_NAME,GROUND_COLL_SIZE);
 		//InstantiateObject<FBXObject>(COIN_PATH,COIN_NAME,COIN_COLL_SIZE,COIN_INIT_POS);
-		//InstantiateObject<FBXObject>(BOX_PATH,BOX_NAME,BOX_COLL_SIZE,BOX_INIT_POS);
+		InstantiateObject<FBXObject>(BOX_PATH,BOX_NAME,BOX_COLL_SIZE,BOX_INIT_POS);
 
 		//スレッドが全て完了するまでここで待機
 		for (auto& th : _ths)							
@@ -87,14 +87,14 @@ PlayScene::SceneStart()
 			if (_actor = dynamic_pointer_cast<FBXActor>(object.second))
 			{
 				//コールバックを設定
-				_actor->_isOnGround = [&](const XMVECTOR& footVec)
+				_actor->_isOnGround = [&](const BoxCollider* col,const XMVECTOR& footVec)
 				{
 					//OBBの中心、右、上、正面ベクトル
 					XMVECTOR center = _actorAndObjs[GROUND_NAME]->Collider()->Center();
 					XMVECTOR axis[3] = {_actorAndObjs[GROUND_NAME]->Collider()->_rightDir,_actorAndObjs[GROUND_NAME]->Collider()->_upDir,_actorAndObjs[GROUND_NAME]->Collider()->_frontDir};
 
 					//アクターとOBBの中心を結ぶベクトル
-					XMVECTOR vecBetCenter = center - _actor->Collider()->Center();
+					XMVECTOR vecBetCenter = center - col->Center();
 
 					float tMin = 0.0f;
 					float tMax = FLT_MAX;
@@ -125,17 +125,13 @@ PlayScene::SceneStart()
 							break;
 						}
 
-						//足元ベクトルの投影が少しでもあったら
 						//足元ベクトルと軸ベクトルが並行でない場合
 						if (fabs(f) > FLT_EPSILON) {
-							//中心間投影とOBBの半分長さの和を足元投影で割る
 							//これはOBBと足元ベクトルの最初の交差座標
 							float t1 = (e + half);
-							//中心間投影とOBBの半分長さの差を足元投影で割る
 							//こちらはOBBと足元ベクトルの最後の交差座標
 							float t2 = (e - half);
 							//和が差より大きければ入れ替える
-							//普通和の方が大きくなるのでは？
 							if (t1 > t2)
 							{
 								std::swap(t1, t2);
@@ -150,7 +146,6 @@ PlayScene::SceneStart()
 								return false;
 							}
 						}
-						//なければ
 						//足元ベクトルと軸ベクトルが並行な場合
 						else {
 							//負の中心間投影とOBB半分長さの差が0より大きいか負の中心間投影とOBB半分長さの和が0より小さければ接してない
@@ -205,10 +200,6 @@ PlayScene::Update()
 
 		//	SoundManager::Instance().CallSound(Sounds::COIN);
 		//}
-
-		float d[3] = { _actor->FootVec().m128_f32[0],_actor->FootVec().m128_f32[1],_actor->FootVec().m128_f32[2] };
-
-		ImGuiManager::Instance().SetDiffs(d);
 
 		//WASDキーの入力に応じて視点を移動させる
 		//注視点を中心に視点を回転
@@ -279,7 +270,7 @@ PlayScene::Update()
 			_direction = XMVector3Normalize(_direction);
 
 			//当たり判定をチェック
-			//CheckColliders(*_actorAndObjs[BOX_NAME]->Collider(), *_actor->Collider());
+			CheckColliders(*_actorAndObjs[BOX_NAME]->Collider(), *_actor->Collider());
 
 			//アクターを移動
 			_actor->Translate(_direction);
@@ -382,7 +373,7 @@ PlayScene::CheckColliders(const BoxCollider& col1, const BoxCollider& col2)
 	XMVECTOR frontLen2 = col2._frontDir * col2.HalfLength().z;
 
 	//双方のOBBの中心を結ぶベクトル
-	XMVECTOR vecBetCenter = center1 - center2;
+	XMVECTOR vecBetCenter = center2 - center1;
 
 	//obb1_front
 	float r = LenOnSeparateAxis(col1._frontDir, rightLen2, upLen2, frontLen2);
@@ -393,6 +384,10 @@ PlayScene::CheckColliders(const BoxCollider& col1, const BoxCollider& col2)
 	}
 
 	auto diffZ = r + col1.HalfLength().z - fabs(lenBetCenter);
+	if (lenBetCenter <= 0)
+	{
+		diffZ *= -1.0f;
+	}
 
 	//obb1_right
 	r = LenOnSeparateAxis(col1._rightDir, rightLen2, upLen2, frontLen2);
@@ -403,6 +398,10 @@ PlayScene::CheckColliders(const BoxCollider& col1, const BoxCollider& col2)
 	}
 
 	auto diffX = r + col1.HalfLength().x - fabs(lenBetCenter);
+	if (lenBetCenter <= 0)
+	{
+		diffX *= -1.0f;
+	}
 
 	//obb1_up
 	r = LenOnSeparateAxis(col1._upDir, rightLen2, upLen2, frontLen2);
@@ -438,24 +437,25 @@ PlayScene::CheckColliders(const BoxCollider& col1, const BoxCollider& col2)
 		return false;
 	}
 
-	//ここにめり込みを戻す処理
-	if (1.0f < fabs(diffX) && 1.0f < fabs(diffY) && 1.0f < fabs(diffZ))
+	auto min = min(fabs(diffX), fabs(diffZ));
+
+	ImGuiManager::Instance().AddLabelAndValue("Min", min);
+
+	if (1.0f < fabs(diffX) && fabs(min - fabs(diffX)) < FLT_EPSILON)
 	{
-		auto diff = min(fabs(diffX), fabs(diffY), fabs(diffZ));
-		auto sign = copysign(1.0f,diff);
-		if (fabs(diff - fabs(diffX)) <= FLT_EPSILON)
-		{
-			col2.Object().Pos().m128_f32[0] += sign * Dx12Wrapper::Instance().GetDeltaTime() * 10.0f;
-		}
-		else if (fabs(diff - fabs(diffY)) <= FLT_EPSILON)
-		{
-			col2.Object().Pos().m128_f32[1] += diffY * Dx12Wrapper::Instance().GetDeltaTime() * 10.0f;
-		}
-		else
-		{
-			col2.Object().Pos().m128_f32[2] += sign * Dx12Wrapper::Instance().GetDeltaTime() * 10.0f;
-		}
+		auto sign = clamp(diffX, -1.0f, 1.0f);
+
+		col2.Object().Pos().m128_f32[0] += sign * Dx12Wrapper::Instance().GetDeltaTime() * -300.0f;
 	}
+	else if (1.0f < fabs(diffZ) && fabs(min - fabs(diffZ)) < FLT_EPSILON)
+	{
+		auto sign = clamp(diffZ, -1.0f, 1.0f);
+
+		col2.Object().Pos().m128_f32[2] += sign * Dx12Wrapper::Instance().GetDeltaTime() * -300.0f;
+	}
+
+	ImGuiManager::Instance().AddLabelAndValue("DiffX", diffX);
+	ImGuiManager::Instance().AddLabelAndValue("DiffZ", diffZ);
 
 	return true;
 }

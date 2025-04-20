@@ -102,7 +102,7 @@ private:
 	HRESULT CreateTransformView()override;									
 public:	
 	//アクターが地面の上にいるか判別するためのコールバック
-	function<bool(const XMVECTOR&)> _isOnGround;
+	function<bool(const BoxCollider* col, const XMVECTOR&)> _isOnGround;
 
 	//コンストラクタ
 	FBXActor(const wchar_t* filePath, XMFLOAT3 size, XMFLOAT3 pos = XMFLOAT3(0.0f, 0.0f, 0.0f));

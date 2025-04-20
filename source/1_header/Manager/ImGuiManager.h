@@ -12,6 +12,7 @@ class FBXActor;
 class ImGuiManager
 {
 public:
+	string str;
 	//初期化関数
 	void Init(HWND hwnd);
 
@@ -33,7 +34,10 @@ public:
 	//アクターを受け取る関数
 	void SetActor(const map<string, shared_ptr<FBXBase>> actorAndObjs);
 	//アニメーション名の配列を初期化する関数
-	void ResetAnimStr();											
+	void ResetAnimStr();
+
+	//float型の数値を追加する関数
+	void AddLabelAndValue(const char* label,float value);
 
 	bool _isCrossed;
 private:
@@ -45,6 +49,9 @@ private:
 
 	shared_ptr<FBXActor> _actor;					//アクター
 	shared_ptr<FBXObject> _ground;					//地面
+
+	//表示するラベルと値
+	map<const char*, float> labelAndValues;
 
 	ComPtr<ID3D12DescriptorHeap> _heapForImgui;		//ImGui用ヒープ
 
