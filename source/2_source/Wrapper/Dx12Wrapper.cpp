@@ -22,8 +22,10 @@ void EnableDebugLayer()
 	auto result = D3D12GetDebugInterface(
 		IID_PPV_ARGS(&debugLayer));
 		
-	debugLayer->EnableDebugLayer();				//デバッグレイヤーを有効化する
-	debugLayer->Release();						//有効化したらインターフェイスを開放する
+	//デバッグレイヤーを有効化する
+	debugLayer->EnableDebugLayer();				
+	//有効化したらインターフェイスを開放する
+	debugLayer->Release();						
 }
 
 /// <summary>
@@ -40,43 +42,47 @@ Dx12Wrapper::InitializeDXGIDevice()
 	auto result = CreateDXGIFactory1(IID_PPV_ARGS(&_dxgiFactory));
 #endif // _DEBUG
 	
-	D3D_FEATURE_LEVEL levels[] = {												//フィーチャーレベルの配列を初期化
+	//フィーチャーレベルの配列を初期化
+	D3D_FEATURE_LEVEL levels[] = {												
 		D3D_FEATURE_LEVEL_12_1,
 		D3D_FEATURE_LEVEL_12_0,
 		D3D_FEATURE_LEVEL_11_1,
 		D3D_FEATURE_LEVEL_11_0,
 	};
 
-	vector<IDXGIAdapter*> adapters;												//列挙したアダプターを格納
-	IDXGIAdapter* tmpAdapter = nullptr;											//アダプター
+	//ファクトリー内の全アダプターをベクトルに格納
+	vector<IDXGIAdapter*> adapters;												
+	IDXGIAdapter* tmpAdapter = nullptr;
 
 	for (int i = 0;
-		_dxgiFactory->EnumAdapters(i, &tmpAdapter) != DXGI_ERROR_NOT_FOUND;++i	//ファクトリー内の全アダプターをベクトルに格納
+		_dxgiFactory->EnumAdapters(i, &tmpAdapter) != DXGI_ERROR_NOT_FOUND;++i	
 		)
 	{
 		adapters.push_back(tmpAdapter);
 	}
 
-	for (auto adpt : adapters)													//格納した全アダプターに対しループ
+	//格納した全アダプターに対しループを行い、"NVIDIA"という名前のアダプターがあったら保存
+	for (auto adpt : adapters)													
 	{
 		DXGI_ADAPTER_DESC adesc = {};
-		adpt->GetDesc(&adesc);													//アダプターの説明を記述する構造体を取得
+		adpt->GetDesc(&adesc);
 
-		wstring strDesc = adesc.Description;									//アダプターの名前を取得
+		wstring strDesc = adesc.Description;
 
-		if (strDesc.find(L"NVIDIA") != string::npos)							//アダプターの名前が特定の名前と一致したらループ終了
+		if (strDesc.find(L"NVIDIA") != string::npos)
 		{
-			tmpAdapter = adpt;													//デバイス作成に使用するアダプターを決定
+			tmpAdapter = adpt;
 			break;
 		}
 	}
 
-	for (auto lv : levels)														//初期化したフィーチャーレベルに対しループ
+	//デバイスを作成できるフィーチャーレベルを探す
+	for (auto lv : levels)														
 	{
-		if (D3D12CreateDevice(tmpAdapter, lv, IID_PPV_ARGS(&_dev)) == S_OK)		//デバイスを作成できるフィーチャーレベルを探す
+		if (D3D12CreateDevice(tmpAdapter, lv, IID_PPV_ARGS(&_dev)) == S_OK)
 		{
 			result = S_OK;
-			break;																//生成可能なバージョンが見つかったらループ終了
+			break;
 		}
 	}
 	return result;
@@ -531,11 +537,11 @@ Dx12Wrapper::ScalingCoordinates(int x)
 /// <param name="dir">平行移動させる方向</param>
 /// <param name="value">移動距離</param>
 void
-Dx12Wrapper::TranslateCoordinates(XMVECTOR vec)
+Dx12Wrapper::SetCoordinatesCenter(XMVECTOR vec)
 {
-	_target.x += vec.m128_f32[0] * _deltaTime * 300.0f;
-	_target.y += vec.m128_f32[1] * _deltaTime * 300.0f;
-	_target.z += vec.m128_f32[2] * _deltaTime * 300.0f;
+	_target.x = vec.m128_f32[0];
+	_target.y = vec.m128_f32[1];
+	_target.z = vec.m128_f32[2];
 
 	//その後カメラ座標を更新
 	_eye =
@@ -607,10 +613,12 @@ Dx12Wrapper::ResetCoordinates(float azimth, float elevation)
 void
 Dx12Wrapper::SetScene()
 {
-	_mappedScene->view = XMMatrixLookAtLH(										//行列・座標を書き込む
+	//行列・座標を書き込む
+	_mappedScene->view = XMMatrixLookAtLH(										
 		XMLoadFloat3(&_eye), XMLoadFloat3(&_target), XMLoadFloat3(&_up));
 
-	if (_perspective)															//透視投影
+	//透視投影
+	if (_perspective)															
 	{
 		_mappedScene->proj = XMMatrixPerspectiveFovLH(XM_PIDIV4,
 			static_cast<float>(_winSize.cx) / static_cast<float>(_winSize.cy),
@@ -618,7 +626,8 @@ Dx12Wrapper::SetScene()
 			2000.0f
 		);
 	}
-	else																		//平行投影
+	//平行投影
+	else																		
 	{
 		_currentRad = _coordinates->GetRadius();
 
@@ -631,10 +640,12 @@ Dx12Wrapper::SetScene()
 	_mappedScene->light = _light;
 	_mappedScene->eye = _eye;
 
-	ID3D12DescriptorHeap* sceneHeaps[] = { _sceneDescHeap.Get() };				//ディスクリプタヒープをコマンドリストにセット
+	//ディスクリプタヒープをコマンドリストにセット
+	ID3D12DescriptorHeap* sceneHeaps[] = { _sceneDescHeap.Get() };				
 	_cmdList->SetDescriptorHeaps(1, sceneHeaps);
 
-	_cmdList->SetGraphicsRootDescriptorTable(									//ヒープのハンドルをルートパラメータと関連付け
+	//ヒープのハンドルをルートパラメータと関連付け
+	_cmdList->SetGraphicsRootDescriptorTable(									
 		0, _sceneDescHeap->GetGPUDescriptorHandleForHeapStart());
 }
 

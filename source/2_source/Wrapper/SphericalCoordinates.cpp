@@ -46,7 +46,7 @@ SphericalCoordinates::SetAzimth(float azimth)
 float
 SphericalCoordinates::GetRadius()const
 {
-	return clamp(_radius, 50.0f, 500.0f);
+	return clamp(_radius, 50.0f, 5000.0f);
 }
 
 /// <summary>

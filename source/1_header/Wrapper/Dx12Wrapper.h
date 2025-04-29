@@ -229,7 +229,7 @@ public:
 	//カメラを近付ける・遠ざける関数
 	void ScalingCoordinates(int x);								
 	//カメラを移動させる関数
-	void TranslateCoordinates(XMVECTOR vec);							
+	void SetCoordinatesCenter(XMVECTOR vec);							
 	//カメラを回転させる関数
 	void RotateCoordinates(Degree deg, float value);					
 	//カメラの位置を初期化する関数

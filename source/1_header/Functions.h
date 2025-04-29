@@ -145,7 +145,7 @@ namespace
 	/// </summary>
 	/// <param name="func">並列処理したいラムダ式</param>
 	void
-	ParallelProcess(function<void(void)> func)
+	ParallelProcess(const function<void(void)>& func)
 	{
 		thread th(func);	//ラムダ式を処理するスレッドを作成
 		th.detach();		//スレッドの管理を手放す
