@@ -271,6 +271,7 @@ PlayScene::Update()
 
 			//当たり判定をチェック
 			CheckColliders(*_actorAndObjs[BOX_NAME]->Collider(), *_actor->Collider());
+			CheckColliders(*_actorAndObjs[GROUND_NAME]->Collider(), *_actor->Collider());
 
 			//アクターを移動
 			_actor->Translate(_direction);
@@ -344,7 +345,7 @@ PlayScene::InstantiateObject(const wchar_t* path,string name, XMFLOAT3 size,XMFL
 	auto f = [=]() {
 		shared_ptr<className> object;
 
-		object = make_shared<className>(path, size, pos);
+		object = make_shared<className>(path, name, size, pos);
 
 		_actorAndObjs[name] = object;
 	};
@@ -437,25 +438,36 @@ PlayScene::CheckColliders(const BoxCollider& col1, const BoxCollider& col2)
 		return false;
 	}
 
-	auto min = min(fabs(diffX), fabs(diffZ));
-
-	ImGuiManager::Instance().AddLabelAndValue("Min", min);
+	//最小値を更新
+	auto min = fabs(diffX);
+	if (min > fabs(diffY))
+	{
+		min = fabs(diffY);
+	}
+	if (min > fabs(diffZ))
+	{
+		min = fabs(diffZ);
+	}
 
 	if (1.0f < fabs(diffX) && fabs(min - fabs(diffX)) < FLT_EPSILON)
 	{
-		auto sign = clamp(diffX, -1.0f, 1.0f);
-
-		col2.Object().Pos().m128_f32[0] += sign * Dx12Wrapper::Instance().GetDeltaTime() * -300.0f;
+		col2.Object().Pos().m128_f32[0] -= Dx12Wrapper::Instance().GetDeltaTime() * col2.Object().Speed().x;
+	}
+	else if (1.0f < fabs(diffY) && fabs(min - fabs(diffY)) < FLT_EPSILON)
+	{
+		col2.Object().Pos().m128_f32[1] -= Dx12Wrapper::Instance().GetDeltaTime() * col2.Object().Speed().y;
 	}
 	else if (1.0f < fabs(diffZ) && fabs(min - fabs(diffZ)) < FLT_EPSILON)
 	{
-		auto sign = clamp(diffZ, -1.0f, 1.0f);
-
-		col2.Object().Pos().m128_f32[2] += sign * Dx12Wrapper::Instance().GetDeltaTime() * -300.0f;
+		col2.Object().Pos().m128_f32[2] -= Dx12Wrapper::Instance().GetDeltaTime() * col2.Object().Speed().z;
 	}
 
-	ImGuiManager::Instance().AddLabelAndValue("DiffX", diffX);
-	ImGuiManager::Instance().AddLabelAndValue("DiffZ", diffZ);
+	if (col1.Object().Name() == GROUND_NAME)
+	{
+		ImGuiManager::Instance().AddLabelAndValue("DiffX", diffX);
+		ImGuiManager::Instance().AddLabelAndValue("DiffY", diffY);
+		ImGuiManager::Instance().AddLabelAndValue("DiffZ", diffZ);
+	}
 
 	return true;
 }
