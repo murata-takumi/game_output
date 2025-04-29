@@ -6,11 +6,12 @@
 /// コンストラクタ
 /// </summary>
 /// <param name="filePath">モデル格納ファイル名</param>
+/// <param name="diff">当たり判定の差分</param>
+/// <param name="name">オブジェクトの名前</param>
 /// <param name="size">当たり判定の大きさ</param>
 /// <param name="pos">初期座標</param>
-/// <param name="diff">当たり判定の差分</param>
-FBXBase::FBXBase(const wchar_t* filePath, const XMFLOAT3& size, const XMFLOAT3& pos)
-	:_motionMat(XMMatrixIdentity()), _pos(XMLoadFloat3(&pos)),_rejectBone(true)
+FBXBase::FBXBase(const wchar_t* filePath, string name, const XMFLOAT3& size, const XMFLOAT3& pos)
+	:_motionMat(XMMatrixIdentity()), _pos(XMLoadFloat3(&pos)),_speed(XMFLOAT3(0,0,0)),_name(name), _rejectBone(true)
 {
 	//モデル関連の情報を初期化
 	InitModel(filePath);														
@@ -394,7 +395,7 @@ FBXBase::Update()
 	_collider->Update(_motionMat * FBXBase::_mappedMats[0]);
 
 	//足元ベクトルも設定
-	_footVec = XMVectorSet(0, -5.0f, 0, 0);
+	_footVec = XMVectorSet(0, -1.0f, 0, 0);
 }
 
 /// <summary>
@@ -425,6 +426,26 @@ XMVECTOR
 FBXBase::FootVec()const
 {
 	return _footVec;
+}
+
+/// <summary>
+/// オブジェクトの速度を返す
+/// </summary>
+/// <returns>速度</returns>
+XMFLOAT3
+FBXBase::Speed()const
+{
+	return _speed;
+}
+
+/// <summary>
+/// オブジェクトの名前を返す
+/// </summary>
+/// <returns>名前</returns>
+string
+FBXBase::Name()const
+{
+	return _name;
 }
 
 /// <summary>

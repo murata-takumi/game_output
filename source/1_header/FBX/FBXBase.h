@@ -2,6 +2,7 @@
 #include "Application.h"
 #include "FBX/AssimpLoader.h"
 #include "FBX/BoxCollider.h"
+#include "Manager/ImGuiManager.h"
 
 /// <summary>
 /// FBXモデルの派生元となるクラス
@@ -61,6 +62,12 @@ protected:
 	//足元判定に使用
 	XMVECTOR _footVec;
 
+	//オブジェクトの速度
+	XMFLOAT3 _speed;
+
+	//オブジェクトの名前
+	string _name;
+
 	//当たり判定の更新からボーンの座標変換を排除するか
 	bool _rejectBone;
 
@@ -78,7 +85,7 @@ protected:
 
 public:
 	//コンストラクタ
-	FBXBase(const wchar_t* filePath,const XMFLOAT3& size,const XMFLOAT3& pos);
+	FBXBase(const wchar_t* filePath,string name,const XMFLOAT3& size,const XMFLOAT3& pos);
 	//デストラクタ
 	virtual ~FBXBase();													
 
@@ -94,6 +101,10 @@ public:
 	XMVECTOR& Pos();
 
 	XMVECTOR FootVec()const;
+	
+	XMFLOAT3 Speed()const;
+
+	string Name()const;
 
 	//ボーン変換を排除するか決める
 	void SetRejectBone(bool val);

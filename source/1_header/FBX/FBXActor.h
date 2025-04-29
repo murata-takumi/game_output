@@ -105,7 +105,7 @@ public:
 	function<bool(const BoxCollider* col, const XMVECTOR&)> _isOnGround;
 
 	//コンストラクタ
-	FBXActor(const wchar_t* filePath, XMFLOAT3 size, XMFLOAT3 pos = XMFLOAT3(0.0f, 0.0f, 0.0f));
+	FBXActor(const wchar_t* filePath, string name, XMFLOAT3 size, XMFLOAT3 pos = XMFLOAT3(0.0f, 0.0f, 0.0f));
 	//デストラクタ
 	~FBXActor();														
 
