@@ -166,9 +166,15 @@ ImGuiManager::ImGuiDraw()
 		ImGui::DragFloat("PlayerZ", &_actor->Pos().m128_f32[2]);
 
 		//追加された値を表示
-		for (auto pair : labelAndValues)
+		for (auto& pair : labelAndFloats)
 		{
 			ImGui::DragFloat(pair.first, &pair.second);
+		}
+
+		//追加された値を表示
+		for (auto& pair : labelAndBools)
+		{
+			ImGui::Checkbox(pair.first, &pair.second);
 		}
 
 		ImGui::Text(_actor->GetCurentAnimStr().c_str());
@@ -359,9 +365,20 @@ ImGuiManager::ResetAnimStr()
 /// <param name="label">変数名</param>
 /// <param name="value">値</param>
 void
-ImGuiManager::AddLabelAndValue(const char* label, float value)
+ImGuiManager::AddLabelAndFloat(const char* label, float value)
 {
-	labelAndValues[label] = value;
+	labelAndFloats[label] = value;
+}
+
+/// <summary>
+/// float値を表示する関数
+/// </summary>
+/// <param name="label">変数名</param>
+/// <param name="value">値</param>
+void
+ImGuiManager::AddLabelAndBool(const char* label, bool value)
+{
+	labelAndBools[label] = value;
 }
 
 /// <summary>

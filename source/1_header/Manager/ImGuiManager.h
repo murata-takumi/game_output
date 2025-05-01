@@ -37,7 +37,10 @@ public:
 	void ResetAnimStr();
 
 	//float型の数値を追加する関数
-	void AddLabelAndValue(const char* label,float value);
+	void AddLabelAndFloat(const char* label,float value);
+
+	//bool型の値を追加する関数
+	void AddLabelAndBool(const char* label, bool value);
 
 	bool _isCrossed;
 private:
@@ -50,8 +53,11 @@ private:
 	shared_ptr<FBXActor> _actor;					//アクター
 	shared_ptr<FBXObject> _ground;					//地面
 
-	//表示するラベルと値
-	map<const char*, float> labelAndValues;
+	//表示ラベルとfloat値
+	map<const char*, float> labelAndFloats;
+
+	//表示ラベルとbool値
+	map<const char*, bool> labelAndBools;
 
 	ComPtr<ID3D12DescriptorHeap> _heapForImgui;		//ImGui用ヒープ
 
