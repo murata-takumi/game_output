@@ -394,6 +394,12 @@ FBXBase::Update()
 	if (_rejectBone) _motionMat = XMMatrixTranslation(0, _collider->HalfLength().y, 0);
 	_collider->Update(_motionMat * FBXBase::_mappedMats[0]);
 
+	XMVECTOR scale, trans, skew;
+	XMMatrixDecompose(&scale, &skew, &trans,FBXBase::_mappedMats[0]);
+
+	_frontVec = XMVectorSet(0, 0, _collider->HalfLength().z, 0);
+	_frontVec = XMVector3Transform(_frontVec, XMMatrixRotationQuaternion(skew));
+
 	//足元ベクトルも設定
 	_footVec = XMVectorSet(0, -1.0f, 0, 0);
 }
@@ -416,6 +422,16 @@ XMVECTOR&
 FBXBase::Pos()
 {
 	return _pos;
+}
+
+/// <summary>
+/// 正面ベクトルを返す
+/// </summary>
+/// <returns>正面ベクトル</returns>
+XMVECTOR
+FBXBase::FrontVec()const
+{
+	return _frontVec;
 }
 
 /// <summary>

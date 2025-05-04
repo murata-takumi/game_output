@@ -59,6 +59,9 @@ protected:
 	//座標
 	XMVECTOR _pos;
 
+	//正面判定に使用
+	XMVECTOR _frontVec;
+
 	//足元判定に使用
 	XMVECTOR _footVec;
 
@@ -99,6 +102,8 @@ public:
 	shared_ptr<BoxCollider>Collider()const;		
 
 	XMVECTOR& Pos();
+
+	XMVECTOR FrontVec()const;
 
 	XMVECTOR FootVec()const;
 	

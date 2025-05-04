@@ -70,6 +70,7 @@ BoxCollider::SetVec(const XMVECTOR& vec)
 
 	//正面ベクトル、右ベクトルの外積を上ベクトルとする
 	_upDir = XMVector3Normalize(XMVector3Cross(_frontDir, _rightDir));
+	_upDir *= -1.0f;
 }
 
 /// <summary>

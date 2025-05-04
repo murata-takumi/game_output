@@ -37,7 +37,7 @@ private:
 	vector<string> _animStr;												
 
 	//正面ベクトル
-	XMVECTOR _frontVec = XMVectorSet(0.0f,0.0f,1.0f,0.0f);
+	XMVECTOR _currentFrontVec = XMVectorSet(0.0f,0.0f,1.0f,0.0f);
 
 	//入力ベクトル
 	XMVECTOR _inputVec;
@@ -102,7 +102,7 @@ private:
 	HRESULT CreateTransformView()override;									
 public:	
 	//アクターが地面の上にいるか判別するためのコールバック
-	function<bool(const BoxCollider* col, const XMVECTOR&)> _isOnGround;
+	function<bool(const BoxCollider* col)> _isOnGround;
 
 	//コンストラクタ
 	FBXActor(const wchar_t* filePath, string name, XMFLOAT3 size, XMFLOAT3 pos = XMFLOAT3(0.0f, 0.0f, 0.0f));

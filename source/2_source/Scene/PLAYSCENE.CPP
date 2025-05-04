@@ -87,14 +87,14 @@ PlayScene::SceneStart()
 			if (_actor = dynamic_pointer_cast<FBXActor>(object.second))
 			{
 				//コールバックを設定
-				_actor->_isOnGround = [&](const BoxCollider* col,const XMVECTOR& footVec)
+				_actor->_isOnGround = [&](const BoxCollider* col)
 				{
 					//OBBの中心、右、上、正面ベクトル
 					XMVECTOR center = _actorAndObjs[GROUND_NAME]->Collider()->Center();
 					XMVECTOR axis[3] = {_actorAndObjs[GROUND_NAME]->Collider()->_rightDir,_actorAndObjs[GROUND_NAME]->Collider()->_upDir,_actorAndObjs[GROUND_NAME]->Collider()->_frontDir};
 
 					//アクターとOBBの中心を結ぶベクトル
-					XMVECTOR vecBetCenter = center - col->Center();
+					XMVECTOR vecBetCenter = col->Center() - center;
 
 					float tMin = 0.0f;
 					float tMax = FLT_MAX;
@@ -105,7 +105,7 @@ PlayScene::SceneStart()
 						//中心間ベクトルの軸への投影
 						float e = XMVector3Dot(axis[i], vecBetCenter).m128_f32[0];
 						//足元ベクトルの軸への投影
-						float f = XMVector3Dot(axis[i], footVec).m128_f32[0];
+						float f = XMVector3Dot(axis[i], col->Object().FootVec()).m128_f32[0];
 
 						float half = 0;
 
@@ -438,6 +438,20 @@ PlayScene::CheckColliders(const BoxCollider& col1, const BoxCollider& col2)
 		return false;
 	}
 
+	if (col1.Object().Name() == BOX_NAME)
+	{
+		ImGuiManager::Instance().AddLabelAndFloat("DiffX", diffX);
+		ImGuiManager::Instance().AddLabelAndFloat("DiffY", diffY);
+		ImGuiManager::Instance().AddLabelAndFloat("DiffZ", diffZ);
+
+		ImGuiManager::Instance().AddLabelAndBool("FrontVecIn", CheckColAndVecs(col1, col2));
+
+		if (!CheckColAndVecs(col1, col2))
+		{
+			return false;
+		}
+	}
+
 	//最小値を更新
 	auto min = fabs(diffX);
 	if (min > fabs(diffY))
@@ -449,24 +463,97 @@ PlayScene::CheckColliders(const BoxCollider& col1, const BoxCollider& col2)
 		min = fabs(diffZ);
 	}
 
-	if (1.0f < fabs(diffX) && fabs(min - fabs(diffX)) < FLT_EPSILON)
+	if (FLT_EPSILON < fabs(diffX) && fabs(min - fabs(diffX)) < FLT_EPSILON)
 	{
 		col2.Object().Pos().m128_f32[0] -= Dx12Wrapper::Instance().GetDeltaTime() * col2.Object().Speed().x;
 	}
-	else if (1.0f < fabs(diffY) && fabs(min - fabs(diffY)) < FLT_EPSILON)
+	else if (FLT_EPSILON < fabs(diffY) && fabs(min - fabs(diffY)) < FLT_EPSILON)
 	{
 		col2.Object().Pos().m128_f32[1] -= Dx12Wrapper::Instance().GetDeltaTime() * col2.Object().Speed().y;
 	}
-	else if (1.0f < fabs(diffZ) && fabs(min - fabs(diffZ)) < FLT_EPSILON)
+	else if (FLT_EPSILON < fabs(diffZ) && fabs(min - fabs(diffZ)) < FLT_EPSILON)
 	{
 		col2.Object().Pos().m128_f32[2] -= Dx12Wrapper::Instance().GetDeltaTime() * col2.Object().Speed().z;
 	}
 
-	if (col1.Object().Name() == GROUND_NAME)
+	return true;
+}
+
+/// <summary>
+/// OBBにベクトルが入り込んでいるか確認する関数
+/// </summary>
+/// <param name="col1"></param>
+/// <param name="col2"></param>
+/// <param name="vec"></param>
+/// <returns></returns>
+bool 
+PlayScene::CheckColAndVecs(const BoxCollider& col1, const BoxCollider& col2)
+{
+	//OBBの中心、右、上、正面ベクトル
+	XMVECTOR center = col1.Center();
+	XMVECTOR axis[3] = {col1._rightDir,col1._upDir,col1._frontDir };
+
+	//アクターとOBBの中心を結ぶベクトル
+	XMVECTOR vecBetCenter = col2.Center() - center;
+
+	float tMin = 0.0f;
+	float tMax = FLT_MAX;
+
+	//各軸に対し行う
+	for (int i = 0; i < 3; i++)
 	{
-		ImGuiManager::Instance().AddLabelAndValue("DiffX", diffX);
-		ImGuiManager::Instance().AddLabelAndValue("DiffY", diffY);
-		ImGuiManager::Instance().AddLabelAndValue("DiffZ", diffZ);
+		//中心間ベクトルの軸への投影
+		float e = fabs(XMVector3Dot(axis[i], vecBetCenter).m128_f32[0]) * -1;
+		//足元ベクトルの軸への投影
+		float f = fabs(XMVector3Dot(axis[i], col2.Object().FrontVec()).m128_f32[0]) * -1;
+
+		float half = 0;
+
+		switch (i)
+		{
+		case 0:
+			half =col1.HalfLength().x;
+			break;
+		case 1:
+			half =col1.HalfLength().y;
+			break;
+		case 2:
+			half =col1.HalfLength().z;
+			break;
+		default:
+			assert(0);
+			break;
+		}
+
+		//ベクトルと軸ベクトルが並行でない場合
+		if (fabs(f) > FLT_EPSILON) {
+			//これはOBBと足元ベクトルの最初の交差座標
+			float t1 = (e + (half - f));
+			//こちらはOBBと足元ベクトルの最後の交差座標
+			float t2 = (e - (half - f));
+			//和が差より大きければ入れ替える
+			if (t1 > t2)
+			{
+				std::swap(t1, t2);
+			}
+			//比較し、最小値を更新
+			tMin = max(tMin, t1);
+			//最大値も更新
+			tMax = min(tMax, t2);
+			//最小値が最大値を上回ってしまったら接してない
+			if (tMin > tMax)
+			{
+				return false;
+			}
+		}
+		//足元ベクトルと軸ベクトルが並行な場合
+		else {
+			//負の中心間投影とOBB半分長さの差が0より大きいか負の中心間投影とOBB半分長さの和が0より小さければ接してない
+			if (-e - half > 0.0f || -e + half < 0.0f)
+			{
+				return false;
+			}
+		}
 	}
 
 	return true;

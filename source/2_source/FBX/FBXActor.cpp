@@ -34,7 +34,7 @@ const int COLLIDER_BONE = 0;
 /// <param name="filePath">モデルのパス</param>
 FBXActor::FBXActor(const wchar_t* filePath, string name, XMFLOAT3 size, XMFLOAT3 pos)
 	:FBXBase(filePath, name, size, pos),
-	_crntNode(nullptr), _frontVec(XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f)),
+	_crntNode(nullptr), _currentFrontVec(XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f)),
 	_canControll(false),_isInBlend(false),_isInLoop(true),
 	_canChangeAnim(true),_blendWeight(0.0f), _animTime(0.0f),
 	_destRad(0.0f), _rotY(0.0f)
@@ -702,9 +702,9 @@ FBXActor::Update()
 	//前フレームの時間を更新
 	_befFrameTime = _currFrameTime;
 
-	ImGuiManager::Instance().AddLabelAndValue("SpeedX", FBXBase::_speed.x);
-	ImGuiManager::Instance().AddLabelAndValue("SpeedY", FBXBase::_speed.y);
-	ImGuiManager::Instance().AddLabelAndValue("SpeedZ", FBXBase::_speed.z);
+	ImGuiManager::Instance().AddLabelAndFloat("SpeedX", FBXBase::_speed.x);
+	ImGuiManager::Instance().AddLabelAndFloat("SpeedY", FBXBase::_speed.y);
+	ImGuiManager::Instance().AddLabelAndFloat("SpeedZ", FBXBase::_speed.z);
 }
 
 /// <summary>
@@ -735,8 +735,8 @@ FBXActor::Translate(const XMVECTOR& input)
 	FBXBase::_speed.z = input.m128_f32[2] * MOVE_SPEED;
 
 	//入力ベクトルと正面ベクトルの角度差を取得
-	auto diff = XMVector3AngleBetweenVectors(input, _frontVec).m128_f32[0];			
-	diff = XMVector3Cross(input, _frontVec).m128_f32[1] > 0 ? diff * -1 : diff;
+	auto diff = XMVector3AngleBetweenVectors(input, _currentFrontVec).m128_f32[0];			
+	diff = XMVector3Cross(input, _currentFrontVec).m128_f32[1] > 0 ? diff * -1 : diff;
 	//角度の差がある場合目的角度を更新
 	if (FLT_EPSILON <= fabs(diff))													
 	{
@@ -748,18 +748,18 @@ FBXActor::Translate(const XMVECTOR& input)
 
 	//Z軸から正面ベクトルの角度差を取得
 	//0～360の範囲にする
-	_zToFrontAngle = XMVector3AngleBetweenVectors(Z_VECTOR, _frontVec).m128_f32[0];
-	_zToFrontAngle = XMVector3Cross(Z_VECTOR, _frontVec).m128_f32[1] > 0 ? (2 * XM_PI) - _zToFrontAngle : _zToFrontAngle;
+	_zToFrontAngle = XMVector3AngleBetweenVectors(Z_VECTOR, _currentFrontVec).m128_f32[0];
+	_zToFrontAngle = XMVector3Cross(Z_VECTOR, _currentFrontVec).m128_f32[1] > 0 ? (2 * XM_PI) - _zToFrontAngle : _zToFrontAngle;
 	_zToFrontAngle = _zToFrontAngle / XM_PI * 180.0f;
 
 	//正面ベクトルを取得・正規化
-	_frontVec = XMVectorSet(														
+	_currentFrontVec = XMVectorSet(														
 		FBXBase::_mappedMats[0].r[2].m128_f32[0],
 		FBXBase::_mappedMats[0].r[2].m128_f32[1],
 		FBXBase::_mappedMats[0].r[2].m128_f32[2],
 		0.0f
 	);
-	_frontVec = XMVector3Normalize(_frontVec);
+	_currentFrontVec = XMVector3Normalize(_currentFrontVec);
 }
 
 /// <summary>
@@ -785,7 +785,7 @@ FBXActor::EndControll()
 	//単位行列を代入し、座標や正面ベクトルを初期化
 	FBXBase::_mappedMats[0] = XMMatrixIdentity();
 	_pos = XMVectorZero();
-	_frontVec = XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
+	_currentFrontVec = XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
 
 	//角度、目的角度も初期化
 	_rotY = 0.0f;
@@ -961,7 +961,7 @@ FBXActor::SetIsInLoop(bool val)
 bool
 FBXActor::GetOnGround()const
 {
-	return _isOnGround(Collider().get(), _footVec);
+	return _isOnGround(Collider().get());
 }
 
 /// <summary>
