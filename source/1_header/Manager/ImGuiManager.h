@@ -36,6 +36,9 @@ public:
 	//アニメーション名の配列を初期化する関数
 	void ResetAnimStr();
 
+	//文字列を追加する関数
+	void AddText(int idx, const char* text);
+
 	//float型の数値を追加する関数
 	void AddLabelAndFloat(const char* label,float value);
 
@@ -53,11 +56,14 @@ private:
 	shared_ptr<FBXActor> _actor;					//アクター
 	shared_ptr<FBXObject> _ground;					//地面
 
+	//文字列
+	map<int,const char*> _texts;
+
 	//表示ラベルとfloat値
-	map<const char*, float> labelAndFloats;
+	map<const char*, float> _labelAndFloats;
 
 	//表示ラベルとbool値
-	map<const char*, bool> labelAndBools;
+	map<const char*, bool> _labelAndBools;
 
 	ComPtr<ID3D12DescriptorHeap> _heapForImgui;		//ImGui用ヒープ
 

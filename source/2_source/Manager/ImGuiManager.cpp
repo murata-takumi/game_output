@@ -165,14 +165,20 @@ ImGuiManager::ImGuiDraw()
 		ImGui::DragFloat("PlayerY", &_actor->Pos().m128_f32[1]);
 		ImGui::DragFloat("PlayerZ", &_actor->Pos().m128_f32[2]);
 
-		//追加された値を表示
-		for (auto& pair : labelAndFloats)
+		//文字列を表示
+		for (auto& pair : _texts)
+		{
+			ImGui::Text(pair.second);
+		}
+
+		//float値を表示
+		for (auto& pair : _labelAndFloats)
 		{
 			ImGui::DragFloat(pair.first, &pair.second);
 		}
 
-		//追加された値を表示
-		for (auto& pair : labelAndBools)
+		//bool値を表示
+		for (auto& pair : _labelAndBools)
 		{
 			ImGui::Checkbox(pair.first, &pair.second);
 		}
@@ -360,25 +366,36 @@ ImGuiManager::ResetAnimStr()
 }
 
 /// <summary>
-/// float値を表示する関数
+/// 文字列を追加する関数
+/// </summary>
+/// <param name="idx">インデックス</param>
+/// <param name="text">文字列</param>
+void
+ImGuiManager::AddText(int idx, const char* text)
+{
+	_texts[idx] = text;
+}
+
+/// <summary>
+/// float値を追加する関数
 /// </summary>
 /// <param name="label">変数名</param>
 /// <param name="value">値</param>
 void
 ImGuiManager::AddLabelAndFloat(const char* label, float value)
 {
-	labelAndFloats[label] = value;
+	_labelAndFloats[label] = value;
 }
 
 /// <summary>
-/// float値を表示する関数
+/// bool値を追加する関数
 /// </summary>
 /// <param name="label">変数名</param>
 /// <param name="value">値</param>
 void
 ImGuiManager::AddLabelAndBool(const char* label, bool value)
 {
-	labelAndBools[label] = value;
+	_labelAndBools[label] = value;
 }
 
 /// <summary>
