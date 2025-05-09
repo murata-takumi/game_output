@@ -57,7 +57,7 @@ private:
 	shared_ptr<FBXObject> _ground;					//地面
 
 	//文字列
-	map<int,const char*> _texts;
+	map<int,string> _texts;
 
 	//表示ラベルとfloat値
 	map<const char*, float> _labelAndFloats;

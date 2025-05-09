@@ -168,7 +168,7 @@ ImGuiManager::ImGuiDraw()
 		//•¶Žš—ñ‚ð•\Ž¦
 		for (auto& pair : _texts)
 		{
-			ImGui::Text(pair.second);
+			ImGui::Text(pair.second.c_str());
 		}
 
 		//float’l‚ð•\Ž¦
