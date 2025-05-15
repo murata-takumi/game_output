@@ -69,7 +69,7 @@ protected:
 	XMFLOAT3 _speed;
 
 	//オブジェクトの名前
-	string _name;
+	const string _name;
 
 	//当たり判定の更新からボーンの座標変換を排除するか
 	bool _rejectBone;
@@ -88,7 +88,7 @@ protected:
 
 public:
 	//コンストラクタ
-	FBXBase(const wchar_t* filePath,string name,const XMFLOAT3& size,const XMFLOAT3& pos);
+	FBXBase(const wchar_t* filePath,const string name,const XMFLOAT3& size,const XMFLOAT3& pos);
 	//デストラクタ
 	virtual ~FBXBase();													
 
@@ -109,7 +109,7 @@ public:
 	
 	XMFLOAT3 Speed()const;
 
-	string Name()const;
+	const string Name();
 
 	//ボーン変換を排除するか決める
 	void SetRejectBone(bool val);

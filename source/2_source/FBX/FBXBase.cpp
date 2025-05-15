@@ -10,7 +10,7 @@
 /// <param name="name">オブジェクトの名前</param>
 /// <param name="size">当たり判定の大きさ</param>
 /// <param name="pos">初期座標</param>
-FBXBase::FBXBase(const wchar_t* filePath, string name, const XMFLOAT3& size, const XMFLOAT3& pos)
+FBXBase::FBXBase(const wchar_t* filePath, const string name, const XMFLOAT3& size, const XMFLOAT3& pos)
 	:_motionMat(XMMatrixIdentity()), _pos(XMLoadFloat3(&pos)),_speed(XMFLOAT3(0,0,0)),_name(name), _rejectBone(true)
 {
 	//モデル関連の情報を初期化
@@ -458,8 +458,8 @@ FBXBase::Speed()const
 /// オブジェクトの名前を返す
 /// </summary>
 /// <returns>名前</returns>
-string
-FBXBase::Name()const
+const string
+FBXBase::Name()
 {
 	return _name;
 }

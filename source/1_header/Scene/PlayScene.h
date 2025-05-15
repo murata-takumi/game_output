@@ -45,6 +45,8 @@ protected:
 	//プレイヤー、カメラの進行ベクトル
 	XMVECTOR _direction;							
 
+	char* _currentFootObjName;
+
 	//オブジェクトを生成する関数
 	template<class className> void InstantiateObject(const wchar_t* path, string name,XMFLOAT3 size, XMFLOAT3 pos = XMFLOAT3(0.0f,0.0f,0.0f));												
 

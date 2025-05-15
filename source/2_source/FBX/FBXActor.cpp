@@ -32,7 +32,7 @@ const int COLLIDER_BONE = 0;
 /// コンストラクタ
 /// </summary>
 /// <param name="filePath">モデルのパス</param>
-FBXActor::FBXActor(const wchar_t* filePath, string name, XMFLOAT3 size, XMFLOAT3 pos)
+FBXActor::FBXActor(const wchar_t* filePath,const string name, XMFLOAT3 size, XMFLOAT3 pos)
 	:FBXBase(filePath, name, size, pos),
 	_crntNode(nullptr), _currentFrontVec(XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f)),
 	_canControll(false),_isInBlend(false),_isInLoop(true),
