@@ -62,9 +62,6 @@ protected:
 	//正面判定に使用
 	XMVECTOR _frontVec;
 
-	//足元判定に使用
-	XMVECTOR _footVec;
-
 	//オブジェクトの速度
 	XMFLOAT3 _speed;
 
@@ -104,8 +101,6 @@ public:
 	XMVECTOR& Pos();
 
 	XMVECTOR FrontVec()const;
-
-	XMVECTOR FootVec()const;
 	
 	XMFLOAT3 Speed()const;
 
