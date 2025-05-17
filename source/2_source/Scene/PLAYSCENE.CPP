@@ -26,7 +26,8 @@ const XMFLOAT3 ACTOR_INIT_POS = XMFLOAT3(0.0f, 0.0f, 0.0f);
 //コインの初期座標
 const XMFLOAT3 COIN_INIT_POS = XMFLOAT3(0.0f, 0.0f, 100.0f);
 //箱の初期座標
-const XMFLOAT3 BOX_INIT_POS = XMFLOAT3(200.0f, 0.0f, 0.0f);
+const XMFLOAT3 BOX_INIT_POS = XMFLOAT3(600.0f, -200.0f, 0.0f);
+//const XMFLOAT3 BOX_INIT_POS = XMFLOAT3(300.0f, 0.0f, 0.0f);
 
 //オブジェクトの名前一覧
 const string ACTOR_NAME = "Actor";
@@ -61,7 +62,11 @@ PlayScene::SceneStart()
 	Dx12Wrapper::Instance().ResetCoordinates(0,0);								
 
 	//プレイヤーの移動ベクトルを初期化
-	_direction = XMVectorZero();										
+	_direction = XMVectorZero();
+
+	_currentFootObjName = new char[100];
+
+	strcpy(_currentFootObjName, GROUND_NAME.c_str());
 
 	//モデル読み込み処理
 	auto f = [&]()
@@ -90,8 +95,8 @@ PlayScene::SceneStart()
 				_actor->_isOnGround = [&](const BoxCollider* col)
 				{
 					//OBBの中心、右、上、正面ベクトル
-					XMVECTOR center = _actorAndObjs[GROUND_NAME]->Collider()->Center();
-					XMVECTOR axis[3] = {_actorAndObjs[GROUND_NAME]->Collider()->_rightDir,_actorAndObjs[GROUND_NAME]->Collider()->_upDir,_actorAndObjs[GROUND_NAME]->Collider()->_frontDir};
+					XMVECTOR center = _actorAndObjs[_currentFootObjName]->Collider()->Center();
+					XMVECTOR axis[3] = {_actorAndObjs[_currentFootObjName]->Collider()->_rightDir,_actorAndObjs[_currentFootObjName]->Collider()->_upDir,_actorAndObjs[_currentFootObjName]->Collider()->_frontDir};
 
 					//アクターとOBBの中心を結ぶベクトル
 					XMVECTOR vecBetCenter = col->Center() - center;
@@ -112,13 +117,13 @@ PlayScene::SceneStart()
 						switch (i)
 						{
 						case 0:
-							half = _actorAndObjs[GROUND_NAME]->Collider()->HalfLength().x;
+							half = _actorAndObjs[_currentFootObjName]->Collider()->HalfLength().x;
 							break;
 						case 1:
-							half = _actorAndObjs[GROUND_NAME]->Collider()->HalfLength().y;
+							half = _actorAndObjs[_currentFootObjName]->Collider()->HalfLength().y;
 							break;
 						case 2:
-							half = _actorAndObjs[GROUND_NAME]->Collider()->HalfLength().z;
+							half = _actorAndObjs[_currentFootObjName]->Collider()->HalfLength().z;
 							break;
 						default:
 							assert(0);
@@ -193,6 +198,8 @@ PlayScene::Update()
 	//操作可能な場合入力を反映する
 	if (BaseScene::_canInput)
 	{
+		ImGuiManager::Instance().AddText(0, _currentFootObjName);
+
 		//コインとアクターが接触したらコインを削除
 		//if (_actorAndObjs[COIN_NAME] && CheckColliders(*_actorAndObjs[COIN_NAME]->Collider(), *_actor->Collider()))
 		//{
@@ -378,78 +385,71 @@ PlayScene::CheckColliders(const BoxCollider& col1, const BoxCollider& col2)
 
 	//obb1_front
 	float r = LenOnSeparateAxis(col1._frontDir, rightLen2, upLen2, frontLen2);
-	float lenBetCenter = XMVector3Dot(vecBetCenter,col1._frontDir ).m128_f32[0];
-	if (fabs(lenBetCenter) > r + col1.HalfLength().z)
+	float s = XMVector3Dot(vecBetCenter,col1._frontDir ).m128_f32[0];
+	if (fabs(s) > r + col1.HalfLength().z)
 	{
 		return false;
 	}
 
-	auto diffZ = r + col1.HalfLength().z - fabs(lenBetCenter);
-	if (lenBetCenter <= 0)
+	auto diffZ = r + col1.HalfLength().z - fabs(s);
+	if (s <= 0)
 	{
 		diffZ *= -1.0f;
 	}
 
 	//obb1_right
 	r = LenOnSeparateAxis(col1._rightDir, rightLen2, upLen2, frontLen2);
-	lenBetCenter = XMVector3Dot(vecBetCenter,col1._rightDir).m128_f32[0];
-	if (fabs(lenBetCenter) > r + col1.HalfLength().x)
+	s = XMVector3Dot(vecBetCenter,col1._rightDir).m128_f32[0];
+	if (fabs(s) > r + col1.HalfLength().x)
 	{
 		return false;
 	}
 
-	auto diffX = r + col1.HalfLength().x - fabs(lenBetCenter);
-	if (lenBetCenter <= 0)
+	auto diffX = r + col1.HalfLength().x - fabs(s);
+	if (s <= 0)
 	{
 		diffX *= -1.0f;
 	}
 
 	//obb1_up
 	r = LenOnSeparateAxis(col1._upDir, rightLen2, upLen2, frontLen2);
-	lenBetCenter = XMVector3Dot(vecBetCenter,col1._upDir).m128_f32[0];
-	if (fabs(lenBetCenter) > r + col1.HalfLength().y)
+	s = XMVector3Dot(vecBetCenter,col1._upDir).m128_f32[0];
+	if (fabs(s) > r + col1.HalfLength().y)
 	{
 		return false;
 	}
 
-	auto diffY = r + col1.HalfLength().y - fabs(lenBetCenter);
+	auto diffY = r + col1.HalfLength().y - fabs(s);
 
 	//obb2_front
 	r = LenOnSeparateAxis(col2._frontDir, rightLen1, upLen1, frontLen1);
-	lenBetCenter = fabs(XMVector3Dot(vecBetCenter,col2._frontDir).m128_f32[0]);
-	if (lenBetCenter > r + col2.HalfLength().z)
+	s = fabs(XMVector3Dot(vecBetCenter,col2._frontDir).m128_f32[0]);
+	if (s > r + col2.HalfLength().z)
 	{
 		return false;
 	}
 
 	//obb2_right
 	r = LenOnSeparateAxis(col2._rightDir, rightLen1, upLen1, frontLen1);
-	lenBetCenter = fabs(XMVector3Dot(vecBetCenter,col2._rightDir).m128_f32[0]);
-	if (lenBetCenter > r + col2.HalfLength().x)
+	s = fabs(XMVector3Dot(vecBetCenter,col2._rightDir).m128_f32[0]);
+	if (s > r + col2.HalfLength().x)
 	{
 		return false;
 	}
 
 	//obb2_up
 	r = LenOnSeparateAxis(col2._upDir, rightLen1, upLen1, frontLen1);
-	lenBetCenter = fabs(XMVector3Dot(vecBetCenter,col2._upDir).m128_f32[0]);
-	if (lenBetCenter > r + col2.HalfLength().y)
+	s = fabs(XMVector3Dot(vecBetCenter,col2._upDir).m128_f32[0]);
+	if (s > r + col2.HalfLength().y)
 	{
 		return false;
 	}
 
-	if (col1.Object().Name() == BOX_NAME)
+
+	if (!CheckColAndPoint(col1, col2.Object().FrontVec()))
 	{
-		ImGuiManager::Instance().AddLabelAndFloat("DiffX", diffX);
-		ImGuiManager::Instance().AddLabelAndFloat("DiffY", diffY);
-		ImGuiManager::Instance().AddLabelAndFloat("DiffZ", diffZ);
-
-		ImGuiManager::Instance().AddLabelAndBool("FrontVecIn", CheckColAndVecs(col1, col2));
-
-		if (!CheckColAndVecs(col1, col2))
-		{
-			return false;
-		}
+		ImGuiManager::Instance().AddLabelAndBool("FrontVecInCol", CheckColAndPoint(col1, col2.Object().FrontVec()));
+		return false;
 	}
 
 	//最小値を更新
@@ -463,12 +463,14 @@ PlayScene::CheckColliders(const BoxCollider& col1, const BoxCollider& col2)
 		min = fabs(diffZ);
 	}
 
+	//最小値の座標軸に対しめり込みを戻す処理を行う
 	if (FLT_EPSILON < fabs(diffX) && fabs(min - fabs(diffX)) < FLT_EPSILON)
 	{
 		col2.Object().Pos().m128_f32[0] -= Dx12Wrapper::Instance().GetDeltaTime() * col2.Object().Speed().x;
 	}
 	else if (FLT_EPSILON < fabs(diffY) && fabs(min - fabs(diffY)) < FLT_EPSILON)
 	{
+		strcpy(_currentFootObjName, col1.Object().Name().c_str());
 		col2.Object().Pos().m128_f32[1] -= Dx12Wrapper::Instance().GetDeltaTime() * col2.Object().Speed().y;
 	}
 	else if (FLT_EPSILON < fabs(diffZ) && fabs(min - fabs(diffZ)) < FLT_EPSILON)
@@ -479,84 +481,48 @@ PlayScene::CheckColliders(const BoxCollider& col1, const BoxCollider& col2)
 	return true;
 }
 
+
 /// <summary>
-/// OBBにベクトルが入り込んでいるか確認する関数
+/// OBBに座標が入り込んでいるか確認する関数
 /// </summary>
-/// <param name="col1"></param>
-/// <param name="col2"></param>
-/// <param name="vec"></param>
-/// <returns></returns>
+/// <param name="col">対象のOBB</param>
+/// <param name="point">座標</param>
+/// <returns>入り込んでいるかどうか</returns>
 bool 
-PlayScene::CheckColAndVecs(const BoxCollider& col1, const BoxCollider& col2)
+PlayScene::CheckColAndPoint(const BoxCollider& col, const XMVECTOR& point)
 {
-	//OBBの中心、右、上、正面ベクトル
-	XMVECTOR center = col1.Center();
-	XMVECTOR axis[3] = {col1._rightDir,col1._upDir,col1._frontDir };
+	//座標とOBBの中心を結ぶベクトルを取得
+	auto vecBetcolAndPoint = col.Center() - point;
 
-	//アクターとOBBの中心を結ぶベクトル
-	XMVECTOR vecBetCenter = col2.Center() - center;
+	//方向ベクトルからはみ出ているベクトル
+	XMVECTOR vec = XMVectorSet(0,0,0,0);
 
-	float tMin = 0.0f;
-	float tMax = FLT_MAX;
-
-	//各軸に対し行う
-	for (int i = 0; i < 3; i++)
+	//方向ベクトルに対する比率を取得し、絶対値が1より大きければ（=はみ出ていたら）距離に加算
+	float s = XMVector3Dot(vecBetcolAndPoint, col._rightDir).m128_f32[0] / col.HalfLength().x;
+	if (fabs(s) > 1)
 	{
-		//中心間ベクトルの軸への投影
-		float e = fabs(XMVector3Dot(axis[i], vecBetCenter).m128_f32[0]) * -1;
-		//足元ベクトルの軸への投影
-		float f = fabs(XMVector3Dot(axis[i], col2.Object().FrontVec()).m128_f32[0]) * -1;
-
-		float half = 0;
-
-		switch (i)
-		{
-		case 0:
-			half =col1.HalfLength().x;
-			break;
-		case 1:
-			half =col1.HalfLength().y;
-			break;
-		case 2:
-			half =col1.HalfLength().z;
-			break;
-		default:
-			assert(0);
-			break;
-		}
-
-		//ベクトルと軸ベクトルが並行でない場合
-		if (fabs(f) > FLT_EPSILON) {
-			//これはOBBと足元ベクトルの最初の交差座標
-			float t1 = (e + (half - f));
-			//こちらはOBBと足元ベクトルの最後の交差座標
-			float t2 = (e - (half - f));
-			//和が差より大きければ入れ替える
-			if (t1 > t2)
-			{
-				std::swap(t1, t2);
-			}
-			//比較し、最小値を更新
-			tMin = max(tMin, t1);
-			//最大値も更新
-			tMax = min(tMax, t2);
-			//最小値が最大値を上回ってしまったら接してない
-			if (tMin > tMax)
-			{
-				return false;
-			}
-		}
-		//足元ベクトルと軸ベクトルが並行な場合
-		else {
-			//負の中心間投影とOBB半分長さの差が0より大きいか負の中心間投影とOBB半分長さの和が0より小さければ接してない
-			if (-e - half > 0.0f || -e + half < 0.0f)
-			{
-				return false;
-			}
-		}
+		vec += (1 - fabs(s)) * col.HalfLength().x * col._rightDir;
 	}
 
-	return true;
+	s = XMVector3Dot(vecBetcolAndPoint, col._upDir).m128_f32[0] / col.HalfLength().y;
+	if (fabs(s) > 1)
+	{
+		vec += (1 - fabs(s)) * col.HalfLength().y * col._upDir;
+	}
+
+	s = XMVector3Dot(vecBetcolAndPoint, col._frontDir).m128_f32[0] / col.HalfLength().z;
+	if (fabs(s) > 1)
+	{
+		vec += (1 - fabs(s)) * col.HalfLength().z * col._frontDir;
+	}
+
+	//距離が0以下だったらOBBの中に座標が入り込んでいる
+	if (XMVector3Length(vec).m128_f32[0] <= 0)
+	{
+		return true;
+	}
+
+	return false;
 }
 
 /// <summary>

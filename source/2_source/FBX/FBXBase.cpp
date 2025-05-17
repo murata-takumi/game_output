@@ -398,7 +398,7 @@ FBXBase::Update()
 	XMMatrixDecompose(&scale, &skew, &trans,FBXBase::_mappedMats[0]);
 
 	_frontVec = XMVectorSet(0, 0, _collider->HalfLength().z, 0);
-	_frontVec = XMVector3Transform(_frontVec, XMMatrixRotationQuaternion(skew));
+	_frontVec = XMVector3Transform(_frontVec, FBXBase::_mappedMats[0]);
 
 	//‘«Œ³ƒxƒNƒgƒ‹‚àİ’è
 	_footVec = XMVectorSet(0, -1.0f, 0, 0);
