@@ -64,8 +64,8 @@ PlayScene::SceneStart()
 	//プレイヤーの移動ベクトルを初期化
 	_direction = XMVectorZero();
 
+	//乗る対象となるオブジェクトの名前も初期化
 	_currentFootObjName = new char[100];
-
 	strcpy(_currentFootObjName, GROUND_NAME.c_str());
 
 	//モデル読み込み処理
@@ -92,76 +92,12 @@ PlayScene::SceneStart()
 			if (_actor = dynamic_pointer_cast<FBXActor>(object.second))
 			{
 				//コールバックを設定
-				_actor->_isOnGround = [&](const BoxCollider* col)
+				_actor->_isOnGround = [&](const XMVECTOR& vec)
 				{
-					//OBBの中心、右、上、正面ベクトル
-					XMVECTOR center = _actorAndObjs[_currentFootObjName]->Collider()->Center();
-					XMVECTOR axis[3] = {_actorAndObjs[_currentFootObjName]->Collider()->_rightDir,_actorAndObjs[_currentFootObjName]->Collider()->_upDir,_actorAndObjs[_currentFootObjName]->Collider()->_frontDir};
-
-					//アクターとOBBの中心を結ぶベクトル
-					XMVECTOR vecBetCenter = col->Center() - center;
-
-					float tMin = 0.0f;
-					float tMax = FLT_MAX;
-
-					//各軸に対し行う
-					for (int i = 0; i < 3; i++)
-					{
-						//中心間ベクトルの軸への投影
-						float e = XMVector3Dot(axis[i], vecBetCenter).m128_f32[0];
-						//足元ベクトルの軸への投影
-						float f = XMVector3Dot(axis[i], col->Object().FootVec()).m128_f32[0];
-
-						float half = 0;
-
-						switch (i)
-						{
-						case 0:
-							half = _actorAndObjs[_currentFootObjName]->Collider()->HalfLength().x;
-							break;
-						case 1:
-							half = _actorAndObjs[_currentFootObjName]->Collider()->HalfLength().y;
-							break;
-						case 2:
-							half = _actorAndObjs[_currentFootObjName]->Collider()->HalfLength().z;
-							break;
-						default:
-							assert(0);
-							break;
-						}
-
-						//足元ベクトルと軸ベクトルが並行でない場合
-						if (fabs(f) > FLT_EPSILON) {
-							//これはOBBと足元ベクトルの最初の交差座標
-							float t1 = (e + half);
-							//こちらはOBBと足元ベクトルの最後の交差座標
-							float t2 = (e - half);
-							//和が差より大きければ入れ替える
-							if (t1 > t2)
-							{
-								std::swap(t1, t2);
-							}
-							//比較し、最小値を更新
-							tMin = max(tMin, t1);
-							//最大値も更新
-							tMax = min(tMax, t2);
-							//最小値が最大値を上回ってしまったら接してない
-							if (tMin > tMax)
-							{
-								return false;
-							}
-						}
-						//足元ベクトルと軸ベクトルが並行な場合
-						else {
-							//負の中心間投影とOBB半分長さの差が0より大きいか負の中心間投影とOBB半分長さの和が0より小さければ接してない
-							if (-e - half > 0.0f || -e + half < 0.0f)
-							{
-								return false;
-							}
-						}
-					}
-
-					return true;
+					return CheckColAndPoint(
+						*_actorAndObjs[_currentFootObjName]->Collider().get(),
+						vec
+					);
 				};
 				break;
 			}

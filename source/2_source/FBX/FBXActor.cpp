@@ -702,9 +702,9 @@ FBXActor::Update()
 	//前フレームの時間を更新
 	_befFrameTime = _currFrameTime;
 
-	ImGuiManager::Instance().AddLabelAndFloat("SpeedX", FBXBase::_speed.x);
-	ImGuiManager::Instance().AddLabelAndFloat("SpeedY", FBXBase::_speed.y);
-	ImGuiManager::Instance().AddLabelAndFloat("SpeedZ", FBXBase::_speed.z);
+	ImGuiManager::Instance().AddLabelAndFloat("FrontX", FBXBase::_frontVec.m128_f32[0]);
+	ImGuiManager::Instance().AddLabelAndFloat("FrontY", FBXBase::_frontVec.m128_f32[1]);
+	ImGuiManager::Instance().AddLabelAndFloat("FrontZ", FBXBase::_frontVec.m128_f32[2]);
 }
 
 /// <summary>
@@ -961,7 +961,7 @@ FBXActor::SetIsInLoop(bool val)
 bool
 FBXActor::GetOnGround()const
 {
-	return _isOnGround(Collider().get());
+	return _isOnGround(FootVec());
 }
 
 /// <summary>
