@@ -26,8 +26,8 @@ const XMFLOAT3 ACTOR_INIT_POS = XMFLOAT3(0.0f, 0.0f, 0.0f);
 //コインの初期座標
 const XMFLOAT3 COIN_INIT_POS = XMFLOAT3(0.0f, 0.0f, 100.0f);
 //箱の初期座標
-const XMFLOAT3 BOX_INIT_POS = XMFLOAT3(600.0f, -200.0f, 0.0f);
-//const XMFLOAT3 BOX_INIT_POS = XMFLOAT3(300.0f, 0.0f, 0.0f);
+//const XMFLOAT3 BOX_INIT_POS = XMFLOAT3(600.0f, -200.0f, 0.0f);
+const XMFLOAT3 BOX_INIT_POS = XMFLOAT3(300.0f, 0.0f, 0.0f);
 
 //オブジェクトの名前一覧
 const string ACTOR_NAME = "Actor";

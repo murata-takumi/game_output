@@ -1,4 +1,5 @@
 #pragma once
+#include "Collider/CollisionDetector.h"
 #include "FBX/AnimNodes/Animations.h"
 #include "FBX/AnimNodes/AnimNode.h"
 #include "FBX/FBXBase.h"

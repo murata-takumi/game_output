@@ -1,6 +1,6 @@
 #include "Functions.h"
+#include "Collider/BoxCollider2D.h"
 #include "FBX/FBXActor.h"
-#include "FBX/BoxCollider2D.h"
 #include "Manager/InputManager.h"
 #include "Manager/SpriteManager.h"
 #include "Package/Package.h"
@@ -503,7 +503,14 @@ SpriteManager::GridDraw(const map<string, shared_ptr<FBXBase>> actorAndObjs)
 	//当たり判定を持つオブジェクトが存在したら当たり判定の描画
 	for (const auto& actor : actorAndObjs)
 	{
-		if (actor.second != nullptr)ColliderDraw(actor.second->Collider());
+		if (actor.second != nullptr)
+		{
+			ColliderDraw(actor.second->Collider());
+			//X軸のグリッドの描画
+			v1 = VertexPositionColor(RightPosToLeftPos(actor.second->Pos()), {1.0f,0.0f,0.0f,.10f});
+			v2 = VertexPositionColor(RightPosToLeftPos(actor.second->Collider()->Center()), {1.0f,0.0f,0.0f,.10f});
+			_batch->DrawLine(v1, v2);
+		}
 	}
 
 	//描画終了

@@ -1,9 +1,9 @@
 #pragma once
 #include "Application.h"
 
+#include "Collider/BoxCollider.h"
+#include "Collider/CollisionDetector.h"
 #include "FBX/AssimpLoader.h"
-#include "FBX/CollisionDetector.h"
-#include "FBX/BoxCollider.h"
 #include "FBX/FBXActor.h"
 #include "FBX/FBXBase.h"
 #include "FBX/FBXObject.h"

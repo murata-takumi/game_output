@@ -399,6 +399,9 @@ FBXBase::Update()
 
 	_frontVec = XMVectorSet(0, 0, _collider->HalfLength().z, 0);
 	_frontVec = XMVector3Transform(_frontVec, FBXBase::_mappedMats[0]);
+
+	_footVec = XMVectorSet(0, -1 * (_collider->HalfLength().y + 65.0f), 0, 0);
+	_footVec = XMVector3Transform(_footVec, _motionMat * FBXBase::_mappedMats[0]);
 }
 
 /// <summary>
@@ -429,6 +432,16 @@ XMVECTOR
 FBXBase::FrontVec()const
 {
 	return _frontVec;
+}
+
+/// <summary>
+/// 足元ベクトルを返す
+/// </summary>
+/// <returns>足元ベクトル</returns>
+XMVECTOR
+FBXBase::FootVec()const
+{
+	return _footVec;
 }
 
 /// <summary>

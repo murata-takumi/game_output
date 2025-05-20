@@ -73,6 +73,7 @@ FBXActor::FBXActor(const wchar_t* filePath,const string name, XMFLOAT3 size, XMF
 			}
 			else
 			{
+				//落下アニメーション
 				nextAnimName = FALL;
 			}
 

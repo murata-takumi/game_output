@@ -1,7 +1,7 @@
 #pragma once
 #include "Application.h"
+#include "Collider/BoxCollider.h"
 #include "FBX/AssimpLoader.h"
-#include "FBX/BoxCollider.h"
 #include "Manager/ImGuiManager.h"
 
 /// <summary>
@@ -61,6 +61,9 @@ protected:
 
 	//正面判定に使用
 	XMVECTOR _frontVec;
+	
+	//ジャンプ後のアニメーション遷移に使用
+	XMVECTOR _footVec;
 
 	//オブジェクトの速度
 	XMFLOAT3 _speed;
@@ -101,6 +104,8 @@ public:
 	XMVECTOR& Pos();
 
 	XMVECTOR FrontVec()const;
+
+	XMVECTOR FootVec()const;
 	
 	XMFLOAT3 Speed()const;
 
