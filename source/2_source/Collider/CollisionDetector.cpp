@@ -1,4 +1,4 @@
-#include "FBX/CollisionDetector.h"
+#include "Collider/CollisionDetector.h"
 
 /// <summary>
 /// ƒVƒ“ƒOƒ‹ƒgƒ“‚ð•Ô‚·
@@ -91,11 +91,6 @@ CollisionDetector::CheckColAndCol(const BoxCollider& col1, const BoxCollider& co
 	r = LenOnSeparateAxis(col2._upDir, rightLen1, upLen1, frontLen1);
 	s = fabs(XMVector3Dot(vecBetCenter, col2._upDir).m128_f32[0]);
 	if (s > r + col2.HalfLength().y)
-	{
-		return false;
-	}
-
-	if (!CheckColAndPoint(col1, col2.Object().FrontVec()))
 	{
 		return false;
 	}

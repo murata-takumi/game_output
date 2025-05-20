@@ -1,4 +1,4 @@
-#include "FBX/BoxCollider2D.h"
+#include "Collider/BoxCollider2D.h"
 
 /// <summary>
 /// コンストラクタ

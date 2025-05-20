@@ -20,12 +20,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="1_header\Application.h" />
+    <ClInclude Include="1_header\Collider\BoxCollider.h" />
+    <ClInclude Include="1_header\Collider\BoxCollider2D.h" />
+    <ClInclude Include="1_header\Collider\CollisionDetector.h" />
     <ClInclude Include="1_header\FBX\AnimNodes\Animations.h" />
     <ClInclude Include="1_header\FBX\AnimNodes\AnimNode.h" />
     <ClInclude Include="1_header\FBX\AssimpLoader.h" />
-    <ClInclude Include="1_header\FBX\BoxCollider.h" />
-    <ClInclude Include="1_header\FBX\BoxCollider2D.h" />
-    <ClInclude Include="1_header\FBX\CollisionDetector.h" />
     <ClInclude Include="1_header\FBX\FBXActor.h" />
     <ClInclude Include="1_header\FBX\FBXBase.h" />
     <ClInclude Include="1_header\FBX\FBXObject.h" />
@@ -48,11 +48,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="2_source\Application.cpp" />
+    <ClCompile Include="2_source\Collider\BoxCollider.cpp" />
+    <ClCompile Include="2_source\Collider\BoxCollider2D.cpp" />
+    <ClCompile Include="2_source\Collider\CollisionDetector.cpp" />
     <ClCompile Include="2_source\FBX\AnimNodes\AnimNode.cpp" />
     <ClCompile Include="2_source\FBX\AssimpLoader.cpp" />
-    <ClCompile Include="2_source\FBX\BoxCollider.cpp" />
-    <ClCompile Include="2_source\FBX\BoxCollider2D.cpp" />
-    <ClCompile Include="2_source\FBX\CollisionDetector.cpp" />
     <ClCompile Include="2_source\FBX\FBXActor.cpp" />
     <ClCompile Include="2_source\FBX\FBXBase.cpp" />
     <ClCompile Include="2_source\FBX\FBXObject.cpp" />

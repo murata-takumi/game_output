@@ -1,7 +1,7 @@
 #pragma once
 #include "Application.h"
 
-#include "FBX/BoxCollider.h"
+#include "Collider/BoxCollider.h"
 #include "FBX/FBXActor.h"
 #include "FBX/FBXBase.h"
 #include "FBX/FBXObject.h"

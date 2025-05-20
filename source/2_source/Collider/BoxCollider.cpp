@@ -1,5 +1,5 @@
 #pragma once
-#include "FBX/BoxCollider.h"
+#include "Collider/BoxCollider.h"
 #include "FBX/FBXBase.h"
 #include "Includes.h"
 

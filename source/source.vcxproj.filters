@@ -58,6 +58,12 @@
     <Filter Include="2_source\FBX\AnimNodes">
       <UniqueIdentifier>{7a03f491-5709-4282-8078-1b888dfb9408}</UniqueIdentifier>
     </Filter>
+    <Filter Include="1_header\Collider">
+      <UniqueIdentifier>{98d9ef17-73f2-480a-9cb6-acaa774b786b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="2_source\Collider">
+      <UniqueIdentifier>{9ebdf3cf-671b-42e1-8a64-28d529208d4c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="1_header\Functions.h">
@@ -114,9 +120,6 @@
     <ClInclude Include="1_header\FBX\FBXObject.h">
       <Filter>1_header\FBX</Filter>
     </ClInclude>
-    <ClInclude Include="1_header\FBX\BoxCollider.h">
-      <Filter>1_header\FBX</Filter>
-    </ClInclude>
     <ClInclude Include="1_header\FBX\AnimNodes\Animations.h">
       <Filter>1_header\FBX\AnimNodes</Filter>
     </ClInclude>
@@ -129,14 +132,17 @@
     <ClInclude Include="1_header\Scene\BaseScene.h">
       <Filter>1_header\Scene</Filter>
     </ClInclude>
-    <ClInclude Include="1_header\FBX\BoxCollider2D.h">
-      <Filter>1_header\FBX</Filter>
-    </ClInclude>
     <ClInclude Include="1_header\FBX\AnimNodes\AnimNode.h">
       <Filter>1_header\FBX\AnimNodes</Filter>
     </ClInclude>
-    <ClInclude Include="1_header\FBX\CollisionDetector.h">
-      <Filter>1_header\FBX</Filter>
+    <ClInclude Include="1_header\Collider\BoxCollider.h">
+      <Filter>1_header\Collider</Filter>
+    </ClInclude>
+    <ClInclude Include="1_header\Collider\BoxCollider2D.h">
+      <Filter>1_header\Collider</Filter>
+    </ClInclude>
+    <ClInclude Include="1_header\Collider\CollisionDetector.h">
+      <Filter>1_header\Collider</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -194,9 +200,6 @@
     <ClCompile Include="2_source\FBX\FBXObject.cpp">
       <Filter>2_source\FBX</Filter>
     </ClCompile>
-    <ClCompile Include="2_source\FBX\BoxCollider.cpp">
-      <Filter>2_source\FBX</Filter>
-    </ClCompile>
     <ClCompile Include="2_source\FBX\AnimNodes\AnimNode.cpp">
       <Filter>2_source\FBX\AnimNodes</Filter>
     </ClCompile>
@@ -206,11 +209,14 @@
     <ClCompile Include="2_source\Scene\BaseScene.cpp">
       <Filter>2_source\Scene</Filter>
     </ClCompile>
-    <ClCompile Include="2_source\FBX\BoxCollider2D.cpp">
-      <Filter>2_source\FBX</Filter>
+    <ClCompile Include="2_source\Collider\BoxCollider.cpp">
+      <Filter>2_source\Collider</Filter>
     </ClCompile>
-    <ClCompile Include="2_source\FBX\CollisionDetector.cpp">
-      <Filter>2_source\FBX</Filter>
+    <ClCompile Include="2_source\Collider\BoxCollider2D.cpp">
+      <Filter>2_source\Collider</Filter>
+    </ClCompile>
+    <ClCompile Include="2_source\Collider\CollisionDetector.cpp">
+      <Filter>2_source\Collider</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
