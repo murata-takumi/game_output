@@ -28,9 +28,7 @@ public:
 	void ImGuiDraw();												
 
 	//PlaySceneから受け取ったデータを反映する関数
-	void SetFPS(float fps);											
-	//アクターと地面の座標ごとの真理値の当たり判定を受け取る
-	void SetActorColBool(bool intersects[]);
+	void SetFPS(float fps);
 	//アクターを受け取る関数
 	void SetActor(const map<string, shared_ptr<FBXBase>> actorAndObjs);
 	//アニメーション名の配列を初期化する関数

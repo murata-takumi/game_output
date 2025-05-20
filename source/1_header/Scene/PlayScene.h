@@ -2,6 +2,7 @@
 #include "Application.h"
 
 #include "FBX/AssimpLoader.h"
+#include "FBX/CollisionDetector.h"
 #include "FBX/BoxCollider.h"
 #include "FBX/FBXActor.h"
 #include "FBX/FBXBase.h"
@@ -49,15 +50,6 @@ protected:
 
 	//オブジェクトを生成する関数
 	template<class className> void InstantiateObject(const wchar_t* path, string name,XMFLOAT3 size, XMFLOAT3 pos = XMFLOAT3(0.0f,0.0f,0.0f));												
-
-	//OBB同士の当たり判定を確認する関数
-	bool CheckColliders(const BoxCollider& col1, const BoxCollider& col2);
-
-	//OBBにベクトルが入っているか確認する関数
-	bool CheckColAndPoint(const BoxCollider& col, const XMVECTOR& point);
-
-	//分離軸に投影された線分の長さを取得する
-	float LenOnSeparateAxis(const XMVECTOR& sep, const XMVECTOR& right, const XMVECTOR& up, const XMVECTOR& front = XMVectorZero());
 
 	//モデル描画処理
 	void ModelDraw() override;												

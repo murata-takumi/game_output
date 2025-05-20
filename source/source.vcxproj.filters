@@ -135,6 +135,9 @@
     <ClInclude Include="1_header\FBX\AnimNodes\AnimNode.h">
       <Filter>1_header\FBX\AnimNodes</Filter>
     </ClInclude>
+    <ClInclude Include="1_header\FBX\CollisionDetector.h">
+      <Filter>1_header\FBX</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="2_source\Application.cpp">
@@ -204,6 +207,9 @@
       <Filter>2_source\Scene</Filter>
     </ClCompile>
     <ClCompile Include="2_source\FBX\BoxCollider2D.cpp">
+      <Filter>2_source\FBX</Filter>
+    </ClCompile>
+    <ClCompile Include="2_source\FBX\CollisionDetector.cpp">
       <Filter>2_source\FBX</Filter>
     </ClCompile>
   </ItemGroup>

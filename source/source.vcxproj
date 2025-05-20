@@ -25,6 +25,7 @@
     <ClInclude Include="1_header\FBX\AssimpLoader.h" />
     <ClInclude Include="1_header\FBX\BoxCollider.h" />
     <ClInclude Include="1_header\FBX\BoxCollider2D.h" />
+    <ClInclude Include="1_header\FBX\CollisionDetector.h" />
     <ClInclude Include="1_header\FBX\FBXActor.h" />
     <ClInclude Include="1_header\FBX\FBXBase.h" />
     <ClInclude Include="1_header\FBX\FBXObject.h" />
@@ -51,6 +52,7 @@
     <ClCompile Include="2_source\FBX\AssimpLoader.cpp" />
     <ClCompile Include="2_source\FBX\BoxCollider.cpp" />
     <ClCompile Include="2_source\FBX\BoxCollider2D.cpp" />
+    <ClCompile Include="2_source\FBX\CollisionDetector.cpp" />
     <ClCompile Include="2_source\FBX\FBXActor.cpp" />
     <ClCompile Include="2_source\FBX\FBXBase.cpp" />
     <ClCompile Include="2_source\FBX\FBXObject.cpp" />
