@@ -1,0 +1,43 @@
+#pragma once
+#include "Application.h"
+#include "FBX/FBXObject.h"
+#include "OcTree/Bounds.h"
+
+/// <summary>
+/// 八分木を構成するノード
+/// </summary>
+class OcTreeNode
+{
+public:
+	//コンストラクタ
+	OcTreeNode(Bounds bounds, int capacity);
+	//デストラクタ
+	~OcTreeNode();
+
+	//オブジェクトを追加する関数
+	bool AddObject(const shared_ptr<FBXObject> obj);
+
+	//空間を分割する関数
+	void SubDivide();
+
+	//子ノードに分割する関数
+	void AddToChild(vector<shared_ptr<FBXObject>> objs);
+
+	//クエリ範囲にあるオブジェクトを取得する関数
+	vector<shared_ptr<FBXObject>> Get(Bounds bounds);
+private:
+	//管理する空間
+	Bounds _bounds;
+
+	//子ノード
+	vector<OcTreeNode> _children;
+
+	//格納するオブジェクト
+	vector<shared_ptr<FBXObject>> _objs;
+
+	//容量
+	int _capacity;
+
+	//1ならそのまま、0なら-1を返す関数
+	int Convert(int x);
+};

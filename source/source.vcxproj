@@ -36,6 +36,9 @@
     <ClInclude Include="1_header\Manager\InputManager.h" />
     <ClInclude Include="1_header\Manager\SoundManager.h" />
     <ClInclude Include="1_header\Manager\SpriteManager.h" />
+    <ClInclude Include="1_header\OcTree\Bounds.h" />
+    <ClInclude Include="1_header\OcTree\OcTree.h" />
+    <ClInclude Include="1_header\OcTree\OcTreeNode.h" />
     <ClInclude Include="1_header\Package\MemoryMappedFile.h" />
     <ClInclude Include="1_header\Package\Package.h" />
     <ClInclude Include="1_header\Renderer\PeraRenderer.h" />
@@ -62,6 +65,9 @@
     <ClCompile Include="2_source\Manager\InputManager.cpp" />
     <ClCompile Include="2_source\Manager\SoundManager.cpp" />
     <ClCompile Include="2_source\Manager\SpriteManager.cpp" />
+    <ClCompile Include="2_source\OcTree\Bounds.cpp" />
+    <ClCompile Include="2_source\OcTree\OcTree.cpp" />
+    <ClCompile Include="2_source\OcTree\OcTreeNode.cpp" />
     <ClCompile Include="2_source\Package\MemoryMappedFile.cpp" />
     <ClCompile Include="2_source\Package\Package.cpp" />
     <ClCompile Include="2_source\Renderer\PeraRenderer.cpp" />

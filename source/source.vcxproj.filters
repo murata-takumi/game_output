@@ -64,6 +64,12 @@
     <Filter Include="2_source\Collider">
       <UniqueIdentifier>{9ebdf3cf-671b-42e1-8a64-28d529208d4c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="1_header\OcTree">
+      <UniqueIdentifier>{77d4d597-9a0d-462a-9d36-da476263c6ee}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="2_source\OcTree">
+      <UniqueIdentifier>{e1783631-d363-4fd4-88b0-111fc8a95d42}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="1_header\Functions.h">
@@ -144,6 +150,15 @@
     <ClInclude Include="1_header\Collider\CollisionDetector.h">
       <Filter>1_header\Collider</Filter>
     </ClInclude>
+    <ClInclude Include="1_header\OcTree\OcTreeNode.h">
+      <Filter>1_header\OcTree</Filter>
+    </ClInclude>
+    <ClInclude Include="1_header\OcTree\OcTree.h">
+      <Filter>1_header\OcTree</Filter>
+    </ClInclude>
+    <ClInclude Include="1_header\OcTree\Bounds.h">
+      <Filter>1_header\OcTree</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="2_source\Application.cpp">
@@ -217,6 +232,15 @@
     </ClCompile>
     <ClCompile Include="2_source\Collider\CollisionDetector.cpp">
       <Filter>2_source\Collider</Filter>
+    </ClCompile>
+    <ClCompile Include="2_source\OcTree\OcTreeNode.cpp">
+      <Filter>2_source\OcTree</Filter>
+    </ClCompile>
+    <ClCompile Include="2_source\OcTree\OcTree.cpp">
+      <Filter>2_source\OcTree</Filter>
+    </ClCompile>
+    <ClCompile Include="2_source\OcTree\Bounds.cpp">
+      <Filter>2_source\OcTree</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
