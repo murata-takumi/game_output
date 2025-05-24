@@ -159,6 +159,9 @@
     <ClInclude Include="1_header\OcTree\Bounds.h">
       <Filter>1_header\OcTree</Filter>
     </ClInclude>
+    <ClInclude Include="1_header\Vector3.h">
+      <Filter>1_header</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="2_source\Application.cpp">

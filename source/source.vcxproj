@@ -46,6 +46,7 @@
     <ClInclude Include="1_header\Scene\BaseScene.h" />
     <ClInclude Include="1_header\Scene\PlayScene.h" />
     <ClInclude Include="1_header\Scene\TitleScene.h" />
+    <ClInclude Include="1_header\Vector3.h" />
     <ClInclude Include="1_header\Wrapper\Dx12Wrapper.h" />
     <ClInclude Include="1_header\Wrapper\SphericalCoordinates.h" />
   </ItemGroup>
