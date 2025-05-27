@@ -1,5 +1,7 @@
 #pragma once
 #include "Application.h"
+#include "Vector3.h"
+
 #include "Collider/BoxCollider.h"
 #include "FBX/AssimpLoader.h"
 #include "Manager/ImGuiManager.h"
@@ -57,13 +59,13 @@ protected:
 	vector<FBXVertex> _normals;
 
 	//座標
-	XMVECTOR _pos;
+	Vector3 _pos;
 
 	//正面判定に使用
-	XMVECTOR _frontVec;
+	Vector3 _frontVec;
 	
 	//ジャンプ後のアニメーション遷移に使用
-	XMVECTOR _footVec;
+	Vector3 _footVec;
 
 	//オブジェクトの速度
 	XMFLOAT3 _speed;
@@ -101,11 +103,11 @@ public:
 	//当たり判定のポインタを返す関数
 	shared_ptr<BoxCollider>Collider()const;		
 
-	XMVECTOR& Pos();
+	Vector3& Pos();
 
-	XMVECTOR FrontVec()const;
+	Vector3 FrontVec()const;
 
-	XMVECTOR FootVec()const;
+	Vector3 FootVec()const;
 	
 	XMFLOAT3 Speed()const;
 

@@ -11,22 +11,47 @@ private:
 	XMFLOAT3 _data;
 
 public:
-	//コンストラクタ、渡されたデータの型に応じて処理を変える
+
 	Vector3()
-	{
-		_data = XMFLOAT3(0, 0, 0);
-	}
-	Vector3(float x, float y, float z)
-	{
-		_data = XMFLOAT3(x, y, z);
-	}
+		:_data(XMFLOAT3(0,0,0))
+	{}
+	Vector3(float fx, float fy, float fz)
+		:_data(XMFLOAT3(fx, fy, fz))
+	{}
+	Vector3(const Vector3& vec3)
+		:_data(vec3)
+	{}
 	Vector3(const XMFLOAT3& f)
+		: _data(f)
+	{}
+	Vector3(const XMVECTOR& v)
+		: _data(XMFLOAT3(v.m128_f32[0], v.m128_f32[1], v.m128_f32[2]))
+	{}
+
+	float& X()
 	{
-		_data = f;
+		return _data.x;
 	}
-	Vector3(const XMVECTOR& vec)
+	float& Y()
 	{
-		XMStoreFloat3(&_data,vec);
+		return _data.y;
+	}
+	float& Z()
+	{
+		return _data.z;
+	}
+
+	const float& X()const
+	{
+		return _data.x;
+	}
+	const float& Y()const
+	{
+		return _data.y;
+	}
+	const float& Z()const
+	{
+		return _data.z;
 	}
 
 	operator XMFLOAT3() const
@@ -39,29 +64,52 @@ public:
 		return XMLoadFloat3(&_data);
 	}
 
-	Vector3& operator =(XMVECTOR other)
+	float& operator[](const int& idx)
 	{
-		_data.x = other.m128_f32[0];
-		_data.y = other.m128_f32[1];
-		_data.z = other.m128_f32[2];
+		return XMLoadFloat3(&_data).m128_f32[idx];
+	}
+
+	XMVECTOR* operator&()
+	{
+		XMVECTOR ret = XMLoadFloat3(&_data);
+		return &ret;
+	}
+
+	Vector3& operator=(const Vector3& other)
+	{
+		_data = other._data;
 
 		return *this;
 	}
 
-	Vector3& operator=(XMFLOAT3 other)
+	Vector3& operator=(const XMVECTOR& other)
 	{
-		_data.x = other.x;
-		_data.y = other.y;
-		_data.z = other.z;
+		XMStoreFloat3(&_data, other);
 
 		return *this;
 	}
 
-	Vector3& operator+=(XMVECTOR other)
+	Vector3& operator=(const XMFLOAT3& other)
+	{
+		_data = other;
+
+		return *this;
+	}
+
+	Vector3& operator+=(const XMVECTOR& other)
 	{
 		_data.x += other.m128_f32[0];
 		_data.y += other.m128_f32[1];
 		_data.z += other.m128_f32[2];
+
+		return *this;
+	}
+
+	Vector3& operator*=(const float& other)
+	{
+		_data.x *= other;
+		_data.y *= other;
+		_data.z *= other;
 
 		return *this;
 	}

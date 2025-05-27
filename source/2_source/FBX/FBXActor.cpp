@@ -448,7 +448,7 @@ FBXActor::CalcInterpolatedScaling(float animationTime, const aiNodeAnim* nodeAni
 	}
 
 	////aiVector3DからXMVectorへ変換し、更にXMMatrixに変換
-	XMVECTOR scaling(XMVectorSet(tempVec.x, tempVec.y, tempVec.z, 0));
+	Vector3 scaling(XMVectorSet(tempVec.x, tempVec.y, tempVec.z, 0));
 	XMMATRIX ret = XMMatrixScalingFromVector(scaling);
 
 	return ret;
@@ -557,7 +557,7 @@ FBXActor::CalcInterpolatedPosition(float animationTime, const aiNodeAnim* nodeAn
 		tempPos = start + factor * delta;
 	}
 	//aiVector3DからXMVectorに変換し、その後XMMatrixに変換
-	XMVECTOR translation(XMVectorSet(tempPos.x, tempPos.y, tempPos.z, 0));			
+	Vector3 translation(XMVectorSet(tempPos.x, tempPos.y, tempPos.z, 0));			
 	XMMATRIX ret = XMMatrixTranslationFromVector(translation);
 
 	return ret;
@@ -676,7 +676,7 @@ FBXActor::Update()
 		//地面の上にいなかったら落下処理
 		if (!GetOnGround() && !IsAnimationEqual(JUMP00))
 		{
-			_pos.m128_f32[1] -= Dx12Wrapper::Instance().GetDeltaTime() * 45.0f * GRAVITY_ACCERALATION;
+			_pos.Y() -= Dx12Wrapper::Instance().GetDeltaTime() * 45.0f * GRAVITY_ACCERALATION;
 			FBXBase::_speed.y = -45.0f * GRAVITY_ACCERALATION;
 			SetAnimationNode(FALL);
 		}
@@ -709,7 +709,7 @@ FBXActor::Update()
 /// </summary>
 /// <param name="input">入力ベクトル</param>
 void
-FBXActor::Translate(const XMVECTOR& input)
+FBXActor::Translate(const Vector3& input)
 {
 	//入力されているかどうかに応じて再生するアニメーションを決める
 	if (XMVector3Length(input).m128_f32[0] > 0.0f)
@@ -728,8 +728,8 @@ FBXActor::Translate(const XMVECTOR& input)
 	//座標に入力に応じたベクトルを加算
 	_pos += input * Dx12Wrapper::Instance().GetDeltaTime() * MOVE_SPEED;
 
-	FBXBase::_speed.x = input.m128_f32[0] * MOVE_SPEED;
-	FBXBase::_speed.z = input.m128_f32[2] * MOVE_SPEED;
+	FBXBase::_speed.x = input.X() * MOVE_SPEED;
+	FBXBase::_speed.z = input.Z() * MOVE_SPEED;
 
 	//入力ベクトルと正面ベクトルの角度差を取得
 	auto diff = XMVector3AngleBetweenVectors(input, _currentFrontVec).m128_f32[0];			
@@ -751,9 +751,9 @@ FBXActor::Translate(const XMVECTOR& input)
 
 	//正面ベクトルを取得・正規化
 	_currentFrontVec = XMVectorSet(														
-		FBXBase::_mappedMats[0].r[2].m128_f32[0],
-		FBXBase::_mappedMats[0].r[2].m128_f32[1],
-		FBXBase::_mappedMats[0].r[2].m128_f32[2],
+		Vector3(FBXBase::_mappedMats[0].r[2]).X(),
+		Vector3(FBXBase::_mappedMats[0].r[2]).Y(),
+		Vector3(FBXBase::_mappedMats[0].r[2]).Z(),
 		0.0f
 	);
 	_currentFrontVec = XMVector3Normalize(_currentFrontVec);

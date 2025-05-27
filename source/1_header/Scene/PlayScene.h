@@ -1,5 +1,6 @@
 #pragma once
 #include "Application.h"
+#include "Vector3.h"
 
 #include "Collider/BoxCollider.h"
 #include "Collider/CollisionDetector.h"
@@ -44,12 +45,12 @@ protected:
 	vector<thread> _ths;
 
 	//プレイヤー、カメラの進行ベクトル
-	XMVECTOR _direction;							
+	Vector3 _direction;							
 
 	char* _currentFootObjName;
 
 	//オブジェクトを生成する関数
-	template<class className> void InstantiateObject(const wchar_t* path, string name,XMFLOAT3 size, XMFLOAT3 pos = XMFLOAT3(0.0f,0.0f,0.0f));												
+	template<class className> void InstantiateObject(const wchar_t* path, string name,Vector3 size, Vector3 pos = Vector3(0.0f,0.0f,0.0f));
 
 	//モデル描画処理
 	void ModelDraw() override;												

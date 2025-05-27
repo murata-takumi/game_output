@@ -4,7 +4,7 @@
 #include "Includes.h"
 
 //正面ベクトルの初期値
-const XMVECTOR INITIAL_FRONT = XMVectorSet(0.0f,0.0f,1.0f,0.0f);
+const Vector3 INITIAL_FRONT = XMVectorSet(0.0f,0.0f,1.0f,0.0f);
 
 /// <summary>
 /// コンストラクタ
@@ -59,7 +59,7 @@ BoxCollider::~BoxCollider()
 /// </summary>
 /// <param name="vec">オブジェクトの正面ベクトル</param>
 void 
-BoxCollider::SetVec(const XMVECTOR& vec)
+BoxCollider::SetVec(const Vector3& vec)
 {
 	//まずは正面ベクトル
 	_frontDir = XMVector3Normalize(vec);
@@ -108,7 +108,7 @@ BoxCollider::Update(const XMMATRIX& mat)
 /// 当たり判定を構成する頂点のベクトルを返す関数
 /// </summary>
 /// <returns>頂点のベクトル</returns>
-vector<XMVECTOR>
+vector<Vector3>
 BoxCollider::Vertices()const
 {
 	return _verts;
@@ -128,7 +128,7 @@ BoxCollider::HalfLength()const
 /// 中心座標を返す関数
 /// </summary>
 /// <returns></returns>
-XMVECTOR
+Vector3
 BoxCollider::Center()const
 {
 	return _center;

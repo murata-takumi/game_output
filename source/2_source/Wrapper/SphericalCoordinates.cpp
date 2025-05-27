@@ -94,9 +94,9 @@ SphericalCoordinates::Scaling(float x)
 /// 球面座標から通常座標に変換する関数
 /// </summary>
 /// <returns>通常座標の値</returns>
-XMFLOAT3
+Vector3
 SphericalCoordinates::ToCartesian()
 {
 	float t = _radius * cos(GetElevation());												//注視点から視点への距離(XZ平面)
-	return XMFLOAT3(t * sin(_azimuth), _radius * sin(GetElevation()), t * cos(_azimuth));	//方位角・仰角で演算して返す
+	return Vector3(t * sin(_azimuth), _radius * sin(GetElevation()), t * cos(_azimuth));	//方位角・仰角で演算して返す
 }

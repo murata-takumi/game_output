@@ -21,17 +21,17 @@ bool
 CollisionDetector::CheckColAndCol(const BoxCollider& col1, const BoxCollider& col2)
 {
 	//各OBBの右、上、正面ベクトル
-	XMVECTOR center1 = col1.Center();
-	XMVECTOR center2 = col2.Center();
-	XMVECTOR rightLen1 = col1._rightDir * col1.HalfLength().x;
-	XMVECTOR upLen1 = col1._upDir * col1.HalfLength().y;
-	XMVECTOR frontLen1 = col1._frontDir * col1.HalfLength().z;
-	XMVECTOR rightLen2 = col2._rightDir * col2.HalfLength().x;
-	XMVECTOR upLen2 = col2._upDir * col2.HalfLength().y;
-	XMVECTOR frontLen2 = col2._frontDir * col2.HalfLength().z;
+	Vector3 center1 = col1.Center();
+	Vector3 center2 = col2.Center();
+	Vector3 rightLen1 = col1._rightDir * col1.HalfLength().x;
+	Vector3 upLen1 = col1._upDir * col1.HalfLength().y;
+	Vector3 frontLen1 = col1._frontDir * col1.HalfLength().z;
+	Vector3 rightLen2 = col2._rightDir * col2.HalfLength().x;
+	Vector3 upLen2 = col2._upDir * col2.HalfLength().y;
+	Vector3 frontLen2 = col2._frontDir * col2.HalfLength().z;
 
 	//双方のOBBの中心を結ぶベクトル
-	XMVECTOR vecBetCenter = center2 - center1;
+	Vector3 vecBetCenter = center2 - center1;
 
 	//obb1_front
 	float r = LenOnSeparateAxis(col1._frontDir, rightLen2, upLen2, frontLen2);
@@ -109,15 +109,15 @@ CollisionDetector::CheckColAndCol(const BoxCollider& col1, const BoxCollider& co
 	//最小値の座標軸に対しめり込みを戻す処理を行う
 	if (FLT_EPSILON < fabs(diffX) && fabs(min - fabs(diffX)) < FLT_EPSILON)
 	{
-		col2.Object().Pos().m128_f32[0] -= Dx12Wrapper::Instance().GetDeltaTime() * col2.Object().Speed().x;
+		col2.Object().Pos().X() -= Dx12Wrapper::Instance().GetDeltaTime() * col2.Object().Speed().x;
 	}
 	else if (FLT_EPSILON < fabs(diffY) && fabs(min - fabs(diffY)) < FLT_EPSILON)
 	{
-		col2.Object().Pos().m128_f32[1] -= Dx12Wrapper::Instance().GetDeltaTime() * col2.Object().Speed().y;
+		col2.Object().Pos().Y() -= Dx12Wrapper::Instance().GetDeltaTime() * col2.Object().Speed().y;
 	}
 	else if (FLT_EPSILON < fabs(diffZ) && fabs(min - fabs(diffZ)) < FLT_EPSILON)
 	{
-		col2.Object().Pos().m128_f32[2] -= Dx12Wrapper::Instance().GetDeltaTime() * col2.Object().Speed().z;
+		col2.Object().Pos().Z() -= Dx12Wrapper::Instance().GetDeltaTime() * col2.Object().Speed().z;
 	}
 
 	return true;
@@ -130,13 +130,13 @@ CollisionDetector::CheckColAndCol(const BoxCollider& col1, const BoxCollider& co
 /// <param name="point">座標</param>
 /// <returns>入り込んでいるかどうか</returns>
 bool
-CollisionDetector::CheckColAndPoint(const BoxCollider& col, const XMVECTOR& point)
+CollisionDetector::CheckColAndPoint(const BoxCollider& col, const Vector3& point)
 {
 	//座標とOBBの中心を結ぶベクトルを取得
 	auto vecBetcolAndPoint = col.Center() - point;
 
 	//方向ベクトルからはみ出ているベクトル
-	XMVECTOR vec = XMVectorSet(0, 0, 0, 0);
+	Vector3 vec = XMVectorSet(0, 0, 0, 0);
 
 	//方向ベクトルに対する比率を取得し、絶対値が1より大きければ（=はみ出ていたら）距離に加算
 	float s = XMVector3Dot(vecBetcolAndPoint, col._rightDir).m128_f32[0] / col.HalfLength().x;
@@ -174,7 +174,7 @@ CollisionDetector::CheckColAndPoint(const BoxCollider& col, const XMVECTOR& poin
 /// <param name="direction">直線の向き</param>
 /// <returns></returns>
 bool
-CollisionDetector::CheckColAndVec(const BoxCollider& col, const XMVECTOR& startPos, const XMVECTOR& direction)
+CollisionDetector::CheckColAndVec(const BoxCollider& col, const Vector3& startPos, const Vector3& direction)
 {
 	return true;
 }
@@ -188,7 +188,7 @@ CollisionDetector::CheckColAndVec(const BoxCollider& col, const XMVECTOR& startP
 /// <param name="front">正面ベクトル</param>
 /// <returns>ベクトルの大きさの和</returns>
 float
-CollisionDetector::LenOnSeparateAxis(const XMVECTOR& sep, const XMVECTOR& right, const XMVECTOR& up, const XMVECTOR& front)
+CollisionDetector::LenOnSeparateAxis(const Vector3& sep, const Vector3& right, const Vector3& up, const Vector3& front)
 {
 	//分離軸と各ベクトルの内積を取り、その絶対値が投影された大きさとなる
 	float r1 = fabs(XMVector3Dot(sep, right).m128_f32[0]);

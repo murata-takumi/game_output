@@ -1,4 +1,6 @@
 #pragma once
+#include "Vector3.h"
+
 #include "Collider/CollisionDetector.h"
 #include "FBX/AnimNodes/Animations.h"
 #include "FBX/AnimNodes/AnimNode.h"
@@ -38,10 +40,10 @@ private:
 	vector<string> _animStr;												
 
 	//正面ベクトル
-	XMVECTOR _currentFrontVec = XMVectorSet(0.0f,0.0f,1.0f,0.0f);
+	Vector3 _currentFrontVec = XMVectorSet(0.0f,0.0f,1.0f,0.0f);
 
 	//入力ベクトル
-	XMVECTOR _inputVec;
+	Vector3 _inputVec;
 
 	//操作可能かを判別する真理値
 	bool _canControll = false;			
@@ -103,7 +105,7 @@ private:
 	HRESULT CreateTransformView()override;									
 public:	
 	//アクターが地面の上にいるか判別するためのコールバック
-	function<bool(const XMVECTOR& vec)> _isOnGround;
+	function<bool(const Vector3& vec)> _isOnGround;
 
 	//コンストラクタ
 	FBXActor(const wchar_t* filePath,const string name, XMFLOAT3 size, XMFLOAT3 pos = XMFLOAT3(0.0f, 0.0f, 0.0f));
@@ -135,7 +137,7 @@ public:
 	void Update()override;												
 
 	//入力された方向へ移動する関数
-	void Translate(const XMVECTOR& vec);								
+	void Translate(const Vector3& vec);								
 
 	//操作開始時に実行する関数
 	void StartControll();				

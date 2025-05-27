@@ -158,12 +158,12 @@ ImGuiManager::ImGuiDraw()
 		auto a = _actor->GetOnGround();
 		ImGui::Checkbox("IsOnGround", &a);
 
-		ImGui::DragFloat("ColX", &_actor->Collider()->Center().m128_f32[0]);
-		ImGui::DragFloat("ColY", &_actor->Collider()->Center().m128_f32[1]);
-		ImGui::DragFloat("ColZ", &_actor->Collider()->Center().m128_f32[2]);
-		ImGui::DragFloat("PlayerX", &_actor->Pos().m128_f32[0]);
-		ImGui::DragFloat("PlayerY", &_actor->Pos().m128_f32[1]);
-		ImGui::DragFloat("PlayerZ", &_actor->Pos().m128_f32[2]);
+		ImGui::DragFloat("ColX", &_actor->Collider()->Center().X());
+		ImGui::DragFloat("ColY", &_actor->Collider()->Center().Y());
+		ImGui::DragFloat("ColZ", &_actor->Collider()->Center().Z());
+		ImGui::DragFloat("PlayerX", &_actor->Pos().X());
+		ImGui::DragFloat("PlayerY", &_actor->Pos().Y());
+		ImGui::DragFloat("PlayerZ", &_actor->Pos().Z());
 
 		//•¶Žš—ñ‚ð•\Ž¦
 		for (auto& pair : _texts)

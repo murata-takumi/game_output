@@ -5,22 +5,22 @@
 /// </summary>
 /// <param name="size">当たり判定のサイズ</param>
 /// <param name="center">中心座標</param>
-BoxCollider2D::BoxCollider2D(const XMVECTOR& size, const XMVECTOR& center)
+BoxCollider2D::BoxCollider2D(const Vector3& size, const Vector3& center)
 {
 	_center = center;
 
-	_halfWidth = size.m128_f32[0] / 2;
-	_halfHeight = size.m128_f32[1] / 2;
+	_halfWidth = size.X() / 2;
+	_halfHeight = size.Y() / 2;
 
 	_rightDir = XMVectorSet(_halfWidth,0.0f,0.0f,0.0f);
 	_upDir = XMVectorSet(0.0f,_halfHeight,0.0f, 0.0f);
 
 	_rect = 
 	{
-		(LONG)(center.m128_f32[0] - size.m128_f32[0] / 2),
-		(LONG)(center.m128_f32[1] - size.m128_f32[1] / 2),
-		(LONG)(center.m128_f32[0] + size.m128_f32[0] / 2),
-		(LONG)(center.m128_f32[1] + size.m128_f32[1] / 2),
+		(LONG)(center.X() - size.X() / 2),
+		(LONG)(center.Y() - size.Y() / 2),
+		(LONG)(center.X() + size.X() / 2),
+		(LONG)(center.Y() + size.Y() / 2),
 	};
 }
 

@@ -1,5 +1,6 @@
 #pragma once
 #include "Application.h"
+#include "Vector3.h"
 
 /// <summary>
 /// 3D空間における矩形を表すクラス
@@ -22,7 +23,7 @@ public:
 	bool CheckPointInBounds(XMFLOAT3 point);
 
 	//座標が矩形の中にあるか判定する関数（XMVector版）
-	bool CheckPointInBounds(XMVECTOR& vec);
+	bool CheckPointInBounds(Vector3& vec);
 
 	//中心座標を返す
 	XMFLOAT3 Pos()const;

@@ -1,5 +1,6 @@
 #pragma once
 #include "Application.h"
+#include "Vector3.h"
 
 #include <DirectXTK12-master/Inc/CommonStates.h>
 #include <DirectXTK12-master/Inc/Effects.h>
@@ -98,7 +99,7 @@ private:
 	HRESULT CreateUIBufferView(const wchar_t* path, string key);
 
 	//右手座標を左手座標に変換する関数
-	XMVECTOR RightPosToLeftPos(const XMVECTOR& rightPos);
+	XMVECTOR RightPosToLeftPos(const Vector3& rightPos);
 
 	//スプライト・文字列表示用オブジェクトを初期化する関数
 	void InitSpriteDevices();												

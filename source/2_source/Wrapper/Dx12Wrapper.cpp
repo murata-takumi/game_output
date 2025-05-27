@@ -7,7 +7,7 @@
 #include "Wrapper/SphericalCoordinates.h"
 						
 //視点→注視点のベクトルをXZ平面に制限するためのベクトル
-const XMVECTOR XZ_PLANE = XMVectorSet(1.0f,0.0f,1.0f,0.0f);	
+const Vector3 XZ_PLANE = XMVectorSet(1.0f,0.0f,1.0f,0.0f);
 //フェードイン・アウトにかける時間
 const float FADE_TIME = 1.0f;
 //半径の初期値
@@ -478,15 +478,18 @@ Dx12Wrapper::BarrierTransition(
 /// XZ平面に制限した視点座標から注視点座標へのベクトルを取得する関数
 /// </summary>
 /// <returns>ベクトル</returns>
-XMVECTOR
+Vector3
 Dx12Wrapper::GetXZVecEyeToTarget()const
 {
-	XMVECTOR vec = XMVectorSet
-	(_target.x - _eye.x, _target.y - _eye.y, _target.z - _eye.z, 0);	//まず視点座標から注視点座標へのベクトルを取得
+	//まず視点座標から注視点座標へのベクトルを取得
+	Vector3 vec = XMVectorSet
+	(_target.X() - _eye.X(), _target.Y() - _eye.Y(), _target.Z() - _eye.Z(), 0);
 
-	vec = XMVectorMultiply(vec, XZ_PLANE);								//Y成分を0にし、ベクトルをXZ平面に制限
+	//Y成分を0にし、ベクトルをXZ平面に制限
+	vec = XMVectorMultiply(vec, XZ_PLANE);								
 
-	XMVECTOR ret = XMVector3Normalize(vec);								//ベクトルを正規化
+	//ベクトルを正規化
+	Vector3 ret = XMVector3Normalize(vec);								
 	
 	return ret;
 }
@@ -495,13 +498,17 @@ Dx12Wrapper::GetXZVecEyeToTarget()const
 /// 視点→注視点のベクトルに対し右に垂直なベクトルを返す関数
 /// </summary>
 /// <returns>垂直ベクトル</returns>
-XMVECTOR
+Vector3
 Dx12Wrapper::GetRightVector()const
 {
-	XMVECTOR eyeToTrgtVec = GetXZVecEyeToTarget();						//視点→注視点のベクトルを取得
-	XMVECTOR upVec = XMVectorSet(_up.x, _up.y, _up.z, 0.0f);			//上ベクトルを取得
+	//視点→注視点のベクトルを取得
+	Vector3 eyeToTrgtVec = GetXZVecEyeToTarget();			
 
-	XMVECTOR cross = XMVector3Cross(eyeToTrgtVec, upVec);				//2ベクトルの外積を求める
+	//上ベクトルを取得
+	Vector3 upVec = XMVectorSet(_up.X(), _up.Y(), _up.Z(), 0.0f);			
+
+	//2ベクトルの外積を求める
+	Vector3 cross = XMVector3Cross(eyeToTrgtVec, upVec);				
 
 	return cross;
 }
@@ -525,9 +532,9 @@ Dx12Wrapper::ScalingCoordinates(int x)
 {
 	_eye = XMFLOAT3
 	(
-		_coordinates->Scaling(x * _deltaTime).ToCartesian().x + _target.x,
-		_coordinates->Scaling(x * _deltaTime).ToCartesian().y + _target.y,
-		_coordinates->Scaling(x * _deltaTime).ToCartesian().z + _target.z
+		_coordinates->Scaling(x * _deltaTime).ToCartesian().X() + _target.X(),
+		_coordinates->Scaling(x * _deltaTime).ToCartesian().Y() + _target.Y(),
+		_coordinates->Scaling(x * _deltaTime).ToCartesian().Z() + _target.Z()
 	);
 }
 
@@ -537,19 +544,17 @@ Dx12Wrapper::ScalingCoordinates(int x)
 /// <param name="dir">平行移動させる方向</param>
 /// <param name="value">移動距離</param>
 void
-Dx12Wrapper::SetCoordinatesCenter(XMVECTOR vec)
+Dx12Wrapper::SetCoordinatesCenter(Vector3 vec)
 {
-	_target.x = vec.m128_f32[0];
-	_target.y = vec.m128_f32[1];
-	_target.z = vec.m128_f32[2];
+	_target = vec;
 
 	//その後カメラ座標を更新
 	_eye =
 		XMFLOAT3
 		(
-			_coordinates->ToCartesian().x + _target.x,
-			_coordinates->ToCartesian().y + _target.y,
-			_coordinates->ToCartesian().z + _target.z
+			_coordinates->ToCartesian().X() + _target.X(),
+			_coordinates->ToCartesian().Y() + _target.Y(),
+			_coordinates->ToCartesian().Z() + _target.Z()
 		);
 }
 
@@ -566,17 +571,17 @@ Dx12Wrapper::RotateCoordinates(Degree deg, float value)
 	case Degree::Azimth:	//方位角の方向に回転させる
 		_eye = XMFLOAT3
 		(
-			_coordinates->Rotate(value * _deltaTime, 0.0f).ToCartesian().x + _target.x,
-			_coordinates->Rotate(value * _deltaTime, 0.0f).ToCartesian().y + _target.y,
-			_coordinates->Rotate(value * _deltaTime, 0.0f).ToCartesian().z + _target.z
+			_coordinates->Rotate(value * _deltaTime, 0.0f).ToCartesian().X() + _target.X(),
+			_coordinates->Rotate(value * _deltaTime, 0.0f).ToCartesian().Y() + _target.Y(),
+			_coordinates->Rotate(value * _deltaTime, 0.0f).ToCartesian().Z() + _target.Z()
 		);
 		break;
 	case Degree::Elevation:	//仰角の方向に回転させる
 		_eye = XMFLOAT3
 		(
-			_coordinates->Rotate(0.0f, value * _deltaTime).ToCartesian().x + _target.x,
-			_coordinates->Rotate(0.0f, value * _deltaTime).ToCartesian().y + _target.y,
-			_coordinates->Rotate(0.0f, value * _deltaTime).ToCartesian().z + _target.z
+			_coordinates->Rotate(0.0f, value * _deltaTime).ToCartesian().X() + _target.X(),
+			_coordinates->Rotate(0.0f, value * _deltaTime).ToCartesian().Y() + _target.Y(),
+			_coordinates->Rotate(0.0f, value * _deltaTime).ToCartesian().Z() + _target.Z()
 		);
 		break;
 	default:
@@ -601,9 +606,9 @@ Dx12Wrapper::ResetCoordinates(float azimth, float elevation)
 
 	_eye = XMFLOAT3											//視点座標を設定
 	(
-		_coordinates->ToCartesian().x + _target.x,
-		_coordinates->ToCartesian().y + _target.y,
-		_coordinates->ToCartesian().z + _target.z
+		_coordinates->ToCartesian().X() + _target.X(),
+		_coordinates->ToCartesian().Y() + _target.Y(),
+		_coordinates->ToCartesian().Z() + _target.Z()
 	);
 }
 
@@ -614,8 +619,7 @@ void
 Dx12Wrapper::SetScene()
 {
 	//行列・座標を書き込む
-	_mappedScene->view = XMMatrixLookAtLH(										
-		XMLoadFloat3(&_eye), XMLoadFloat3(&_target), XMLoadFloat3(&_up));
+	_mappedScene->view = XMMatrixLookAtLH(_eye, _target, _up);
 
 	//透視投影
 	if (_perspective)															
@@ -829,10 +833,10 @@ Dx12Wrapper::CreateDescriptorHeap(
 XMMATRIX
 Dx12Wrapper::ViewMatrix()const
 {
-	XMFLOAT3 RHEye = XMFLOAT3(-_eye.x,_eye.y,_eye.z);
-	XMFLOAT3 RHTarget = XMFLOAT3(-_target.x, _target.y, _target.z);
+	XMFLOAT3 RHEye = XMFLOAT3(-_eye.X(),_eye.Y(),_eye.Z());
+	XMFLOAT3 RHTarget = XMFLOAT3(-_target.X(), _target.Y(), _target.Z());
 
-	return XMMatrixLookAtRH(XMLoadFloat3(&RHEye), XMLoadFloat3(&RHTarget), XMLoadFloat3(&_up));
+	return XMMatrixLookAtRH(XMLoadFloat3(&RHEye), XMLoadFloat3(&RHTarget), _up);
 }
 
 /// <summary>
@@ -973,10 +977,10 @@ Dx12Wrapper::Rect() const
 /// 視点座標を返す関数
 /// </summary>
 /// <returns>視点座標</returns>
-XMVECTOR
+Vector3
 Dx12Wrapper::Eye() const
 {
-	return XMLoadFloat3(&_eye);
+	return _eye;
 }
 
 /// <summary>

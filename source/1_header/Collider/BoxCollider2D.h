@@ -1,5 +1,6 @@
 #pragma once
 #include "Application.h"
+#include "Vector3.h"
 
 /// <summary>
 /// 矩形の当たり判定を実装するクラス
@@ -8,19 +9,19 @@ class BoxCollider2D
 {
 private:
 	//中心ベクトルの初期値
-	XMVECTOR _initCenter;
+	Vector3 _initCenter;
 
 	RECT _rect;
 
 	//それぞれ中心、右、上ベクトル
-	XMVECTOR _center, _rightDir, _upDir;
+	Vector3 _center, _rightDir, _upDir;
 
 public:
 	//それぞれ幅、高さ、奥行の長さの半分
 	float _halfWidth, _halfHeight;
 
 	//コンストラクタ
-	BoxCollider2D(const XMVECTOR& size, const XMVECTOR& center);
+	BoxCollider2D(const Vector3& size, const Vector3& center);
 	//デストラクタ
 	~BoxCollider2D();
 

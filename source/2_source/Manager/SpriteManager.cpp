@@ -365,9 +365,9 @@ SpriteManager::CreateUIBufferView(const wchar_t* path,string key)
 /// <param name="rightPos">âEéËç¿ïW</param>
 /// <returns>ç∂éËç¿ïW</returns>
 XMVECTOR
-SpriteManager::RightPosToLeftPos(const XMVECTOR& rightPos)
+SpriteManager::RightPosToLeftPos(const Vector3& rightPos)
 {
-	return XMVectorSet(rightPos.m128_f32[0] * -1, rightPos.m128_f32[1], rightPos.m128_f32[2], 0.0f);
+	return XMVectorSet(rightPos.X() * -1, rightPos.Y(), rightPos.Z(), 0.0f);
 }
 
 /// <summary>

@@ -1,6 +1,7 @@
 #pragma once
 #include "Includes.h"
 #include "Functions.h"
+#include "Vector3.h"
 
 /// <summary>
 /// カメラをどちらの方に回転させるか決定する列挙体
@@ -114,8 +115,8 @@ private:
 	{
 		XMMATRIX view;
 		XMMATRIX proj;
-		XMFLOAT3 light;
-		XMFLOAT3 eye;
+		Vector3 light;
+		Vector3 eye;
 	};
 	//マップ用ポインタ
 	SceneData* _mappedScene;									
@@ -129,18 +130,18 @@ private:
 	CD3DX12_RESOURCE_BARRIER _barrier;							
 
 	//視点（カメラ）座標
-	XMFLOAT3 _eye;												
+	Vector3 _eye;
 	//注視点座標
-	XMFLOAT3 _target;											
+	Vector3 _target;
 	//上座標
-	XMFLOAT3 _up;				
+	Vector3 _up;
 	//ライト座標
-	XMFLOAT3 _light;
+	Vector3 _light;
 
 	//視点の初期座標
-	XMFLOAT3 _initEye;											
+	Vector3 _initEye;											
 	//注視点の初期座標
-	XMFLOAT3 _initTarget;										
+	Vector3 _initTarget;
 
 	//排他制御用オブジェクト
 	mutex _mtx;													
@@ -219,9 +220,9 @@ public:
 		D3D12_RESOURCE_STATES after);
 
 	//視点座標（カメラ座標）から注視点座標へのベクトルを取得する関数
-	XMVECTOR GetXZVecEyeToTarget()const;								
+	Vector3 GetXZVecEyeToTarget()const;
 	//注視点へのベクトルの右方向のベクトルを取得する関数
-	XMVECTOR GetRightVector()const;										
+	Vector3 GetRightVector()const;
 
 	//前フレームと現フレームの時間の差分を取得する関数
 	float GetDeltaTime()const;
@@ -229,7 +230,7 @@ public:
 	//カメラを近付ける・遠ざける関数
 	void ScalingCoordinates(int x);								
 	//カメラを移動させる関数
-	void SetCoordinatesCenter(XMVECTOR vec);							
+	void SetCoordinatesCenter(Vector3 vec);							
 	//カメラを回転させる関数
 	void RotateCoordinates(Degree deg, float value);					
 	//カメラの位置を初期化する関数
@@ -302,7 +303,7 @@ public:
 	D3D12_RECT* Rect() const;
 
 	//視点座標を返す関数
-	XMVECTOR Eye() const;
+	Vector3 Eye() const;
 
 	//透視投影かどうか返す関数
 	bool Perspective()const;

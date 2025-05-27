@@ -418,7 +418,7 @@ FBXBase::Collider()const
 /// 座標を返す
 /// </summary>
 /// <returns>座標</returns>
-XMVECTOR& 
+Vector3& 
 FBXBase::Pos()
 {
 	return _pos;
@@ -428,7 +428,7 @@ FBXBase::Pos()
 /// 正面ベクトルを返す
 /// </summary>
 /// <returns>正面ベクトル</returns>
-XMVECTOR
+Vector3
 FBXBase::FrontVec()const
 {
 	return _frontVec;
@@ -438,7 +438,7 @@ FBXBase::FrontVec()const
 /// 足元ベクトルを返す
 /// </summary>
 /// <returns>足元ベクトル</returns>
-XMVECTOR
+Vector3
 FBXBase::FootVec()const
 {
 	return _footVec;

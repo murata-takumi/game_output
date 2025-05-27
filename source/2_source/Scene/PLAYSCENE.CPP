@@ -105,9 +105,9 @@ PlayScene::SceneStart()
 
 		ImGuiManager::Instance().SetActor(_actorAndObjs);
 
-		ImGuiManager::Instance().AddLabelAndFloat("BoxX", _actorAndObjs[BOX_NAME]->Collider()->Center().m128_f32[0]);
-		ImGuiManager::Instance().AddLabelAndFloat("BoxY", _actorAndObjs[BOX_NAME]->Collider()->Center().m128_f32[1]);
-		ImGuiManager::Instance().AddLabelAndFloat("BoxZ", _actorAndObjs[BOX_NAME]->Collider()->Center().m128_f32[2]);
+		ImGuiManager::Instance().AddLabelAndFloat("BoxX", _actorAndObjs[BOX_NAME]->Collider()->Center().X());
+		ImGuiManager::Instance().AddLabelAndFloat("BoxY", _actorAndObjs[BOX_NAME]->Collider()->Center().Y());
+		ImGuiManager::Instance().AddLabelAndFloat("BoxZ", _actorAndObjs[BOX_NAME]->Collider()->Center().Z());
 
 		//ロード完了
 		BaseScene::_canInput = true;
@@ -287,7 +287,7 @@ PlayScene::SceneEnd()
 /// <param name="size">オブジェクトの当たり判定のサイズ</param>
 template<class className>
 void
-PlayScene::InstantiateObject(const wchar_t* path,string name, XMFLOAT3 size,XMFLOAT3 pos)
+PlayScene::InstantiateObject(const wchar_t* path,string name, Vector3 size, Vector3 pos)
 {
 	auto f = [=]() {
 		shared_ptr<className> object;

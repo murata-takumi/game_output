@@ -1,5 +1,6 @@
 #pragma once
 #include "Includes.h"
+#include "Vector3.h"
 
 /// <summary>
 /// カメラ座標を注視点を中心とした球体として管理するためのクラス
@@ -26,7 +27,7 @@ public:
 	SphericalCoordinates Scaling(float x);								
 
 	//球面座標から通常座標に変換する関数
-	XMFLOAT3 ToCartesian();												
+	Vector3 ToCartesian();												
 
 private:
 	//それぞれ半径・方位角・仰角

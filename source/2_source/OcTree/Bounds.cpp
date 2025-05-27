@@ -26,16 +26,16 @@ Bounds::CheckPointInBounds(XMFLOAT3 point)
 		point.y - _pos.y,
 		point.z - _pos.z
 	);
-	XMVECTOR vecBetPos = XMLoadFloat3(&a);
+	Vector3 vecBetPos = XMLoadFloat3(&a);
 
 	//半分の長さをXMVECTORに変換
-	XMVECTOR halfLengthVec = XMLoadFloat3(&_halfLength);
+	Vector3 halfLengthVec = XMLoadFloat3(&_halfLength);
 
 	//ベクトルの各要素に対し処理を行う
 	for (int i = 0; i < 3; i++)
 	{
 		//各座標軸に対する比率を求める（半分の長さピッタリだったら絶対値が1になる）
-		auto s = XMVector3Dot(vecBetPos, XMMatrixIdentity().r[i]) / halfLengthVec.m128_f32[i];
+		auto s = XMVector3Dot(vecBetPos, XMMatrixIdentity().r[i]) / halfLengthVec[i];
 		//比率の絶対値が1よりおおきければはみ出ているとみなし、中に含んでいない
 		if (fabs(s.m128_f32[0]) > 1)
 		{
@@ -52,10 +52,10 @@ Bounds::CheckPointInBounds(XMFLOAT3 point)
 /// <param name="vec">座標ベクトル</param>
 /// <returns>中にあるか</returns>
 bool 
-Bounds::CheckPointInBounds(XMVECTOR& vec)
+Bounds::CheckPointInBounds(Vector3& vec)
 {
 	//XMVectorからXMFLOAT3に変換したうえで渡す
-	XMFLOAT3 temp = XMFLOAT3(vec.m128_f32[0], vec.m128_f32[1], vec.m128_f32[2]);
+	XMFLOAT3 temp = XMFLOAT3(vec.X(), vec.Y(), vec.Z());
 
 	return CheckPointInBounds(temp);
 }
