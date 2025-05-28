@@ -32,7 +32,7 @@ public:
 	Vector3 _frontDir, _rightDir, _upDir;
 
 	//コンストラクタ
-	BoxCollider(FBXBase& object, const XMFLOAT3& size);	
+	BoxCollider(FBXBase& object, const Vector3& size);	
 	//デストラクタ
 	~BoxCollider();
 
@@ -43,7 +43,7 @@ public:
 	vector<Vector3> Vertices()const;
 
 	//幅、高さ、奥行を返す
-	XMFLOAT3 HalfLength()const;
+	Vector3 HalfLength()const;
 
 	//中心座標を返す
 	Vector3 Center()const;

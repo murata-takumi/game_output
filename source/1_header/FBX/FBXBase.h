@@ -68,7 +68,7 @@ protected:
 	Vector3 _footVec;
 
 	//オブジェクトの速度
-	XMFLOAT3 _speed;
+	Vector3 _speed;
 
 	//オブジェクトの名前
 	const string _name;
@@ -90,7 +90,7 @@ protected:
 
 public:
 	//コンストラクタ
-	FBXBase(const wchar_t* filePath,const string name,const XMFLOAT3& size,const XMFLOAT3& pos);
+	FBXBase(const wchar_t* filePath,const string name,const Vector3& size,const Vector3& pos);
 	//デストラクタ
 	virtual ~FBXBase();													
 
@@ -109,7 +109,7 @@ public:
 
 	Vector3 FootVec()const;
 	
-	XMFLOAT3 Speed()const;
+	Vector3 Speed()const;
 
 	const string Name();
 

@@ -7,7 +7,7 @@
 /// </summary>
 /// <param name="filePath">モデルパス</param>
 /// <param name="pos">初期座標</param>
-FBXObject::FBXObject(const wchar_t* filePath,const string name, XMFLOAT3 size, XMFLOAT3 pos)
+FBXObject::FBXObject(const wchar_t* filePath,const string name, Vector3 size, Vector3 pos)
 	:FBXBase(filePath, name, size, pos)
 {
 	//座標変換用バッファー・ビュー作成

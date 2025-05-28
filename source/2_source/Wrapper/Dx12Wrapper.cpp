@@ -530,7 +530,7 @@ Dx12Wrapper::GetDeltaTime()const
 void
 Dx12Wrapper::ScalingCoordinates(int x)
 {
-	_eye = XMFLOAT3
+	_eye = Vector3
 	(
 		_coordinates->Scaling(x * _deltaTime).ToCartesian().X() + _target.X(),
 		_coordinates->Scaling(x * _deltaTime).ToCartesian().Y() + _target.Y(),
@@ -550,7 +550,7 @@ Dx12Wrapper::SetCoordinatesCenter(Vector3 vec)
 
 	//‚»‚ÌŒãƒJƒƒ‰À•W‚ðXV
 	_eye =
-		XMFLOAT3
+		Vector3
 		(
 			_coordinates->ToCartesian().X() + _target.X(),
 			_coordinates->ToCartesian().Y() + _target.Y(),
@@ -569,7 +569,7 @@ Dx12Wrapper::RotateCoordinates(Degree deg, float value)
 	switch (deg)
 	{
 	case Degree::Azimth:	//•ûˆÊŠp‚Ì•ûŒü‚É‰ñ“]‚³‚¹‚é
-		_eye = XMFLOAT3
+		_eye = Vector3
 		(
 			_coordinates->Rotate(value * _deltaTime, 0.0f).ToCartesian().X() + _target.X(),
 			_coordinates->Rotate(value * _deltaTime, 0.0f).ToCartesian().Y() + _target.Y(),
@@ -577,7 +577,7 @@ Dx12Wrapper::RotateCoordinates(Degree deg, float value)
 		);
 		break;
 	case Degree::Elevation:	//‹ÂŠp‚Ì•ûŒü‚É‰ñ“]‚³‚¹‚é
-		_eye = XMFLOAT3
+		_eye = Vector3
 		(
 			_coordinates->Rotate(0.0f, value * _deltaTime).ToCartesian().X() + _target.X(),
 			_coordinates->Rotate(0.0f, value * _deltaTime).ToCartesian().Y() + _target.Y(),
@@ -604,7 +604,7 @@ Dx12Wrapper::ResetCoordinates(float azimth, float elevation)
 	_coordinates->SetAzimth(azimth);						//•ûˆÊŠp
 	_coordinates->SetElevation(elevation);					//‹ÂŠp
 
-	_eye = XMFLOAT3											//Ž‹“_À•W‚ðÝ’è
+	_eye = Vector3											//Ž‹“_À•W‚ðÝ’è
 	(
 		_coordinates->ToCartesian().X() + _target.X(),
 		_coordinates->ToCartesian().Y() + _target.Y(),
@@ -833,10 +833,10 @@ Dx12Wrapper::CreateDescriptorHeap(
 XMMATRIX
 Dx12Wrapper::ViewMatrix()const
 {
-	XMFLOAT3 RHEye = XMFLOAT3(-_eye.X(),_eye.Y(),_eye.Z());
-	XMFLOAT3 RHTarget = XMFLOAT3(-_target.X(), _target.Y(), _target.Z());
+	Vector3 RHEye = Vector3(-_eye.X(),_eye.Y(),_eye.Z());
+	Vector3 RHTarget = Vector3(-_target.X(), _target.Y(), _target.Z());
 
-	return XMMatrixLookAtRH(XMLoadFloat3(&RHEye), XMLoadFloat3(&RHTarget), _up);
+	return XMMatrixLookAtRH(RHEye, RHTarget, _up);
 }
 
 /// <summary>

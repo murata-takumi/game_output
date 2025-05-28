@@ -14,20 +14,20 @@ const wchar_t* COIN_PATH = L"Asset/model/Coin.fbx";
 const wchar_t* BOX_PATH = L"Asset/model/Box.fbx";				
 
 //プレイヤーの当たり判定の大きさ
-const XMFLOAT3 ACTOR_COLL_SIZE = XMFLOAT3(60.0f, 170.0f, 60.0f);
+const Vector3 ACTOR_COLL_SIZE = Vector3(60.0f, 170.0f, 60.0f);
 //地面の当たり判定の大きさ
-const XMFLOAT3 GROUND_COLL_SIZE = XMFLOAT3(1000.0f, 1.0f, 1000.0f);
+const Vector3 GROUND_COLL_SIZE = Vector3(1000.0f, 1.0f, 1000.0f);
 //コインの当たり判定の大きさ
-const XMFLOAT3 COIN_COLL_SIZE = XMFLOAT3(25.0f, 25.0f, 25.0f);
+const Vector3 COIN_COLL_SIZE = Vector3(25.0f, 25.0f, 25.0f);
 //箱の当たり判定
-const XMFLOAT3 BOX_COLL_SIZE = XMFLOAT3(200.0f, 200.0f, 200.0f);
+const Vector3 BOX_COLL_SIZE = Vector3(200.0f, 200.0f, 200.0f);
 //プレイヤーの初期座標
-const XMFLOAT3 ACTOR_INIT_POS = XMFLOAT3(0.0f, 0.0f, 0.0f);
+const Vector3 ACTOR_INIT_POS = Vector3(0.0f, 0.0f, 0.0f);
 //コインの初期座標
-const XMFLOAT3 COIN_INIT_POS = XMFLOAT3(0.0f, 0.0f, 100.0f);
+const Vector3 COIN_INIT_POS = Vector3(0.0f, 0.0f, 100.0f);
 //箱の初期座標
-//const XMFLOAT3 BOX_INIT_POS = XMFLOAT3(600.0f, -200.0f, 0.0f);
-const XMFLOAT3 BOX_INIT_POS = XMFLOAT3(300.0f, 0.0f, 0.0f);
+//const Vector3 BOX_INIT_POS = Vector3(600.0f, -200.0f, 0.0f);
+const Vector3 BOX_INIT_POS = Vector3(300.0f, 0.0f, 0.0f);
 
 //オブジェクトの名前一覧
 const string ACTOR_NAME = "Actor";
@@ -59,7 +59,9 @@ void
 PlayScene::SceneStart()
 {
 	//カメラ位置をリセット
-	Dx12Wrapper::Instance().ResetCoordinates(0,0);								
+	Dx12Wrapper::Instance().ResetCoordinates(0,0);	
+
+	_node = new OcTreeNode(Bounds(Vector3(0, 0, 0), Vector3(1000, 1000, 1000)), 4);
 
 	//プレイヤーの移動ベクトルを初期化
 	_direction = XMVectorZero();
@@ -84,6 +86,15 @@ PlayScene::SceneStart()
 		for (auto& th : _ths)							
 		{
 			th.join();
+		}
+
+		if (!_node->AddObject(dynamic_pointer_cast<FBXObject>(_actorAndObjs[GROUND_NAME])))
+		{
+			assert(0);
+		}
+		if (!_node->AddObject(dynamic_pointer_cast<FBXObject>(_actorAndObjs[BOX_NAME])))
+		{
+			assert(0);
 		}
 
 		//オブジェクトの中からアクターを探す

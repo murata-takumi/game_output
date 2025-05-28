@@ -23,12 +23,12 @@ CollisionDetector::CheckColAndCol(const BoxCollider& col1, const BoxCollider& co
 	//各OBBの右、上、正面ベクトル
 	Vector3 center1 = col1.Center();
 	Vector3 center2 = col2.Center();
-	Vector3 rightLen1 = col1._rightDir * col1.HalfLength().x;
-	Vector3 upLen1 = col1._upDir * col1.HalfLength().y;
-	Vector3 frontLen1 = col1._frontDir * col1.HalfLength().z;
-	Vector3 rightLen2 = col2._rightDir * col2.HalfLength().x;
-	Vector3 upLen2 = col2._upDir * col2.HalfLength().y;
-	Vector3 frontLen2 = col2._frontDir * col2.HalfLength().z;
+	Vector3 rightLen1 = col1._rightDir * col1.HalfLength().X();
+	Vector3 upLen1 = col1._upDir * col1.HalfLength().Y();
+	Vector3 frontLen1 = col1._frontDir * col1.HalfLength().Z();
+	Vector3 rightLen2 = col2._rightDir * col2.HalfLength().X();
+	Vector3 upLen2 = col2._upDir * col2.HalfLength().Y();
+	Vector3 frontLen2 = col2._frontDir * col2.HalfLength().Z();
 
 	//双方のOBBの中心を結ぶベクトル
 	Vector3 vecBetCenter = center2 - center1;
@@ -36,12 +36,12 @@ CollisionDetector::CheckColAndCol(const BoxCollider& col1, const BoxCollider& co
 	//obb1_front
 	float r = LenOnSeparateAxis(col1._frontDir, rightLen2, upLen2, frontLen2);
 	float s = XMVector3Dot(vecBetCenter, col1._frontDir).m128_f32[0];
-	if (fabs(s) > r + col1.HalfLength().z)
+	if (fabs(s) > r + col1.HalfLength().Z())
 	{
 		return false;
 	}
 
-	auto diffZ = r + col1.HalfLength().z - fabs(s);
+	auto diffZ = r + col1.HalfLength().Z() - fabs(s);
 	if (s <= 0)
 	{
 		diffZ *= -1.0f;
@@ -50,12 +50,12 @@ CollisionDetector::CheckColAndCol(const BoxCollider& col1, const BoxCollider& co
 	//obb1_right
 	r = LenOnSeparateAxis(col1._rightDir, rightLen2, upLen2, frontLen2);
 	s = XMVector3Dot(vecBetCenter, col1._rightDir).m128_f32[0];
-	if (fabs(s) > r + col1.HalfLength().x)
+	if (fabs(s) > r + col1.HalfLength().X())
 	{
 		return false;
 	}
 
-	auto diffX = r + col1.HalfLength().x - fabs(s);
+	auto diffX = r + col1.HalfLength().X() - fabs(s);
 	if (s <= 0)
 	{
 		diffX *= -1.0f;
@@ -64,17 +64,17 @@ CollisionDetector::CheckColAndCol(const BoxCollider& col1, const BoxCollider& co
 	//obb1_up
 	r = LenOnSeparateAxis(col1._upDir, rightLen2, upLen2, frontLen2);
 	s = XMVector3Dot(vecBetCenter, col1._upDir).m128_f32[0];
-	if (fabs(s) > r + col1.HalfLength().y)
+	if (fabs(s) > r + col1.HalfLength().Y())
 	{
 		return false;
 	}
 
-	auto diffY = r + col1.HalfLength().y - fabs(s);
+	auto diffY = r + col1.HalfLength().Y() - fabs(s);
 
 	//obb2_front
 	r = LenOnSeparateAxis(col2._frontDir, rightLen1, upLen1, frontLen1);
 	s = fabs(XMVector3Dot(vecBetCenter, col2._frontDir).m128_f32[0]);
-	if (s > r + col2.HalfLength().z)
+	if (s > r + col2.HalfLength().Z())
 	{
 		return false;
 	}
@@ -82,7 +82,7 @@ CollisionDetector::CheckColAndCol(const BoxCollider& col1, const BoxCollider& co
 	//obb2_right
 	r = LenOnSeparateAxis(col2._rightDir, rightLen1, upLen1, frontLen1);
 	s = fabs(XMVector3Dot(vecBetCenter, col2._rightDir).m128_f32[0]);
-	if (s > r + col2.HalfLength().x)
+	if (s > r + col2.HalfLength().X())
 	{
 		return false;
 	}
@@ -90,7 +90,7 @@ CollisionDetector::CheckColAndCol(const BoxCollider& col1, const BoxCollider& co
 	//obb2_up
 	r = LenOnSeparateAxis(col2._upDir, rightLen1, upLen1, frontLen1);
 	s = fabs(XMVector3Dot(vecBetCenter, col2._upDir).m128_f32[0]);
-	if (s > r + col2.HalfLength().y)
+	if (s > r + col2.HalfLength().Y())
 	{
 		return false;
 	}
@@ -109,15 +109,15 @@ CollisionDetector::CheckColAndCol(const BoxCollider& col1, const BoxCollider& co
 	//最小値の座標軸に対しめり込みを戻す処理を行う
 	if (FLT_EPSILON < fabs(diffX) && fabs(min - fabs(diffX)) < FLT_EPSILON)
 	{
-		col2.Object().Pos().X() -= Dx12Wrapper::Instance().GetDeltaTime() * col2.Object().Speed().x;
+		col2.Object().Pos().X() -= Dx12Wrapper::Instance().GetDeltaTime() * col2.Object().Speed().X();
 	}
 	else if (FLT_EPSILON < fabs(diffY) && fabs(min - fabs(diffY)) < FLT_EPSILON)
 	{
-		col2.Object().Pos().Y() -= Dx12Wrapper::Instance().GetDeltaTime() * col2.Object().Speed().y;
+		col2.Object().Pos().Y() -= Dx12Wrapper::Instance().GetDeltaTime() * col2.Object().Speed().Y();
 	}
 	else if (FLT_EPSILON < fabs(diffZ) && fabs(min - fabs(diffZ)) < FLT_EPSILON)
 	{
-		col2.Object().Pos().Z() -= Dx12Wrapper::Instance().GetDeltaTime() * col2.Object().Speed().z;
+		col2.Object().Pos().Z() -= Dx12Wrapper::Instance().GetDeltaTime() * col2.Object().Speed().Z();
 	}
 
 	return true;
@@ -139,22 +139,22 @@ CollisionDetector::CheckColAndPoint(const BoxCollider& col, const Vector3& point
 	Vector3 vec = XMVectorSet(0, 0, 0, 0);
 
 	//方向ベクトルに対する比率を取得し、絶対値が1より大きければ（=はみ出ていたら）距離に加算
-	float s = XMVector3Dot(vecBetcolAndPoint, col._rightDir).m128_f32[0] / col.HalfLength().x;
+	float s = XMVector3Dot(vecBetcolAndPoint, col._rightDir).m128_f32[0] / col.HalfLength().X();
 	if (fabs(s) > 1)
 	{
-		vec += (1 - fabs(s)) * col.HalfLength().x * col._rightDir;
+		vec += (1 - fabs(s)) * col.HalfLength().X() * col._rightDir;
 	}
 
-	s = XMVector3Dot(vecBetcolAndPoint, col._upDir).m128_f32[0] / col.HalfLength().y;
+	s = XMVector3Dot(vecBetcolAndPoint, col._upDir).m128_f32[0] / col.HalfLength().Y();
 	if (fabs(s) > 1)
 	{
-		vec += (1 - fabs(s)) * col.HalfLength().y * col._upDir;
+		vec += (1 - fabs(s)) * col.HalfLength().Y() * col._upDir;
 	}
 
-	s = XMVector3Dot(vecBetcolAndPoint, col._frontDir).m128_f32[0] / col.HalfLength().z;
+	s = XMVector3Dot(vecBetcolAndPoint, col._frontDir).m128_f32[0] / col.HalfLength().Z();
 	if (fabs(s) > 1)
 	{
-		vec += (1 - fabs(s)) * col.HalfLength().z * col._frontDir;
+		vec += (1 - fabs(s)) * col.HalfLength().Z() * col._frontDir;
 	}
 
 	//距離が0以下だったらOBBの中に座標が入り込んでいる

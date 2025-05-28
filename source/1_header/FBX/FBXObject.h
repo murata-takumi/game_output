@@ -19,7 +19,7 @@ private:
 
 public:
 	//コンストラクタ
-	FBXObject(const wchar_t* filePath,const string name,XMFLOAT3 size,XMFLOAT3 pos = XMFLOAT3(0.0f, 0.0f, 0.0f));
+	FBXObject(const wchar_t* filePath,const string name,Vector3 size,Vector3 pos = Vector3(0.0f, 0.0f, 0.0f));
 	//デストラクタ
 	~FBXObject();
 

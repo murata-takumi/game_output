@@ -6,7 +6,7 @@
 /// </summary>
 /// <param name="pos">座標</param>
 /// <param name="halfLength">各座標軸の半分の長さ</param>
-Bounds::Bounds(XMFLOAT3 pos, XMFLOAT3 halfLength) 
+Bounds::Bounds(Vector3 pos, Vector3 halfLength) 
 	:_pos(pos), _halfLength(halfLength)
 {
 
@@ -18,18 +18,18 @@ Bounds::Bounds(XMFLOAT3 pos, XMFLOAT3 halfLength)
 /// <param name="point">座標</param>
 /// <returns>中にあるか</returns>
 bool 
-Bounds::CheckPointInBounds(XMFLOAT3 point)
+Bounds::CheckPointInBounds(Vector3& point)
 {
 	//まずは座標を結ぶベクトルを取得
-	auto a = XMFLOAT3(
-		point.x - _pos.x,
-		point.y - _pos.y,
-		point.z - _pos.z
+	auto a = Vector3(
+		point.X() - _pos.X(),
+		point.Y() - _pos.Y(),
+		point.Z() - _pos.Z()
 	);
-	Vector3 vecBetPos = XMLoadFloat3(&a);
+	Vector3 vecBetPos = a;
 
 	//半分の長さをXMVECTORに変換
-	Vector3 halfLengthVec = XMLoadFloat3(&_halfLength);
+	Vector3 halfLengthVec = _halfLength;
 
 	//ベクトルの各要素に対し処理を行う
 	for (int i = 0; i < 3; i++)
@@ -47,24 +47,10 @@ Bounds::CheckPointInBounds(XMFLOAT3 point)
 }
 
 /// <summary>
-/// 座標が矩形の中にあるか判定する関数（XMVector版）
-/// </summary>
-/// <param name="vec">座標ベクトル</param>
-/// <returns>中にあるか</returns>
-bool 
-Bounds::CheckPointInBounds(Vector3& vec)
-{
-	//XMVectorからXMFLOAT3に変換したうえで渡す
-	XMFLOAT3 temp = XMFLOAT3(vec.X(), vec.Y(), vec.Z());
-
-	return CheckPointInBounds(temp);
-}
-
-/// <summary>
 /// 中心座標を返す
 /// </summary>
 /// <returns></returns>
-XMFLOAT3 
+Vector3 
 Bounds::Pos()const
 {
 	return _pos;
@@ -74,7 +60,7 @@ Bounds::Pos()const
 /// 半分長さを返す
 /// </summary>
 /// <returns></returns>
-XMFLOAT3 
+Vector3 
 Bounds::HalfLength()const
 {
 	return _halfLength;

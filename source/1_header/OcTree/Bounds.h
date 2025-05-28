@@ -9,25 +9,22 @@ class Bounds
 {
 private:
 	//中心座標
-	XMFLOAT3 _pos;
+	Vector3 _pos;
 
 	//幅、高さ、奥行
-	XMFLOAT3 _halfLength;
+	Vector3 _halfLength;
 
 public:
 
 	//コンストラクタ
-	Bounds(XMFLOAT3 pos, XMFLOAT3 halfLength);
+	Bounds(Vector3 pos, Vector3 halfLength);
 
 	//座標が矩形の中にあるか判定する関数
-	bool CheckPointInBounds(XMFLOAT3 point);
-
-	//座標が矩形の中にあるか判定する関数（XMVector版）
-	bool CheckPointInBounds(Vector3& vec);
+	bool CheckPointInBounds(Vector3& point);
 
 	//中心座標を返す
-	XMFLOAT3 Pos()const;
+	Vector3 Pos()const;
 
 	//半分長さを返す
-	XMFLOAT3 HalfLength()const;
+	Vector3 HalfLength()const;
 };

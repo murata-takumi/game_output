@@ -12,20 +12,20 @@ const Vector3 INITIAL_FRONT = XMVectorSet(0.0f,0.0f,1.0f,0.0f);
 /// </summary>
 /// <param name="size">当たり判定の幅、高さ、奥行のサイズ</param>
 /// <param name="center">当たり判定の中心ベクトル</param>
-BoxCollider::BoxCollider(FBXBase& object, const XMFLOAT3& size)
+BoxCollider::BoxCollider(FBXBase& object, const Vector3& size)
 	:_object(object)
 {
 	//ベクトルを初期化
 	SetVec(INITIAL_FRONT);
 
-	auto x = size.x;
-	auto y = size.y;
-	auto z = size.z;
+	auto x = size.X();
+	auto y = size.Y();
+	auto z = size.Z();
 
 	//半分の長さも取得
-	_halfWidth = size.x / 2;
-	_halfHeight = size.y / 2;
-	_halfDepth = size.z / 2;
+	_halfWidth = size.X() / 2;
+	_halfHeight = size.Y() / 2;
+	_halfDepth = size.Z() / 2;
 
 	//中心を初期化
 	_initCenter = XMVectorSet(0,0,0,0);
@@ -118,10 +118,10 @@ BoxCollider::Vertices()const
 /// 幅、高さ、奥行をまとめて返す関数
 /// </summary>
 /// <returns>幅、高さ、奥行</returns>
-XMFLOAT3
+Vector3
 BoxCollider::HalfLength()const
 {
-	return XMFLOAT3(_halfWidth,_halfHeight,_halfDepth);
+	return Vector3(_halfWidth,_halfHeight,_halfDepth);
 }
 
 /// <summary>

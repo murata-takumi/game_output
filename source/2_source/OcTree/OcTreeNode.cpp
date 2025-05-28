@@ -29,6 +29,7 @@ OcTreeNode::~OcTreeNode()
 bool
 OcTreeNode::AddObject(const shared_ptr<FBXObject> obj)
 {
+	//空間内に入ってなかったら処理中断
 	if (!_bounds.CheckPointInBounds(obj.get()->Pos()))
 	{
 		return false;
@@ -59,12 +60,10 @@ OcTreeNode::SubDivide()
 {
 	// 空間の半分長さを取得し、更に半分にする
 	auto bh = _bounds.HalfLength();
-	XMVECTOR halfVec = XMVectorScale(XMLoadFloat3(&bh), 1.0f / 2.0f);
-	XMFLOAT3 halfLength;
-	XMStoreFloat3(&halfLength, halfVec);
+	Vector3 halfVec = XMVectorScale(bh, 1.0f / 2.0f);
 
 	//新しい矩形の座標に使用
-	float quaterLength = halfLength.x / 2.0f;
+	float quaterLength = halfVec.X() / 2.0f;
 	for (int i = 0; i < 8; i++)
 	{
 		//iをビットに変換し、各桁をx,y,z座標に使用
@@ -76,7 +75,7 @@ OcTreeNode::SubDivide()
 		int z = Convert(decStr[2]) * quaterLength;
 
 		//新しい矩形を作成
-		Bounds newBounds = Bounds(halfLength, XMFLOAT3(x, y, z));
+		Bounds newBounds = Bounds(halfVec, Vector3(x, y, z));
 
 		//子ノードを作成し、ベクトルに格納
 		_children.push_back(OcTreeNode(newBounds,_capacity));

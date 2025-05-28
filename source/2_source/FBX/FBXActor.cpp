@@ -32,7 +32,7 @@ const int COLLIDER_BONE = 0;
 /// コンストラクタ
 /// </summary>
 /// <param name="filePath">モデルのパス</param>
-FBXActor::FBXActor(const wchar_t* filePath,const string name, XMFLOAT3 size, XMFLOAT3 pos)
+FBXActor::FBXActor(const wchar_t* filePath,const string name, Vector3 size, Vector3 pos)
 	:FBXBase(filePath, name, size, pos),
 	_crntNode(nullptr), _currentFrontVec(XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f)),
 	_canControll(false),_isInBlend(false),_isInLoop(true),
@@ -677,7 +677,7 @@ FBXActor::Update()
 		if (!GetOnGround() && !IsAnimationEqual(JUMP00))
 		{
 			_pos.Y() -= Dx12Wrapper::Instance().GetDeltaTime() * 45.0f * GRAVITY_ACCERALATION;
-			FBXBase::_speed.y = -45.0f * GRAVITY_ACCERALATION;
+			FBXBase::_speed.Y() = -45.0f * GRAVITY_ACCERALATION;
 			SetAnimationNode(FALL);
 		}
 
@@ -728,8 +728,8 @@ FBXActor::Translate(const Vector3& input)
 	//座標に入力に応じたベクトルを加算
 	_pos += input * Dx12Wrapper::Instance().GetDeltaTime() * MOVE_SPEED;
 
-	FBXBase::_speed.x = input.X() * MOVE_SPEED;
-	FBXBase::_speed.z = input.Z() * MOVE_SPEED;
+	FBXBase::_speed.X() = input.X() * MOVE_SPEED;
+	FBXBase::_speed.Z() = input.Z() * MOVE_SPEED;
 
 	//入力ベクトルと正面ベクトルの角度差を取得
 	auto diff = XMVector3AngleBetweenVectors(input, _currentFrontVec).m128_f32[0];			
