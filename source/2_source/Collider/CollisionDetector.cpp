@@ -107,18 +107,18 @@ CollisionDetector::CheckColAndCol(const BoxCollider& col1, const BoxCollider& co
 	}
 
 	//Å¬’l‚ÌÀ•W²‚É‘Î‚µ‚ß‚è‚İ‚ğ–ß‚·ˆ—‚ğs‚¤
-	if (FLT_EPSILON < fabs(diffX) && fabs(min - fabs(diffX)) < FLT_EPSILON)
-	{
-		col2.Object().Pos().X() -= Dx12Wrapper::Instance().GetDeltaTime() * col2.Object().Speed().X();
-	}
-	else if (FLT_EPSILON < fabs(diffY) && fabs(min - fabs(diffY)) < FLT_EPSILON)
-	{
-		col2.Object().Pos().Y() -= Dx12Wrapper::Instance().GetDeltaTime() * col2.Object().Speed().Y();
-	}
-	else if (FLT_EPSILON < fabs(diffZ) && fabs(min - fabs(diffZ)) < FLT_EPSILON)
-	{
-		col2.Object().Pos().Z() -= Dx12Wrapper::Instance().GetDeltaTime() * col2.Object().Speed().Z();
-	}
+	//if (FLT_EPSILON < fabs(diffX) && fabs(min - fabs(diffX)) < FLT_EPSILON)
+	//{
+	//	col2.Object().Pos().X() -= Dx12Wrapper::Instance().GetDeltaTime() * col2.Object().Speed().X();
+	//}
+	//else if (FLT_EPSILON < fabs(diffY) && fabs(min - fabs(diffY)) < FLT_EPSILON)
+	//{
+	//	col2.Object().Pos().Y() -= Dx12Wrapper::Instance().GetDeltaTime() * col2.Object().Speed().Y();
+	//}
+	//else if (FLT_EPSILON < fabs(diffZ) && fabs(min - fabs(diffZ)) < FLT_EPSILON)
+	//{
+	//	col2.Object().Pos().Z() -= Dx12Wrapper::Instance().GetDeltaTime() * col2.Object().Speed().Z();
+	//}
 
 	return true;
 }

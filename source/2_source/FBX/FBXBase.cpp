@@ -397,7 +397,7 @@ FBXBase::Update()
 	XMVECTOR scale, trans, skew;
 	XMMatrixDecompose(&scale, &skew, &trans,FBXBase::_mappedMats[0]);
 
-	_frontVec = XMVectorSet(0, 0, _collider->HalfLength().Z(), 0);
+	_frontVec = XMVectorSet(0, _collider->HalfLength().Y(), _collider->HalfLength().Z(), 0);
 	_frontVec = XMVector3Transform(_frontVec, FBXBase::_mappedMats[0]);
 
 	_footVec = XMVectorSet(0, -1 * (_collider->HalfLength().Y() + 65.0f), 0, 0);

@@ -7,7 +7,7 @@
 /// </summary>
 /// <param name="bounds">扱う空間</param>
 /// <param name="capacity">容量</param>
-OcTreeNode::OcTreeNode(Bounds bounds, int capacity):
+OcTreeNode::OcTreeNode(Bounds* bounds, int capacity):
 	_bounds(bounds),_capacity(capacity)
 {
 
@@ -30,8 +30,9 @@ bool
 OcTreeNode::AddObject(const shared_ptr<FBXObject> obj)
 {
 	//空間内に入ってなかったら処理中断
-	if (!_bounds.CheckPointInBounds(obj.get()->Pos()))
+	if (!_bounds->CheckPointInBounds(obj.get()->Pos()))
 	{
+		ImGuiManager::Instance().AddText(1, "Add obj1 failed");
 		return false;
 	}
 
@@ -59,7 +60,7 @@ void
 OcTreeNode::SubDivide()
 {
 	// 空間の半分長さを取得し、更に半分にする
-	auto bh = _bounds.HalfLength();
+	auto bh = _bounds->HalfLength();
 	Vector3 halfVec = XMVectorScale(bh, 1.0f / 2.0f);
 
 	//新しい矩形の座標に使用
@@ -75,7 +76,7 @@ OcTreeNode::SubDivide()
 		int z = Convert(decStr[2]) * quaterLength;
 
 		//新しい矩形を作成
-		Bounds newBounds = Bounds(halfVec, Vector3(x, y, z));
+		Bounds* newBounds = new Bounds(Vector3(halfVec), Vector3(x, y, z));
 
 		//子ノードを作成し、ベクトルに格納
 		_children.push_back(OcTreeNode(newBounds,_capacity));
@@ -107,14 +108,14 @@ OcTreeNode::AddToChild(vector<shared_ptr<FBXObject>> objs)
 /// <param name="bounds">クエリ範囲</param>
 /// <returns>オブジェクト</returns>
 vector<shared_ptr<FBXObject>>
-OcTreeNode::Get(Bounds bounds)
+OcTreeNode::Get(BoxCollider col)
 {
 	vector<shared_ptr<FBXObject>> ret;
 
 	//全オブジェクトに対しクエリ範囲内に含まれているかチェックを行う
 	for (auto& obj : _objs)
 	{
-		if (bounds.CheckPointInBounds(obj.get()->Pos()))
+		if (CollisionDetector::Instance().CheckColAndCol(col,*obj->Collider()))
 		{
 			ret.push_back(obj);
 		}
@@ -123,7 +124,7 @@ OcTreeNode::Get(Bounds bounds)
 	//子ノードに対し再帰的に取得処理を行う
 	for (OcTreeNode node : _children)
 	{
-		ret.insert(ret.end(), node.Get(bounds).begin(), node.Get(bounds).end());
+		ret.insert(ret.end(), node.Get(col).begin(), node.Get(col).end());
 	}
 
 	return ret;

@@ -66,13 +66,7 @@ public:
 
 	float& operator[](const int& idx)
 	{
-		return XMLoadFloat3(&_data).m128_f32[idx];
-	}
-
-	XMVECTOR* operator&()
-	{
-		XMVECTOR ret = XMLoadFloat3(&_data);
-		return &ret;
+		return reinterpret_cast<float*>(&_data)[idx];
 	}
 
 	Vector3& operator=(const Vector3& other)

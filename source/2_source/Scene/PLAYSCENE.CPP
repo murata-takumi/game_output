@@ -61,7 +61,9 @@ PlayScene::SceneStart()
 	//カメラ位置をリセット
 	Dx12Wrapper::Instance().ResetCoordinates(0,0);	
 
-	_node = new OcTreeNode(Bounds(Vector3(0, 0, 0), Vector3(1000, 1000, 1000)), 4);
+	auto b = make_shared<Bounds>(Vector3(0, 0, 0), Vector3(1000, 1000, 1000));
+
+	_node = new OcTreeNode(b.get(), 4);
 
 	//プレイヤーの移動ベクトルを初期化
 	_direction = XMVectorZero();
@@ -92,6 +94,7 @@ PlayScene::SceneStart()
 		{
 			assert(0);
 		}
+
 		if (!_node->AddObject(dynamic_pointer_cast<FBXObject>(_actorAndObjs[BOX_NAME])))
 		{
 			assert(0);
@@ -115,10 +118,6 @@ PlayScene::SceneStart()
 		}
 
 		ImGuiManager::Instance().SetActor(_actorAndObjs);
-
-		ImGuiManager::Instance().AddLabelAndFloat("BoxX", _actorAndObjs[BOX_NAME]->Collider()->Center().X());
-		ImGuiManager::Instance().AddLabelAndFloat("BoxY", _actorAndObjs[BOX_NAME]->Collider()->Center().Y());
-		ImGuiManager::Instance().AddLabelAndFloat("BoxZ", _actorAndObjs[BOX_NAME]->Collider()->Center().Z());
 
 		//ロード完了
 		BaseScene::_canInput = true;
@@ -227,12 +226,21 @@ PlayScene::Update()
 			//移動ベクトルを正規化
 			_direction = XMVector3Normalize(_direction);
 
+			//アクターの近くにあるオブジェクトを取得
+			auto objsNearby = _node->Get(*_actor->Collider());
 			//当たり判定をチェック
-			CollisionDetector::Instance().CheckColAndCol(*_actorAndObjs[BOX_NAME]->Collider(), *_actor->Collider());
-			CollisionDetector::Instance().CheckColAndCol(*_actorAndObjs[GROUND_NAME]->Collider(), *_actor->Collider());
-
-			//アクターを移動
-			_actor->Translate(_direction);
+			auto bo = true;
+			
+			//アクターを移動させる
+			for(auto& obj : objsNearby)
+			{
+				if (CollisionDetector::Instance().CheckColAndPoint(*obj->Collider(), _actor->FrontVec()))
+				{
+					bo = false;
+					break;
+				}
+			}
+			_actor->Translate(_direction, bo);
 
 			//移動ベクトルを初期化
 			_direction = XMVectorZero();

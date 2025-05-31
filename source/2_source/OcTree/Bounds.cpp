@@ -6,10 +6,10 @@
 /// </summary>
 /// <param name="pos">座標</param>
 /// <param name="halfLength">各座標軸の半分の長さ</param>
-Bounds::Bounds(Vector3 pos, Vector3 halfLength) 
+Bounds::Bounds(const Vector3& pos, const Vector3& halfLength) 
 	:_pos(pos), _halfLength(halfLength)
 {
-
+	ImGuiManager::Instance().AddLabelAndFloat("HalfLenX", _halfLength.X());
 }
 
 /// <summary>
@@ -20,6 +20,7 @@ Bounds::Bounds(Vector3 pos, Vector3 halfLength)
 bool 
 Bounds::CheckPointInBounds(Vector3& point)
 {
+	ImGuiManager::Instance().AddLabelAndFloat("len", _halfLength.X());
 	//まずは座標を結ぶベクトルを取得
 	auto a = Vector3(
 		point.X() - _pos.X(),
@@ -30,14 +31,15 @@ Bounds::CheckPointInBounds(Vector3& point)
 
 	//半分の長さをXMVECTORに変換
 	Vector3 halfLengthVec = _halfLength;
+	float len = 0.0f;
 
 	//ベクトルの各要素に対し処理を行う
 	for (int i = 0; i < 3; i++)
 	{
 		//各座標軸に対する比率を求める（半分の長さピッタリだったら絶対値が1になる）
-		auto s = XMVector3Dot(vecBetPos, XMMatrixIdentity().r[i]) / halfLengthVec[i];
+		auto s = XMVector3Dot(vecBetPos, XMMatrixIdentity().r[i]).m128_f32[0] / halfLengthVec[i];
 		//比率の絶対値が1よりおおきければはみ出ているとみなし、中に含んでいない
-		if (fabs(s.m128_f32[0]) > 1)
+		if (fabs(s) > 1)
 		{
 			return false;
 		}
@@ -50,8 +52,8 @@ Bounds::CheckPointInBounds(Vector3& point)
 /// 中心座標を返す
 /// </summary>
 /// <returns></returns>
-Vector3 
-Bounds::Pos()const
+Vector3&
+Bounds::Pos()
 {
 	return _pos;
 }

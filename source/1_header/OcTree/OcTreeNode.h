@@ -1,5 +1,8 @@
 #pragma once
 #include "Application.h"
+
+#include "Collider/CollisionDetector.h"
+#include "Collider/BoxCollider.h"
 #include "FBX/FBXObject.h"
 #include "OcTree/Bounds.h"
 
@@ -10,7 +13,7 @@ class OcTreeNode
 {
 public:
 	//コンストラクタ
-	OcTreeNode(Bounds bounds, int capacity);
+	OcTreeNode(Bounds* bounds, int capacity);
 	//デストラクタ
 	~OcTreeNode();
 
@@ -24,10 +27,10 @@ public:
 	void AddToChild(vector<shared_ptr<FBXObject>> objs);
 
 	//クエリ範囲にあるオブジェクトを取得する関数
-	vector<shared_ptr<FBXObject>> Get(Bounds bounds);
+	vector<shared_ptr<FBXObject>> Get(BoxCollider bounds);
 private:
 	//管理する空間
-	Bounds _bounds;
+	Bounds* _bounds;
 
 	//子ノード
 	vector<OcTreeNode> _children;

@@ -2,6 +2,8 @@
 #include "Application.h"
 #include "Vector3.h"
 
+#include "Manager/ImGuiManager.h"
+
 /// <summary>
 /// 3D空間における矩形を表すクラス
 /// </summary>
@@ -17,13 +19,13 @@ private:
 public:
 
 	//コンストラクタ
-	Bounds(Vector3 pos, Vector3 halfLength);
+	Bounds(const Vector3& pos, const Vector3& halfLength);
 
 	//座標が矩形の中にあるか判定する関数
 	bool CheckPointInBounds(Vector3& point);
 
 	//中心座標を返す
-	Vector3 Pos()const;
+	Vector3& Pos();
 
 	//半分長さを返す
 	Vector3 HalfLength()const;

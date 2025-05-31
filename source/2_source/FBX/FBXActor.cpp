@@ -35,7 +35,7 @@ const int COLLIDER_BONE = 0;
 FBXActor::FBXActor(const wchar_t* filePath,const string name, Vector3 size, Vector3 pos)
 	:FBXBase(filePath, name, size, pos),
 	_crntNode(nullptr), _currentFrontVec(XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f)),
-	_canControll(false),_isInBlend(false),_isInLoop(true),
+	_bounds(Bounds(Vector3(0,0,0),Vector3(70,180,70))), _canControll(false), _isInBlend(false), _isInLoop(true),
 	_canChangeAnim(true),_blendWeight(0.0f), _animTime(0.0f),
 	_destRad(0.0f), _rotY(0.0f)
 {
@@ -700,6 +700,8 @@ FBXActor::Update()
 	if (_isInBlend)	copy(_blendMats.begin(), _blendMats.end(), FBXBase::_mappedMats + 1);
 	else copy(_boneMats.begin(), _boneMats.end(), FBXBase::_mappedMats + 1);
 
+	_bounds.Pos() = _pos;
+
 	//前フレームの時間を更新
 	_befFrameTime = _currFrameTime;
 }
@@ -708,8 +710,9 @@ FBXActor::Update()
 /// 入力された方向へ移動する関数
 /// </summary>
 /// <param name="input">入力ベクトル</param>
+/// <param name="canTrans">移動できるかどうか</param>
 void
-FBXActor::Translate(const Vector3& input)
+FBXActor::Translate(const Vector3& input, bool canTrans)
 {
 	//入力されているかどうかに応じて再生するアニメーションを決める
 	if (XMVector3Length(input).m128_f32[0] > 0.0f)
@@ -725,11 +728,15 @@ FBXActor::Translate(const Vector3& input)
 
 	//入力ベクトルを更新
 	_inputVec = input;
-	//座標に入力に応じたベクトルを加算
-	_pos += input * Dx12Wrapper::Instance().GetDeltaTime() * MOVE_SPEED;
 
-	FBXBase::_speed.X() = input.X() * MOVE_SPEED;
-	FBXBase::_speed.Z() = input.Z() * MOVE_SPEED;
+	if (canTrans)
+	{
+		//座標に入力に応じたベクトルを加算
+		_pos += input * Dx12Wrapper::Instance().GetDeltaTime() * MOVE_SPEED;
+
+		FBXBase::_speed.X() = input.X() * MOVE_SPEED;
+		FBXBase::_speed.Z() = input.Z() * MOVE_SPEED;
+	}
 
 	//入力ベクトルと正面ベクトルの角度差を取得
 	auto diff = XMVector3AngleBetweenVectors(input, _currentFrontVec).m128_f32[0];			
@@ -856,6 +863,16 @@ vector<string>
 FBXActor::GetAnimstr()const
 {
 	return _animStr;
+}
+
+/// <summary>
+/// アクターが持っている矩形を返す関数
+/// </summary>
+/// <returns>矩形</returns>
+Bounds
+FBXActor::GetBounds()const
+{
+	return _bounds;
 }
 
 /// <summary>
