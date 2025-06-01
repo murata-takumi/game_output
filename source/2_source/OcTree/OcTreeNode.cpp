@@ -7,7 +7,7 @@
 /// </summary>
 /// <param name="bounds">扱う空間</param>
 /// <param name="capacity">容量</param>
-OcTreeNode::OcTreeNode(Bounds* bounds, int capacity):
+OcTreeNode::OcTreeNode(const shared_ptr<Bounds> bounds, int capacity):
 	_bounds(bounds),_capacity(capacity)
 {
 
@@ -32,7 +32,7 @@ OcTreeNode::AddObject(const shared_ptr<FBXObject> obj)
 	//空間内に入ってなかったら処理中断
 	if (!_bounds->CheckPointInBounds(obj.get()->Pos()))
 	{
-		ImGuiManager::Instance().AddText(1, "Add obj1 failed");
+		assert(0);
 		return false;
 	}
 
@@ -76,10 +76,10 @@ OcTreeNode::SubDivide()
 		int z = Convert(decStr[2]) * quaterLength;
 
 		//新しい矩形を作成
-		Bounds* newBounds = new Bounds(Vector3(halfVec), Vector3(x, y, z));
+		shared_ptr<Bounds> newBounds = make_shared<Bounds>(Vector3(halfVec), Vector3(x, y, z));
 
 		//子ノードを作成し、ベクトルに格納
-		_children.push_back(OcTreeNode(newBounds,_capacity));
+		_children.push_back(make_shared<OcTreeNode>(newBounds,_capacity));
 	}
 }
 
@@ -88,13 +88,13 @@ OcTreeNode::SubDivide()
 /// </summary>
 /// <param name="objs">オブジェクト</param>
 void
-OcTreeNode::AddToChild(vector<shared_ptr<FBXObject>> objs)
+OcTreeNode::AddToChild(const vector<shared_ptr<FBXObject>> objs)
 {
 	for(auto& obj : objs)
 	{
 		for (int i = 0; i < 8; i++)
 		{
-			if (_children[i].AddObject(obj))
+			if (_children[i]->AddObject(obj))
 			{
 				break;
 			}
@@ -108,23 +108,23 @@ OcTreeNode::AddToChild(vector<shared_ptr<FBXObject>> objs)
 /// <param name="bounds">クエリ範囲</param>
 /// <returns>オブジェクト</returns>
 vector<shared_ptr<FBXObject>>
-OcTreeNode::Get(BoxCollider col)
+OcTreeNode::Get(const shared_ptr<BoxCollider> col)
 {
 	vector<shared_ptr<FBXObject>> ret;
 
 	//全オブジェクトに対しクエリ範囲内に含まれているかチェックを行う
 	for (auto& obj : _objs)
 	{
-		if (CollisionDetector::Instance().CheckColAndCol(col,*obj->Collider()))
+		if (CollisionDetector::Instance().CheckColAndCol(*col,*obj->Collider()))
 		{
 			ret.push_back(obj);
 		}
 	}
 
 	//子ノードに対し再帰的に取得処理を行う
-	for (OcTreeNode node : _children)
+	for (shared_ptr<OcTreeNode> node : _children)
 	{
-		ret.insert(ret.end(), node.Get(col).begin(), node.Get(col).end());
+		ret.insert(ret.end(), node->Get(col).begin(), node->Get(col).end());
 	}
 
 	return ret;

@@ -9,7 +9,7 @@
 Bounds::Bounds(const Vector3& pos, const Vector3& halfLength) 
 	:_pos(pos), _halfLength(halfLength)
 {
-	ImGuiManager::Instance().AddLabelAndFloat("HalfLenX", _halfLength.X());
+
 }
 
 /// <summary>
@@ -18,9 +18,8 @@ Bounds::Bounds(const Vector3& pos, const Vector3& halfLength)
 /// <param name="point">座標</param>
 /// <returns>中にあるか</returns>
 bool 
-Bounds::CheckPointInBounds(Vector3& point)
+Bounds::CheckPointInBounds(const Vector3& point)
 {
-	ImGuiManager::Instance().AddLabelAndFloat("len", _halfLength.X());
 	//まずは座標を結ぶベクトルを取得
 	auto a = Vector3(
 		point.X() - _pos.X(),
@@ -31,7 +30,6 @@ Bounds::CheckPointInBounds(Vector3& point)
 
 	//半分の長さをXMVECTORに変換
 	Vector3 halfLengthVec = _halfLength;
-	float len = 0.0f;
 
 	//ベクトルの各要素に対し処理を行う
 	for (int i = 0; i < 3; i++)
@@ -62,7 +60,7 @@ Bounds::Pos()
 /// 半分長さを返す
 /// </summary>
 /// <returns></returns>
-Vector3 
+Vector3
 Bounds::HalfLength()const
 {
 	return _halfLength;

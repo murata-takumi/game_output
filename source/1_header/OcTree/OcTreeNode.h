@@ -13,7 +13,7 @@ class OcTreeNode
 {
 public:
 	//コンストラクタ
-	OcTreeNode(Bounds* bounds, int capacity);
+	OcTreeNode(const shared_ptr<Bounds> bounds, int capacity);
 	//デストラクタ
 	~OcTreeNode();
 
@@ -24,16 +24,16 @@ public:
 	void SubDivide();
 
 	//子ノードに分割する関数
-	void AddToChild(vector<shared_ptr<FBXObject>> objs);
+	void AddToChild(const vector<shared_ptr<FBXObject>> objs);
 
 	//クエリ範囲にあるオブジェクトを取得する関数
-	vector<shared_ptr<FBXObject>> Get(BoxCollider bounds);
+	vector<shared_ptr<FBXObject>> Get(const shared_ptr<BoxCollider> bounds);
 private:
 	//管理する空間
-	Bounds* _bounds;
+	shared_ptr<Bounds> _bounds;
 
 	//子ノード
-	vector<OcTreeNode> _children;
+	vector<shared_ptr<OcTreeNode>> _children;
 
 	//格納するオブジェクト
 	vector<shared_ptr<FBXObject>> _objs;

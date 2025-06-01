@@ -22,7 +22,7 @@ public:
 	Bounds(const Vector3& pos, const Vector3& halfLength);
 
 	//座標が矩形の中にあるか判定する関数
-	bool CheckPointInBounds(Vector3& point);
+	bool CheckPointInBounds(const Vector3& point);
 
 	//中心座標を返す
 	Vector3& Pos();

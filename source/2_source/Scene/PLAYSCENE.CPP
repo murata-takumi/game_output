@@ -60,10 +60,11 @@ PlayScene::SceneStart()
 {
 	//カメラ位置をリセット
 	Dx12Wrapper::Instance().ResetCoordinates(0,0);	
-
-	auto b = make_shared<Bounds>(Vector3(0, 0, 0), Vector3(1000, 1000, 1000));
-
-	_node = new OcTreeNode(b.get(), 4);
+	
+	_node = new OcTreeNode(
+		make_shared<Bounds>(Vector3(0, 0, 0), Vector3(1000, 1000, 1000)),
+		4
+	);
 
 	//プレイヤーの移動ベクトルを初期化
 	_direction = XMVectorZero();
@@ -227,7 +228,7 @@ PlayScene::Update()
 			_direction = XMVector3Normalize(_direction);
 
 			//アクターの近くにあるオブジェクトを取得
-			auto objsNearby = _node->Get(*_actor->Collider());
+			auto objsNearby = _node->Get(_actor->Collider());
 			//当たり判定をチェック
 			auto bo = true;
 			
