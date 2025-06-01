@@ -48,9 +48,7 @@ protected:
 	OcTreeNode* _node;
 
 	//プレイヤー、カメラの進行ベクトル
-	Vector3 _direction;							
-
-	char* _currentFootObjName;
+	Vector3 _direction;
 
 	//オブジェクトを生成する関数
 	template<class className> void InstantiateObject(const wchar_t* path, string name,Vector3 size, Vector3 pos = Vector3(0.0f,0.0f,0.0f));

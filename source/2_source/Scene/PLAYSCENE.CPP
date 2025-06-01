@@ -26,8 +26,8 @@ const Vector3 ACTOR_INIT_POS = Vector3(0.0f, 0.0f, 0.0f);
 //コインの初期座標
 const Vector3 COIN_INIT_POS = Vector3(0.0f, 0.0f, 100.0f);
 //箱の初期座標
-//const Vector3 BOX_INIT_POS = Vector3(600.0f, -200.0f, 0.0f);
-const Vector3 BOX_INIT_POS = Vector3(300.0f, 0.0f, 0.0f);
+const Vector3 BOX_INIT_POS = Vector3(600.0f, -200.0f, 0.0f);
+//const Vector3 BOX_INIT_POS = Vector3(300.0f, 0.0f, 0.0f);
 
 //オブジェクトの名前一覧
 const string ACTOR_NAME = "Actor";
@@ -61,6 +61,7 @@ PlayScene::SceneStart()
 	//カメラ位置をリセット
 	Dx12Wrapper::Instance().ResetCoordinates(0,0);	
 	
+	//八分木ノードの初期化
 	_node = new OcTreeNode(
 		make_shared<Bounds>(Vector3(0, 0, 0), Vector3(1000, 1000, 1000)),
 		4
@@ -68,10 +69,6 @@ PlayScene::SceneStart()
 
 	//プレイヤーの移動ベクトルを初期化
 	_direction = XMVectorZero();
-
-	//乗る対象となるオブジェクトの名前も初期化
-	_currentFootObjName = new char[100];
-	strcpy(_currentFootObjName, GROUND_NAME.c_str());
 
 	//モデル読み込み処理
 	auto f = [&]()
@@ -91,11 +88,11 @@ PlayScene::SceneStart()
 			th.join();
 		}
 
+		//八分木ノードにオブジェクトを追加
 		if (!_node->AddObject(dynamic_pointer_cast<FBXObject>(_actorAndObjs[GROUND_NAME])))
 		{
 			assert(0);
 		}
-
 		if (!_node->AddObject(dynamic_pointer_cast<FBXObject>(_actorAndObjs[BOX_NAME])))
 		{
 			assert(0);
@@ -109,10 +106,24 @@ PlayScene::SceneStart()
 				//コールバックを設定
 				_actor->_isOnGround = [&](const XMVECTOR& vec)
 				{
-					return CollisionDetector::Instance().CheckColAndPoint(
-						*_actorAndObjs[_currentFootObjName]->Collider().get(),
-						vec
-					);
+					//アクターの近くにあるオブジェクトを取得
+					auto objsNearby = _node->Get(_actor->Collider());
+					//当たり判定をチェック
+					auto ret = false;
+
+					for (auto& obj : objsNearby)
+					{
+						if (CollisionDetector::Instance().CheckColAndPoint(
+							*obj->Collider(),
+							vec
+						))
+						{
+							ret = true;
+							break;
+						}
+					}
+
+					return ret;
 				};
 				break;
 			}
@@ -149,8 +160,6 @@ PlayScene::Update()
 	//操作可能な場合入力を反映する
 	if (BaseScene::_canInput)
 	{
-		ImGuiManager::Instance().AddText(0, _currentFootObjName);
-
 		//コインとアクターが接触したらコインを削除
 		//if (_actorAndObjs[COIN_NAME] && CheckColAndCol(*_actorAndObjs[COIN_NAME]->Collider(), *_actor->Collider()))
 		//{
