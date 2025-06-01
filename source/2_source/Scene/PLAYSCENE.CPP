@@ -60,12 +60,6 @@ PlayScene::SceneStart()
 {
 	//カメラ位置をリセット
 	Dx12Wrapper::Instance().ResetCoordinates(0,0);	
-	
-	//八分木ノードの初期化
-	_node = new OcTreeNode(
-		make_shared<Bounds>(Vector3(0, 0, 0), Vector3(1000, 1000, 1000)),
-		4
-	);
 
 	//プレイヤーの移動ベクトルを初期化
 	_direction = XMVectorZero();
@@ -89,11 +83,11 @@ PlayScene::SceneStart()
 		}
 
 		//八分木ノードにオブジェクトを追加
-		if (!_node->AddObject(dynamic_pointer_cast<FBXObject>(_actorAndObjs[GROUND_NAME])))
+		if (!OcTree::Instance().AddObject(dynamic_pointer_cast<FBXObject>(_actorAndObjs[GROUND_NAME])))
 		{
 			assert(0);
 		}
-		if (!_node->AddObject(dynamic_pointer_cast<FBXObject>(_actorAndObjs[BOX_NAME])))
+		if (!OcTree::Instance().AddObject(dynamic_pointer_cast<FBXObject>(_actorAndObjs[BOX_NAME])))
 		{
 			assert(0);
 		}
@@ -107,7 +101,7 @@ PlayScene::SceneStart()
 				_actor->_isOnGround = [&](const XMVECTOR& vec)
 				{
 					//アクターの近くにあるオブジェクトを取得
-					auto objsNearby = _node->Get(_actor->Collider());
+					auto objsNearby = OcTree::Instance().Get(_actor->Collider());
 					//当たり判定をチェック
 					auto ret = false;
 
@@ -237,20 +231,20 @@ PlayScene::Update()
 			_direction = XMVector3Normalize(_direction);
 
 			//アクターの近くにあるオブジェクトを取得
-			auto objsNearby = _node->Get(_actor->Collider());
+			auto objsNearby = OcTree::Instance().Get(_actor->Collider());
 			//当たり判定をチェック
-			auto bo = true;
+			auto collision = true;
 			
 			//アクターを移動させる
 			for(auto& obj : objsNearby)
 			{
 				if (CollisionDetector::Instance().CheckColAndPoint(*obj->Collider(), _actor->FrontVec()))
 				{
-					bo = false;
+					collision = false;
 					break;
 				}
 			}
-			_actor->Translate(_direction, bo);
+			_actor->Translate(_direction, collision);
 
 			//移動ベクトルを初期化
 			_direction = XMVectorZero();

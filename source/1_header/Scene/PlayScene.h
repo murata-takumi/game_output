@@ -11,6 +11,7 @@
 #include "Manager/EffectManager.h"
 #include "Manager/ImGuiManager.h"
 #include "OcTree/OcTreeNode.h"
+#include "OcTree/OcTree.h"
 #include "Scene/BaseScene.h"
 
 #include <chrono>
@@ -44,8 +45,6 @@ protected:
 
 	//並列処理したいスレッドのベクトル
 	vector<thread> _ths;
-
-	OcTreeNode* _node;
 
 	//プレイヤー、カメラの進行ベクトル
 	Vector3 _direction;

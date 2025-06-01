@@ -1,0 +1,60 @@
+#include "OcTree/OcTree.h"
+
+/// <summary>
+/// シングルトンを返す
+/// </summary>
+/// <returns>シングルトン</returns>
+OcTree&
+OcTree::Instance()
+{
+	static OcTree instance;
+	return instance;
+}
+
+/// <summary>
+/// コンストラクタとデストラクタ
+/// どっちも使わない
+/// </summary>
+OcTree::OcTree()
+{
+
+}
+OcTree::~OcTree()
+{
+
+}
+
+/// <summary>
+/// 初期化関数
+/// </summary>
+/// <param name="bounds">管理する空間</param>
+/// <param name="capacity">ノードが持てる最大容量</param>
+void
+OcTree::Init(const shared_ptr<Bounds> bounds, int capacity)
+{
+	//ルートノードを初期化
+	_rootNode = make_shared<OcTreeNode>(bounds, capacity);
+}
+
+/// <summary>
+/// オブジェクトを追加する関数
+/// </summary>
+/// <param name="obj">追加するオブジェクト</param>
+/// <returns>追加で来たかどうか</returns>
+bool 
+OcTree::AddObject(const shared_ptr<FBXObject> obj)
+{
+	//ルートノードに追加処理
+	return _rootNode->AddObject(obj);
+}
+
+/// <summary>
+/// クエリ範囲にあるオブジェクトを取得する関数
+/// </summary>
+/// <param name="bounds">クエリ範囲</param>
+/// <returns>取得したオブジェクト</returns>
+vector<shared_ptr<FBXObject>> 
+OcTree::Get(const shared_ptr<BoxCollider> bounds)
+{
+	return _rootNode->Get(bounds);
+}

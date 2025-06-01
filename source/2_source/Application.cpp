@@ -195,6 +195,11 @@ Application::Init()
 	//ImGui周りを初期化
 	ImGuiManager::Instance().Init(_hwnd);
 
+	OcTree::Instance().Init(
+		make_shared<Bounds>(Vector3(0, 0, 0), Vector3(1000, 1000, 1000)),
+		4
+	);
+
 	//パイプラインを初期化
 	Renderer::Instance().Init();
 	PeraRenderer::Instance().Init();
