@@ -16,6 +16,10 @@ private:
 	vector<Vector3> _initVerts;
 	//画面に表示する頂点
 	vector<Vector3> _verts;
+
+	//方向ベクトル
+	Vector3* _directionVecs = new Vector3[3];
+
 	//中心ベクトルの初期値
 	Vector3 _initCenter;
 	//中心ベクトル
@@ -28,9 +32,6 @@ private:
 	void SetVec(const Vector3& vec);
 
 public:
-	//それぞれ中心、正面、右、上ベクトル
-	Vector3 _frontDir, _rightDir, _upDir;
-
 	//コンストラクタ
 	BoxCollider(FBXBase& object, const Vector3& size);	
 	//デストラクタ
@@ -41,6 +42,8 @@ public:
 
 	//頂点を返す関数
 	vector<Vector3> Vertices()const;
+
+	Vector3* DirectionVectors()const;
 
 	//幅、高さ、奥行を返す
 	Vector3 HalfLength()const;

@@ -62,15 +62,15 @@ void
 BoxCollider::SetVec(const Vector3& vec)
 {
 	//まずは正面ベクトル
-	_frontDir = XMVector3Normalize(vec);
+	_directionVecs[2] = XMVector3Normalize(vec);
 
 	//XZ平面に対し鉛直なベクトルをとり、それと正面ベクトルの外積を取り右ベクトルとする
 	auto vertical = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
-	_rightDir = XMVector3Normalize(XMVector3Cross(_frontDir, vertical));
+	_directionVecs[0] = XMVector3Normalize(XMVector3Cross(_directionVecs[2], vertical));
 
 	//正面ベクトル、右ベクトルの外積を上ベクトルとする
-	_upDir = XMVector3Normalize(XMVector3Cross(_frontDir, _rightDir));
-	_upDir *= -1.0f;
+	_directionVecs[1] = XMVector3Normalize(XMVector3Cross(_directionVecs[2], _directionVecs[0]));
+	_directionVecs[1] *= -1.0f;
 }
 
 /// <summary>
@@ -102,6 +102,16 @@ BoxCollider::Update(const XMMATRIX& mat)
 	{
 		_verts[i] = XMVector3Transform(_initVerts[i], mat);
 	}															
+}
+
+/// <summary>
+/// 方向ベクトルを返す関数
+/// </summary>
+/// <returns>方向ベクトル</returns>
+Vector3*
+BoxCollider::DirectionVectors()const
+{
+	return _directionVecs;
 }
 
 /// <summary>

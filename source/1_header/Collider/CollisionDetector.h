@@ -20,11 +20,15 @@ public:
 	bool CheckColAndCol(const BoxCollider& col1, const BoxCollider& col2);
 
 	//OBBにベクトルが入っているか確認する関数
-	bool CheckColAndVec(const BoxCollider& col, const Vector3& startPos, const Vector3& direction);
+	bool CheckColAndVec(const BoxCollider& col, const Vector3& startPos, const Vector3& endPos);
 
 	//OBBに座標が入っているか確認する関数
 	bool CheckColAndPoint(const BoxCollider& col, const Vector3& point);
 
+private:
+	//ループを回してOBB同士が接触しているか判断する
+	bool CheckOBBIntersection(const BoxCollider& col1, const BoxCollider& col2);
+
 	//分離軸に投影された線分の長さを取得する
-	float LenOnSeparateAxis(const Vector3& sep, const Vector3& right, const Vector3& up, const Vector3& front = XMVectorZero());
+	float LenOnSeparateAxis(const Vector3& sep, const Vector3& dirVec);
 };
