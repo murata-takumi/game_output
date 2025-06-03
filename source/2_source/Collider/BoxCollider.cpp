@@ -12,9 +12,15 @@ const Vector3 INITIAL_FRONT = XMVectorSet(0.0f,0.0f,1.0f,0.0f);
 /// </summary>
 /// <param name="size">当たり判定の幅、高さ、奥行のサイズ</param>
 /// <param name="center">当たり判定の中心ベクトル</param>
-BoxCollider::BoxCollider(FBXBase& object, const Vector3& size)
-	:_object(object)
+BoxCollider::BoxCollider(FBXBase* object, const Vector3& size)
 {
+	//渡されたアドレスを基にスマートポインタを生成
+	//管理権をスマートポインタに渡すためdeleter?を渡す
+	_object = shared_ptr<FBXBase>(object, [](FBXBase*)
+	{
+
+	});
+
 	//ベクトルを初期化
 	SetVec(INITIAL_FRONT);
 
@@ -151,5 +157,5 @@ BoxCollider::Center()const
 FBXBase&
 BoxCollider::Object()const
 {
-	return _object;
+	return *_object;
 }

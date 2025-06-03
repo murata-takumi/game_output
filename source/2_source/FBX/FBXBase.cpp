@@ -24,7 +24,7 @@ FBXBase::FBXBase(const wchar_t* filePath, const string name, const Vector3& size
 	CreateShaderResourceView();													
 
 	//“–‚½‚è”»’è‚ğì¬
-	_collider = make_shared<BoxCollider>(*this,size);
+	_collider = make_shared<BoxCollider>(this,size);
 }
 
 /// <summary>

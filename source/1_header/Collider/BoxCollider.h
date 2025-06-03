@@ -10,7 +10,7 @@ class BoxCollider
 {
 private:
 	//この当たり判定を持つオブジェクト
-	FBXBase& _object;
+	shared_ptr<FBXBase> _object;
 
 	//頂点の初期値
 	vector<Vector3> _initVerts;
@@ -33,7 +33,7 @@ private:
 
 public:
 	//コンストラクタ
-	BoxCollider(FBXBase& object, const Vector3& size);	
+	BoxCollider(FBXBase* object, const Vector3& size);	
 	//デストラクタ
 	~BoxCollider();
 
