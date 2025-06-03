@@ -29,7 +29,7 @@ CollisionDetector::CheckColAndCol(const BoxCollider& col1, const BoxCollider& co
 /// <param name="col">OBB</param>
 /// <param name="startPos">線分の始点</param>
 /// <param name="endPos">線分の終点</param>
-/// <returns></returns>
+/// <returns>入っているかどうか</returns>
 bool
 CollisionDetector::CheckColAndVec(const BoxCollider& col, const Vector3& startPos, const Vector3& endPos)
 {
@@ -56,10 +56,31 @@ CollisionDetector::CheckColAndVec(const BoxCollider& col, const Vector3& startPo
 	Vector3 centerDiff = lineCenter - col.Center();
 
 	float r, r0, r1;
+	//OBBの方向ベクトルに対し分離軸
 	for (int i = 0; i < 3; i++)
 	{
-		//r = abs(XMVector3Dot(centerDiff,col.))
+		r = abs(XMVector3Dot(centerDiff, col.DirectionVectors()[i]).m128_f32[0]);
+		r0 = col.HalfLength()[i];
+		r1 = lineExtent * abs(XMVector3Dot(lineDir, col.DirectionVectors()[i]).m128_f32[0]);
+		if (r > r0 + r1)
+		{
+			return false;
+		}
 	}
+
+	//線分
+	r = abs(XMVector3Dot(centerDiff, lineDir).m128_f32[0]);
+	r0 = 0.0f;
+	for (int i = 0; i < 3; i++)
+	{
+		r0 += col.HalfLength()[i] * abs(XMVector3Dot(lineDir,col.DirectionVectors()[i]).m128_f32[0]);
+	}
+	if (r > r0 + lineExtent)
+	{
+		return false;
+	}
+
+	return true;
 
 	return true;
 }
@@ -98,6 +119,12 @@ CollisionDetector::CheckColAndPoint(const BoxCollider& col, const Vector3& point
 	return false;
 }
 
+/// <summary>
+/// OBB同士が衝突しているか判別する関数
+/// </summary>
+/// <param name="col1">OBBその1</param>
+/// <param name="col2">OBBその2</param>
+/// <returns>衝突しているか</returns>
 bool 
 CollisionDetector::CheckOBBIntersection(const BoxCollider& col1, const BoxCollider& col2)
 {
