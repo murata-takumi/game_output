@@ -35,7 +35,7 @@ const int COLLIDER_BONE = 0;
 FBXActor::FBXActor(const wchar_t* filePath,const string name, Vector3 size, Vector3 pos)
 	:FBXBase(filePath, name, size, pos),
 	_crntNode(nullptr), _currentFrontVec(XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f)),
-	_bounds(Bounds(Vector3(0,0,0),Vector3(70,180,70))), _canControll(false), _isInBlend(false), _isInLoop(true),
+	_canControll(false), _isInBlend(false), _isInLoop(true),
 	_canChangeAnim(true),_blendWeight(0.0f), _animTime(0.0f),
 	_destRad(0.0f), _rotY(0.0f)
 {
@@ -700,8 +700,6 @@ FBXActor::Update()
 	if (_isInBlend)	copy(_blendMats.begin(), _blendMats.end(), FBXBase::_mappedMats + 1);
 	else copy(_boneMats.begin(), _boneMats.end(), FBXBase::_mappedMats + 1);
 
-	_bounds.Pos() = _pos;
-
 	//前フレームの時間を更新
 	_befFrameTime = _currFrameTime;
 }
@@ -863,16 +861,6 @@ vector<string>
 FBXActor::GetAnimstr()const
 {
 	return _animStr;
-}
-
-/// <summary>
-/// アクターが持っている矩形を返す関数
-/// </summary>
-/// <returns>矩形</returns>
-Bounds
-FBXActor::GetBounds()const
-{
-	return _bounds;
 }
 
 /// <summary>

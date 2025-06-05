@@ -5,7 +5,6 @@
 #include "FBX/AnimNodes/Animations.h"
 #include "FBX/AnimNodes/AnimNode.h"
 #include "FBX/FBXBase.h"
-#include "OcTree/Bounds.h"
 
 /// <summary>
 /// ゲーム画面上に登場する3Dオブジェクトのクラス（ボーン入り）
@@ -45,8 +44,6 @@ private:
 
 	//入力ベクトル
 	Vector3 _inputVec;
-
-	Bounds _bounds;
 
 	//操作可能かを判別する真理値
 	bool _canControll = false;			
@@ -117,7 +114,6 @@ public:
 
 	//アニメーション名のベクトルを返す関数
 	vector<string> GetAnimstr()const;
-	Bounds GetBounds()const;
 	//現在実行しているアニメーション名を返す関数
 	string GetCurentAnimStr()const;
 

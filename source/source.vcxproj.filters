@@ -156,9 +156,6 @@
     <ClInclude Include="1_header\OcTree\OcTree.h">
       <Filter>1_header\OcTree</Filter>
     </ClInclude>
-    <ClInclude Include="1_header\OcTree\Bounds.h">
-      <Filter>1_header\OcTree</Filter>
-    </ClInclude>
     <ClInclude Include="1_header\Vector3.h">
       <Filter>1_header</Filter>
     </ClInclude>
@@ -240,9 +237,6 @@
       <Filter>2_source\OcTree</Filter>
     </ClCompile>
     <ClCompile Include="2_source\OcTree\OcTree.cpp">
-      <Filter>2_source\OcTree</Filter>
-    </ClCompile>
-    <ClCompile Include="2_source\OcTree\Bounds.cpp">
       <Filter>2_source\OcTree</Filter>
     </ClCompile>
   </ItemGroup>
