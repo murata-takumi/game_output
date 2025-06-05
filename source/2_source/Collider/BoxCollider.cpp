@@ -12,7 +12,7 @@ const Vector3 INITIAL_FRONT = XMVectorSet(0.0f,0.0f,1.0f,0.0f);
 /// </summary>
 /// <param name="size">当たり判定の幅、高さ、奥行のサイズ</param>
 /// <param name="center">当たり判定の中心ベクトル</param>
-BoxCollider::BoxCollider(FBXBase* object, const Vector3& size)
+BoxCollider::BoxCollider(const Vector3& size, const Vector3& pos, FBXBase* object)
 {
 	//渡されたアドレスを基にスマートポインタを生成
 	//管理権をスマートポインタに渡すためdeleter?を渡す
@@ -34,7 +34,7 @@ BoxCollider::BoxCollider(FBXBase* object, const Vector3& size)
 	_halfDepth = size.Z() / 2;
 
 	//中心を初期化
-	_initCenter = XMVectorSet(0,0,0,0);
+	_initCenter = pos;
 
 	//頂点の初期化
 	_initVerts.emplace_back(XMVectorSet(-x / 2, -y / 2, -z / 2, 0.0f));

@@ -13,7 +13,7 @@ class OcTreeNode
 {
 public:
 	//コンストラクタ
-	OcTreeNode(const shared_ptr<Bounds> bounds, int capacity);
+	OcTreeNode(const shared_ptr<BoxCollider> col, int capacity);
 	//デストラクタ
 	~OcTreeNode();
 
@@ -30,7 +30,7 @@ public:
 	vector<shared_ptr<FBXObject>> Get(const shared_ptr<BoxCollider> bounds);
 private:
 	//管理する空間
-	shared_ptr<Bounds> _bounds;
+	shared_ptr<BoxCollider> _col;
 
 	//子ノード
 	vector<shared_ptr<OcTreeNode>> _children;

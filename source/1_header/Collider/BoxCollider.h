@@ -33,7 +33,7 @@ private:
 
 public:
 	//コンストラクタ
-	BoxCollider(FBXBase* object, const Vector3& size);	
+	BoxCollider(const Vector3& size, const Vector3& pos = Vector3(0,0,0), FBXBase* object = nullptr);
 	//デストラクタ
 	~BoxCollider();
 

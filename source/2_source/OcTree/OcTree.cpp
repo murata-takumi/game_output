@@ -27,13 +27,13 @@ OcTree::~OcTree()
 /// <summary>
 /// 初期化関数
 /// </summary>
-/// <param name="bounds">管理する空間</param>
+/// <param name="col">管理する空間</param>
 /// <param name="capacity">ノードが持てる最大容量</param>
 void
-OcTree::Init(const shared_ptr<Bounds> bounds, int capacity)
+OcTree::Init(const shared_ptr<BoxCollider> col, int capacity)
 {
 	//ルートノードを初期化
-	_rootNode = make_shared<OcTreeNode>(bounds, capacity);
+	_rootNode = make_shared<OcTreeNode>(col, capacity);
 }
 
 /// <summary>
@@ -54,7 +54,7 @@ OcTree::AddObject(const shared_ptr<FBXObject> obj)
 /// <param name="bounds">クエリ範囲</param>
 /// <returns>取得したオブジェクト</returns>
 vector<shared_ptr<FBXObject>> 
-OcTree::Get(const shared_ptr<BoxCollider> bounds)
+OcTree::Get(const shared_ptr<BoxCollider> col)
 {
-	return _rootNode->Get(bounds);
+	return _rootNode->Get(col);
 }

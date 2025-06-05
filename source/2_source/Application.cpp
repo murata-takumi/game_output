@@ -1,4 +1,6 @@
 #include "Application.h"
+
+#include "Collider/BoxCollider.h"
 #include "Package/Package.h"
 #include "Scene/BaseScene.h"
 #include "Scene/TitleScene.h"
@@ -196,7 +198,7 @@ Application::Init()
 	ImGuiManager::Instance().Init(_hwnd);
 
 	OcTree::Instance().Init(
-		make_shared<Bounds>(Vector3(0, 0, 0), Vector3(1000, 1000, 1000)),
+		make_shared<BoxCollider>(Vector3(1500, 15000, 1500)),
 		4
 	);
 

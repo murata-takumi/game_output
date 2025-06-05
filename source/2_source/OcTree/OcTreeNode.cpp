@@ -7,8 +7,8 @@
 /// </summary>
 /// <param name="bounds">扱う空間</param>
 /// <param name="capacity">容量</param>
-OcTreeNode::OcTreeNode(const shared_ptr<Bounds> bounds, int capacity):
-	_bounds(bounds),_capacity(capacity)
+OcTreeNode::OcTreeNode(const shared_ptr<BoxCollider> col, int capacity):
+	_col(col),_capacity(capacity)
 {
 
 }
@@ -30,7 +30,7 @@ bool
 OcTreeNode::AddObject(const shared_ptr<FBXObject> obj)
 {
 	//空間内に入ってなかったら処理中断
-	if (!_bounds->CheckPointInBounds(obj.get()->Pos()))
+	if (!CollisionDetector::Instance().CheckColAndPoint(*_col, obj.get()->Pos()))
 	{
 		assert(0);
 		return false;
@@ -60,7 +60,7 @@ void
 OcTreeNode::SubDivide()
 {
 	// 空間の半分長さを取得し、更に半分にする
-	auto bh = _bounds->HalfLength();
+	auto bh = _col->HalfLength();
 	Vector3 halfVec = XMVectorScale(bh, 1.0f / 2.0f);
 
 	//新しい矩形の座標に使用
@@ -76,10 +76,10 @@ OcTreeNode::SubDivide()
 		int z = Convert(decStr[2]) * quaterLength;
 
 		//新しい矩形を作成
-		shared_ptr<Bounds> newBounds = make_shared<Bounds>(Vector3(halfVec), Vector3(x, y, z));
+		shared_ptr<BoxCollider> newCol = make_shared<BoxCollider>(Vector3(halfVec), Vector3(x, y, z));
 
 		//子ノードを作成し、ベクトルに格納
-		_children.push_back(make_shared<OcTreeNode>(newBounds,_capacity));
+		_children.push_back(make_shared<OcTreeNode>(newCol,_capacity));
 	}
 }
 
