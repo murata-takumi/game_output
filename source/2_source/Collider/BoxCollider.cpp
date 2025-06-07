@@ -37,15 +37,15 @@ BoxCollider::BoxCollider(const Vector3& size, const Vector3& pos, FBXBase* objec
 	_initCenter = pos;
 
 	//í∏ì_ÇÃèâä˙âª
-	_initVerts.emplace_back(XMVectorSet(-x / 2, -y / 2, -z / 2, 0.0f));
-	_initVerts.emplace_back(XMVectorSet(-x / 2, -y / 2, z / 2, 0.0f));
-	_initVerts.emplace_back(XMVectorSet(x / 2, -y / 2, z / 2, 0.0f));
-	_initVerts.emplace_back(XMVectorSet(x / 2, -y / 2, -z / 2, 0.0f));
+	_initVerts.emplace_back(XMVectorSet(-_halfWidth, -_halfHeight, -_halfDepth, 0.0f));
+	_initVerts.emplace_back(XMVectorSet(-_halfWidth, -_halfHeight, _halfDepth, 0.0f));
+	_initVerts.emplace_back(XMVectorSet(_halfWidth, -_halfHeight, _halfDepth, 0.0f));
+	_initVerts.emplace_back(XMVectorSet(_halfWidth, -_halfHeight, -_halfDepth, 0.0f));
 
-	_initVerts.emplace_back(XMVectorSet(-x / 2, y / 2, -z / 2, 0.0f));
-	_initVerts.emplace_back(XMVectorSet(-x / 2, y / 2, z / 2, 0.0f));
-	_initVerts.emplace_back(XMVectorSet(x / 2, y / 2, z / 2, 0.0f));
-	_initVerts.emplace_back(XMVectorSet(x / 2, y / 2, -z / 2, 0.0f));
+	_initVerts.emplace_back(XMVectorSet(-_halfWidth, _halfHeight, -_halfDepth, 0.0f));
+	_initVerts.emplace_back(XMVectorSet(-_halfWidth, _halfHeight, _halfDepth, 0.0f));
+	_initVerts.emplace_back(XMVectorSet(_halfWidth, _halfHeight, _halfDepth, 0.0f));
+	_initVerts.emplace_back(XMVectorSet(_halfWidth, _halfHeight, -_halfDepth, 0.0f));
 
 	//í∏ì_Çë„ì¸
 	_center = _initCenter;

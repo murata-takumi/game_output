@@ -198,7 +198,7 @@ Application::Init()
 	ImGuiManager::Instance().Init(_hwnd);
 
 	OcTree::Instance().Init(
-		make_shared<BoxCollider>(Vector3(1500, 15000, 1500)),
+		make_shared<BoxCollider>(Vector3(2000, 2000, 2000)),
 		4
 	);
 

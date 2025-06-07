@@ -32,7 +32,6 @@ OcTreeNode::AddObject(const shared_ptr<FBXObject> obj)
 	//空間内に入ってなかったら処理中断
 	if (!CollisionDetector::Instance().CheckColAndPoint(*_col, obj.get()->Pos()))
 	{
-		assert(0);
 		return false;
 	}
 
@@ -61,22 +60,21 @@ OcTreeNode::SubDivide()
 {
 	// 空間の半分長さを取得し、更に半分にする
 	auto bh = _col->HalfLength();
-	Vector3 halfVec = XMVectorScale(bh, 1.0f / 2.0f);
 
 	//新しい矩形の座標に使用
-	float quaterLength = halfVec.X() / 2.0f;
+	float halfLen = bh.X() / 2.0f;
 	for (int i = 0; i < 8; i++)
 	{
 		//iをビットに変換し、各桁をx,y,z座標に使用
 		std::bitset<3> decimal(i);
 		string decStr = decimal.to_string();
 
-		int x = Convert(decStr[0]) * quaterLength;
-		int y = Convert(decStr[1]) * quaterLength;
-		int z = Convert(decStr[2]) * quaterLength;
+		int x = Convert(decStr[0]) * halfLen;
+		int y = Convert(decStr[1]) * halfLen;
+		int z = Convert(decStr[2]) * halfLen;
 
 		//新しい矩形を作成
-		shared_ptr<BoxCollider> newCol = make_shared<BoxCollider>(Vector3(halfVec), Vector3(x, y, z));
+		shared_ptr<BoxCollider> newCol = make_shared<BoxCollider>(bh, Vector3(x, y, z));
 
 		//子ノードを作成し、ベクトルに格納
 		_children.push_back(make_shared<OcTreeNode>(newCol,_capacity));
@@ -124,7 +122,8 @@ OcTreeNode::Get(const shared_ptr<BoxCollider> col)
 	//子ノードに対し再帰的に取得処理を行う
 	for (shared_ptr<OcTreeNode> node : _children)
 	{
-		ret.insert(ret.end(), node->Get(col).begin(), node->Get(col).end());
+		const auto& child = node->Get(col);
+		ret.insert(ret.end(), child.begin(), child.end());
 	}
 
 	return ret;
@@ -138,5 +137,8 @@ OcTreeNode::Get(const shared_ptr<BoxCollider> col)
 int
 OcTreeNode::Convert(int x)
 {
-	return x == 1 ? x : -1;
+	//渡されていたのが数字の1ではなく文字の'1'であったことが判明したため数字に変換する
+	int ret = x - '0';
+
+	return ret == 1 ? ret : -1;
 }

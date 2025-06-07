@@ -27,13 +27,18 @@ const Vector3 ACTOR_INIT_POS = Vector3(0.0f, 0.0f, 0.0f);
 const Vector3 COIN_INIT_POS = Vector3(0.0f, 0.0f, 100.0f);
 //箱の初期座標
 const Vector3 BOX_INIT_POS = Vector3(600.0f, -200.0f, 0.0f);
-//const Vector3 BOX_INIT_POS = Vector3(300.0f, 0.0f, 0.0f);
+const Vector3 BOX_INIT_POS_1 = Vector3(-600.0f, 200.0f, -600.0f);
+const Vector3 BOX_INIT_POS_2 = Vector3(0.0f, -200.0f, 600.0f);
+const Vector3 BOX_INIT_POS_3 = Vector3(0.0f, -200.0f, -600.0f);
 
 //オブジェクトの名前一覧
 const string ACTOR_NAME = "Actor";
 const string GROUND_NAME = "Ground";
 const string COIN_NAME = "Coin";
 const string BOX_NAME = "Box";
+const string BOX_NAME_1 = "Box1";
+const string BOX_NAME_2 = "Box2";
+const string BOX_NAME_3 = "Box3";
 
 /// <summary>
 /// コンストラクタ
@@ -75,6 +80,9 @@ PlayScene::SceneStart()
 		InstantiateObject<FBXObject>(GROUND_PATH,GROUND_NAME,GROUND_COLL_SIZE);
 		//InstantiateObject<FBXObject>(COIN_PATH,COIN_NAME,COIN_COLL_SIZE,COIN_INIT_POS);
 		InstantiateObject<FBXObject>(BOX_PATH,BOX_NAME,BOX_COLL_SIZE,BOX_INIT_POS);
+		InstantiateObject<FBXObject>(BOX_PATH,BOX_NAME_1,BOX_COLL_SIZE,BOX_INIT_POS_1);
+		InstantiateObject<FBXObject>(BOX_PATH,BOX_NAME_2,BOX_COLL_SIZE,BOX_INIT_POS_2);
+		InstantiateObject<FBXObject>(BOX_PATH,BOX_NAME_3,BOX_COLL_SIZE,BOX_INIT_POS_3);
 
 		//スレッドが全て完了するまでここで待機
 		for (auto& th : _ths)							
@@ -88,6 +96,18 @@ PlayScene::SceneStart()
 			assert(0);
 		}
 		if (!OcTree::Instance().AddObject(dynamic_pointer_cast<FBXObject>(_actorAndObjs[BOX_NAME])))
+		{
+			assert(0);
+		}
+		if (!OcTree::Instance().AddObject(dynamic_pointer_cast<FBXObject>(_actorAndObjs[BOX_NAME_1])))
+		{
+			assert(0);
+		}
+		if (!OcTree::Instance().AddObject(dynamic_pointer_cast<FBXObject>(_actorAndObjs[BOX_NAME_2])))
+		{
+			assert(0);
+		}
+		if (!OcTree::Instance().AddObject(dynamic_pointer_cast<FBXObject>(_actorAndObjs[BOX_NAME_3])))
 		{
 			assert(0);
 		}
