@@ -120,11 +120,9 @@ PlayScene::SceneStart()
 				//コールバックを設定
 				_actor->_isOnGround = [&](const XMVECTOR& vec)
 				{
-					//アクターの近くにあるオブジェクトを取得
-					auto objsNearby = OcTree::Instance().Get(_actor->Collider());
-					//当たり判定をチェック
+					//アクターの近くにあるオブジェクトを取得し当たり判定をチェック
+					auto objsNearby = OcTree::Instance().Get(_actor->GetColForGround());
 					auto ret = false;
-
 					for (auto& obj : objsNearby)
 					{
 						if (CollisionDetector::Instance().CheckColAndPoint(

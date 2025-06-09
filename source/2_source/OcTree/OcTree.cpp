@@ -54,7 +54,7 @@ OcTree::AddObject(const shared_ptr<FBXObject> obj)
 /// <param name="bounds">クエリ範囲</param>
 /// <returns>取得したオブジェクト</returns>
 vector<shared_ptr<FBXObject>> 
-OcTree::Get(const shared_ptr<BoxCollider> col)
+OcTree::Get(const shared_ptr<BoxCollider> col)noexcept
 {
 	return _rootNode->Get(col);
 }

@@ -19,7 +19,7 @@ public:
 	bool AddObject(const shared_ptr<FBXObject> obj);
 
 	//クエリ範囲にあるオブジェクトを取得する関数
-	vector<shared_ptr<FBXObject>> Get(const shared_ptr<BoxCollider> col);
+	vector<shared_ptr<FBXObject>> Get(const shared_ptr<BoxCollider> col)noexcept;
 
 private:
 	//ノード

@@ -29,9 +29,9 @@ BoxCollider::BoxCollider(const Vector3& size, const Vector3& pos, FBXBase* objec
 	auto z = size.Z();
 
 	//”¼•ª‚Ì’·‚³‚àæ“¾
-	_halfWidth = size.X() / 2;
-	_halfHeight = size.Y() / 2;
-	_halfDepth = size.Z() / 2;
+	_halfWidth = x / 2;
+	_halfHeight = y / 2;
+	_halfDepth = z / 2;
 
 	//’†S‚ğ‰Šú‰»
 	_initCenter = pos;

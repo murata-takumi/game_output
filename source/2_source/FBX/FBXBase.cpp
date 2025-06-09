@@ -392,16 +392,16 @@ FBXBase::Update()
 {
 	//こう書かないと当たり判定の中心がオブジェクト下になってしまう
 	if (_rejectBone) _motionMat = XMMatrixTranslation(0, _collider->HalfLength().Y(), 0);
-	_collider->Update(_motionMat * FBXBase::_mappedMats[0]);
+	_collider->Update(_motionMat * _mappedMats[0]);
 
 	XMVECTOR scale, trans, skew;
 	XMMatrixDecompose(&scale, &skew, &trans,FBXBase::_mappedMats[0]);
 
 	_frontVec = XMVectorSet(0, _collider->HalfLength().Y(), _collider->HalfLength().Z(), 0);
-	_frontVec = XMVector3Transform(_frontVec, FBXBase::_mappedMats[0]);
+	_frontVec = XMVector3Transform(_frontVec, _mappedMats[0]);
 
 	_footVec = XMVectorSet(0, -1 * (_collider->HalfLength().Y() + 65.0f), 0, 0);
-	_footVec = XMVector3Transform(_footVec, _motionMat * FBXBase::_mappedMats[0]);
+	_footVec = XMVector3Transform(_footVec, _motionMat * _mappedMats[0]);
 }
 
 /// <summary>

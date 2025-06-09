@@ -17,6 +17,8 @@ class FBXActor : public FBXBase
 	template<typename T>using ComPtr = ComPtr<T>;
 
 private:
+	//着地判定を検出するための当たり判定
+	shared_ptr<BoxCollider> _colForGround;
 
 	//アニメーション実行用ノードの配列
 	unique_ptr<AnimNode> _animNodes[Length];
@@ -157,6 +159,9 @@ public:
 	void SetCanChangeAnim(bool val);
 	//アニメーションループ可能か設定する
 	void SetIsInLoop(bool val);
+
+	//接地判定を行うOBBを返す
+	shared_ptr<BoxCollider> GetColForGround()const;
 	//地面に接しているかどうかを返す
 	bool GetOnGround()const;
 };

@@ -81,8 +81,6 @@ CollisionDetector::CheckColAndVec(const BoxCollider& col, const Vector3& startPo
 	}
 
 	return true;
-
-	return true;
 }
 
 /// <summary>

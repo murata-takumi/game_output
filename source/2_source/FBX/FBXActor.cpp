@@ -39,6 +39,8 @@ FBXActor::FBXActor(const wchar_t* filePath,const string name, Vector3 size, Vect
 	_canChangeAnim(true),_blendWeight(0.0f), _animTime(0.0f),
 	_destRad(0.0f), _rotY(0.0f)
 {
+	//接地用当たり判定を作成
+	_colForGround = make_shared<BoxCollider>(Vector3(size.X() * 2, size.Y() * 2, size.Z() * 2), Vector3(0, 0, 0), this);
 	auto jumpStart = [&]()
 	{
 		//開始時間を少し後に設定
@@ -663,6 +665,8 @@ FBXActor::Update()
 		auto diff = GetLIntDiff(_currFrameTime, _befFrameTime);
 		_animTime += static_cast<float>(diff) * GetAnimTickPerSpeed(_currentActorAnim) * _animSpeed;
 
+		_colForGround->Update(_motionMat * _mappedMats[0]);
+
 		//最初のフレームを無視したうえでアニメーションがループするよう設定
 		if (_isInLoop)
 		{
@@ -954,6 +958,16 @@ void
 FBXActor::SetIsInLoop(bool val)
 {
 	_isInLoop = val;
+}
+
+/// <summary>
+/// 接地判定を決める当たり判定を返す
+/// </summary>
+/// <returns>当たり判定</returns>
+shared_ptr<BoxCollider> 
+FBXActor::GetColForGround()const
+{
+	return _colForGround;
 }
 
 /// <summary>

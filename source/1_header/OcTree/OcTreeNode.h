@@ -26,7 +26,7 @@ public:
 	void AddToChild(const vector<shared_ptr<FBXObject>> objs);
 
 	//クエリ範囲にあるオブジェクトを取得する関数
-	vector<shared_ptr<FBXObject>> Get(const shared_ptr<BoxCollider> bounds);
+	vector<shared_ptr<FBXObject>> Get(const shared_ptr<BoxCollider> bounds)noexcept;
 private:
 	//管理する空間
 	shared_ptr<BoxCollider> _col;

@@ -106,7 +106,7 @@ OcTreeNode::AddToChild(const vector<shared_ptr<FBXObject>> objs)
 /// <param name="bounds">クエリ範囲</param>
 /// <returns>オブジェクト</returns>
 vector<shared_ptr<FBXObject>>
-OcTreeNode::Get(const shared_ptr<BoxCollider> col)
+OcTreeNode::Get(const shared_ptr<BoxCollider> col)noexcept
 {
 	vector<shared_ptr<FBXObject>> ret;
 
