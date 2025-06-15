@@ -11,7 +11,7 @@
 /// <param name="size">当たり判定の大きさ</param>
 /// <param name="pos">初期座標</param>
 FBXBase::FBXBase(const wchar_t* filePath, const string name, const Vector3& size, const Vector3& pos)
-	:_motionMat(XMMatrixIdentity()), _pos(pos),_speed(Vector3(0,0,0)),_name(name), _rejectBone(true)
+	:_shiftColMatrix(XMMatrixIdentity()), _translateVector(pos),_speed(Vector3(0,0,0)),_name(name), _rejectBone(true)
 {
 	//モデル関連の情報を初期化
 	InitModel(filePath);														
@@ -79,9 +79,7 @@ HRESULT
 FBXBase::CreateVertexBufferView()
 {
 	//返り値を初期化
-	result = S_OK;											
-
-	_normals.emplace_back(_meshes[0].vertices[0]);
+	result = S_OK;
 
 	//ビュー数をメッシュ数に合わせる
 	_vbViews.reserve(_meshes.size());													
@@ -390,18 +388,17 @@ FBXBase::Draw()
 void
 FBXBase::Update()
 {
+	//当たり判定を上にずらす
 	//こう書かないと当たり判定の中心がオブジェクト下になってしまう
-	if (_rejectBone) _motionMat = XMMatrixTranslation(0, _collider->HalfLength().Y(), 0);
-	_collider->Update(_motionMat * _mappedMats[0]);
+	if (_rejectBone) _shiftColMatrix = XMMatrixTranslation(0, _collider->HalfLength().Y(), 0);
+	_collider->Update(_shiftColMatrix * _mappedMats[0]);
 
-	XMVECTOR scale, trans, skew;
-	XMMatrixDecompose(&scale, &skew, &trans,FBXBase::_mappedMats[0]);
-
+	//正面ベクトルを設定
 	_frontVec = XMVectorSet(0, _collider->HalfLength().Y(), _collider->HalfLength().Z(), 0);
 	_frontVec = XMVector3Transform(_frontVec, _mappedMats[0]);
 
-	_footVec = XMVectorSet(0, -1 * (_collider->HalfLength().Y() + 65.0f), 0, 0);
-	_footVec = XMVector3Transform(_footVec, _motionMat * _mappedMats[0]);
+	//表示座標を当たり判定の中心から高さの半分だけずらした箇所にする
+	_currentPosition = _collider->Center() - XMVectorSet(0, _collider->HalfLength().Y(), 0, 0);
 }
 
 /// <summary>
@@ -415,13 +412,13 @@ FBXBase::Collider()const
 }
 
 /// <summary>
-/// 座標を返す
+/// 表示用座標を返す
 /// </summary>
-/// <returns>座標</returns>
-Vector3& 
-FBXBase::Pos()
+/// <returns>表示用座標</returns>
+Vector3
+FBXBase::CurrentPosition()const
 {
-	return _pos;
+	return _currentPosition;
 }
 
 /// <summary>

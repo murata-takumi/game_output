@@ -54,12 +54,14 @@ protected:
 	//モデルの座標変換行列を格納する構造体のポインタ
 	XMMATRIX* _mappedMats = nullptr;
 
-	XMMATRIX _motionMat;
+	//当たり判定をオブジェクトの半分ほど上にずらすための行列
+	XMMATRIX _shiftColMatrix;
 
-	vector<FBXVertex> _normals;
+	//移動量を格納するベクトル
+	Vector3 _translateVector;
 
-	//座標
-	Vector3 _pos;
+	//ImGuiでの表示に使う座標
+	Vector3 _currentPosition;
 
 	//正面判定に使用
 	Vector3 _frontVec;
@@ -101,9 +103,10 @@ public:
 	virtual void Update();											
 
 	//当たり判定のポインタを返す関数
-	shared_ptr<BoxCollider>Collider()const;		
+	shared_ptr<BoxCollider>Collider()const;
 
-	Vector3& Pos();
+	//表示用座標を取得
+	Vector3 CurrentPosition()const;
 
 	Vector3 FrontVec()const;
 

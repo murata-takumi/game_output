@@ -26,7 +26,7 @@ const Vector3 ACTOR_INIT_POS = Vector3(0.0f, 0.0f, 0.0f);
 //コインの初期座標
 const Vector3 COIN_INIT_POS = Vector3(0.0f, 0.0f, 100.0f);
 //箱の初期座標
-const Vector3 BOX_INIT_POS = Vector3(600.0f, -200.0f, 0.0f);
+const Vector3 BOX_INIT_POS = Vector3(100.0f, -150.0f, 0.0f);
 const Vector3 BOX_INIT_POS_1 = Vector3(-600.0f, 200.0f, -600.0f);
 const Vector3 BOX_INIT_POS_2 = Vector3(0.0f, -200.0f, 600.0f);
 const Vector3 BOX_INIT_POS_3 = Vector3(0.0f, -200.0f, -600.0f);
@@ -80,9 +80,9 @@ PlayScene::SceneStart()
 		InstantiateObject<FBXObject>(GROUND_PATH,GROUND_NAME,GROUND_COLL_SIZE);
 		//InstantiateObject<FBXObject>(COIN_PATH,COIN_NAME,COIN_COLL_SIZE,COIN_INIT_POS);
 		InstantiateObject<FBXObject>(BOX_PATH,BOX_NAME,BOX_COLL_SIZE,BOX_INIT_POS);
-		InstantiateObject<FBXObject>(BOX_PATH,BOX_NAME_1,BOX_COLL_SIZE,BOX_INIT_POS_1);
-		InstantiateObject<FBXObject>(BOX_PATH,BOX_NAME_2,BOX_COLL_SIZE,BOX_INIT_POS_2);
-		InstantiateObject<FBXObject>(BOX_PATH,BOX_NAME_3,BOX_COLL_SIZE,BOX_INIT_POS_3);
+		//InstantiateObject<FBXObject>(BOX_PATH,BOX_NAME_1,BOX_COLL_SIZE,BOX_INIT_POS_1);
+		//InstantiateObject<FBXObject>(BOX_PATH,BOX_NAME_2,BOX_COLL_SIZE,BOX_INIT_POS_2);
+		//InstantiateObject<FBXObject>(BOX_PATH,BOX_NAME_3,BOX_COLL_SIZE,BOX_INIT_POS_3);
 
 		//スレッドが全て完了するまでここで待機
 		for (auto& th : _ths)							
@@ -99,7 +99,7 @@ PlayScene::SceneStart()
 		{
 			assert(0);
 		}
-		if (!OcTree::Instance().AddObject(dynamic_pointer_cast<FBXObject>(_actorAndObjs[BOX_NAME_1])))
+		/*if (!OcTree::Instance().AddObject(dynamic_pointer_cast<FBXObject>(_actorAndObjs[BOX_NAME_1])))
 		{
 			assert(0);
 		}
@@ -110,7 +110,7 @@ PlayScene::SceneStart()
 		if (!OcTree::Instance().AddObject(dynamic_pointer_cast<FBXObject>(_actorAndObjs[BOX_NAME_3])))
 		{
 			assert(0);
-		}
+		}*/
 
 		//オブジェクトの中からアクターを探す
 		for (const auto& object : _actorAndObjs)
@@ -125,13 +125,14 @@ PlayScene::SceneStart()
 					auto ret = false;
 					for (auto& obj : objsNearby)
 					{
-						if (CollisionDetector::Instance().CheckColAndPoint(
+						if (CollisionDetector::Instance().CheckColAndVec(
 							*obj->Collider(),
-							vec
+							vec,
+							vec - XMVectorSet(0,85,0,0)
 						))
 						{
 							ret = true;
-							break;
+							//break;
 						}
 					}
 
@@ -268,7 +269,7 @@ PlayScene::Update()
 			_direction = XMVectorZero();
 
 			//カメラを移動
-			Dx12Wrapper::Instance().SetCoordinatesCenter(_actor->Pos());
+			Dx12Wrapper::Instance().SetCoordinatesCenter(_actor->Collider()->Center());
 
 			//スペースキーが押されたらジャンプ処理
 			if (InputManager::Instance().KeyTracker().IsKeyPressed(Keyboard::Space) && _actor->GetOnGround())

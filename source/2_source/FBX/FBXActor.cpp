@@ -352,7 +352,7 @@ FBXActor::CreateTransformView()
 		return result;
 	}
 	FBXBase::_mappedMats[0] = XMMatrixIdentity();
-	FBXBase::_mappedMats[0] *= XMMatrixTranslationFromVector(_pos);
+	FBXBase::_mappedMats[0] *= XMMatrixTranslationFromVector(_translateVector);
 	copy(_boneMats.begin(), _boneMats.end(), FBXBase::_mappedMats + 1);
 
 	//ディスクリプタヒープの作成
@@ -665,7 +665,7 @@ FBXActor::Update()
 		auto diff = GetLIntDiff(_currFrameTime, _befFrameTime);
 		_animTime += static_cast<float>(diff) * GetAnimTickPerSpeed(_currentActorAnim) * _animSpeed;
 
-		_colForGround->Update(_motionMat * _mappedMats[0]);
+		_colForGround->Update(_shiftColMatrix * _mappedMats[0]);
 
 		//最初のフレームを無視したうえでアニメーションがループするよう設定
 		if (_isInLoop)
@@ -680,14 +680,14 @@ FBXActor::Update()
 		//地面の上にいなかったら落下処理
 		if (!GetOnGround() && !IsAnimationEqual(JUMP00))
 		{
-			_pos.Y() -= Dx12Wrapper::Instance().GetDeltaTime() * 45.0f * GRAVITY_ACCERALATION;
+			_translateVector.Y() -= Dx12Wrapper::Instance().GetDeltaTime() * 45.0f * GRAVITY_ACCERALATION;
 			FBXBase::_speed.Y() = -45.0f * GRAVITY_ACCERALATION;
 			SetAnimationNode(FALL);
 		}
 
 		//回転、平行移動
 		FBXBase::_mappedMats[0] = XMMatrixRotationY(_rotY);
-		FBXBase::_mappedMats[0] *= XMMatrixTranslationFromVector(_pos);
+		FBXBase::_mappedMats[0] *= XMMatrixTranslationFromVector(_translateVector);
 	}
 
 	//スケーリング、回転、平行移動成分を変換行列とボーン行列の積から取得し、回転要素を削除したうえで再度合成
@@ -695,8 +695,10 @@ FBXActor::Update()
 	XMMatrixDecompose(&scale, &skew, &trans, 
 		_invMats[COLLIDER_BONE] * FBXBase::_mappedMats[COLLIDER_BONE + 1]);
 	skew = XMVectorZero();
-	if(!_rejectBone)_motionMat = XMMatrixScalingFromVector(scale) * XMMatrixRotationQuaternion(skew) * XMMatrixTranslationFromVector(trans);
-
+	if (!_rejectBone)
+	{
+		_shiftColMatrix = XMMatrixScalingFromVector(scale) * XMMatrixRotationQuaternion(skew) * XMMatrixTranslationFromVector(trans);
+	}
 	//経過時間を渡し、ボーン行列を取得
 	BoneTransform(_animTime);														
 	
@@ -734,7 +736,7 @@ FBXActor::Translate(const Vector3& input, bool canTrans)
 	if (canTrans)
 	{
 		//座標に入力に応じたベクトルを加算
-		_pos += input * Dx12Wrapper::Instance().GetDeltaTime() * MOVE_SPEED;
+		_translateVector += input * Dx12Wrapper::Instance().GetDeltaTime() * MOVE_SPEED;
 
 		FBXBase::_speed.X() = input.X() * MOVE_SPEED;
 		FBXBase::_speed.Z() = input.Z() * MOVE_SPEED;
@@ -790,7 +792,7 @@ FBXActor::EndControll()
 {
 	//単位行列を代入し、座標や正面ベクトルを初期化
 	FBXBase::_mappedMats[0] = XMMatrixIdentity();
-	_pos = XMVectorZero();
+	_translateVector = XMVectorZero();
 	_currentFrontVec = XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
 
 	//角度、目的角度も初期化
@@ -977,7 +979,7 @@ FBXActor::GetColForGround()const
 bool
 FBXActor::GetOnGround()const
 {
-	return _isOnGround(FBXBase::_pos);
+	return _isOnGround(FBXBase::_currentPosition);
 }
 
 /// <summary>

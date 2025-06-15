@@ -57,7 +57,7 @@ FBXObject::CreateTransformView()
 	}
 	FBXBase::_mappedMats[0] = XMMatrixIdentity();
 	//•½sˆÚ“®
-	FBXBase::_mappedMats[0] *= XMMatrixTranslationFromVector(_pos);
+	FBXBase::_mappedMats[0] *= XMMatrixTranslationFromVector(_translateVector);
 
 	_collider->Update(FBXBase::_mappedMats[0]);
 

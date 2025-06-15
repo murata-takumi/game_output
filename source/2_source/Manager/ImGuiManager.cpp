@@ -158,13 +158,9 @@ ImGuiManager::ImGuiDraw()
 		auto onGround = _actor->GetOnGround();
 		ImGui::Checkbox("IsOnGround", &onGround);
 
-		ImGui::DragFloat("PlayerX", &_actor->Pos().X());
-		ImGui::DragFloat("PlayerY", &_actor->Pos().Y());
-		ImGui::DragFloat("PlayerZ", &_actor->Pos().Z());
-
-		ImGui::DragFloat("FootX", &_actor->FootVec().X());
-		ImGui::DragFloat("FootY", &_actor->FootVec().Y());
-		ImGui::DragFloat("FootZ", &_actor->FootVec().Z());
+		ImGui::DragFloat("PlayerX", &_actor->CurrentPosition().X());
+		ImGui::DragFloat("PlayerY", &_actor->CurrentPosition().Y());
+		ImGui::DragFloat("PlayerZ", &_actor->CurrentPosition().Z());
 
 		//•¶Žš—ñ‚ð•\Ž¦
 		for (auto& pair : _texts)
