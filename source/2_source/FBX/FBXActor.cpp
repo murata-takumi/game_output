@@ -711,12 +711,12 @@ FBXActor::Update()
 }
 
 /// <summary>
-/// 入力された方向へ移動する関数
+/// 入力時に呼び出される関数
 /// </summary>
 /// <param name="input">入力ベクトル</param>
-/// <param name="canTrans">移動できるかどうか</param>
+/// <param name="objsNearby">近くにいるオブジェクト</param>
 void
-FBXActor::Translate(const Vector3& input, bool canTrans)
+FBXActor::OnKeyPressed(const Vector3& input, vector<shared_ptr<FBXObject>> objsNearby)
 {
 	//入力されているかどうかに応じて再生するアニメーションを決める
 	if (XMVector3Length(input).m128_f32[0] > 0.0f)
@@ -733,7 +733,17 @@ FBXActor::Translate(const Vector3& input, bool canTrans)
 	//入力ベクトルを更新
 	_inputVec = input;
 
-	if (canTrans)
+	//当たり判定をチェックし、正面にオブジェクトが存在しなかったら移動処理
+	auto collision = true;
+	for (auto& obj : objsNearby)
+	{
+		if (CollisionDetector::Instance().CheckColAndPoint(*obj->Collider(), FrontVec()))
+		{
+			collision = false;
+			break;
+		}
+	}
+	if (collision)
 	{
 		//座標に入力に応じたベクトルを加算
 		_translateVector += input * Dx12Wrapper::Instance().GetDeltaTime() * MOVE_SPEED;
@@ -743,25 +753,19 @@ FBXActor::Translate(const Vector3& input, bool canTrans)
 	}
 
 	//入力ベクトルと正面ベクトルの角度差を取得
-	auto diff = XMVector3AngleBetweenVectors(input, _currentFrontVec).m128_f32[0];			
+	auto diff = XMVector3AngleBetweenVectors(input, _currentFrontVec).m128_f32[0];
 	diff = XMVector3Cross(input, _currentFrontVec).m128_f32[1] > 0 ? diff * -1 : diff;
 	//角度の差がある場合目的角度を更新
-	if (FLT_EPSILON <= fabs(diff))													
+	if (FLT_EPSILON <= fabs(diff))
 	{
 		_destRad = _rotY + diff;
 	}
 
 	//目的角度に向け線形補間
-	_rotY = lerp(_rotY, _destRad, 0.2f);											
-
-	//Z軸から正面ベクトルの角度差を取得
-	//0～360の範囲にする
-	_zToFrontAngle = XMVector3AngleBetweenVectors(Z_VECTOR, _currentFrontVec).m128_f32[0];
-	_zToFrontAngle = XMVector3Cross(Z_VECTOR, _currentFrontVec).m128_f32[1] > 0 ? (2 * XM_PI) - _zToFrontAngle : _zToFrontAngle;
-	_zToFrontAngle = _zToFrontAngle / XM_PI * 180.0f;
+	_rotY = lerp(_rotY, _destRad, 0.2f);
 
 	//正面ベクトルを取得・正規化
-	_currentFrontVec = XMVectorSet(														
+	_currentFrontVec = XMVectorSet(
 		Vector3(FBXBase::_mappedMats[0].r[2]).X(),
 		Vector3(FBXBase::_mappedMats[0].r[2]).Y(),
 		Vector3(FBXBase::_mappedMats[0].r[2]).Z(),

@@ -69,8 +69,6 @@ private:
 	float _secFrameTime;			
 	//アクターの向き（Y軸）
 	float _rotY = 0.0f;
-	//Z軸からプレイヤーの向きまでの角度
-	float _zToFrontAngle;
 
 	//前フレームの時間
 	LARGE_INTEGER _befFrameTime;									
@@ -136,10 +134,10 @@ public:
 	void InitPose();													
 
 	//毎フレームの座標変換処理
-	void Update()override;												
+	void Update()override;
 
-	//入力された方向へ移動する関数
-	void Translate(const Vector3& vec,bool canTrans = true);								
+	//キーが入力された時に呼び出す関数
+	void OnKeyPressed(const Vector3& input, vector<shared_ptr<FBXObject>> objsNearby);
 
 	//操作開始時に実行する関数
 	void StartControll();				
