@@ -1,5 +1,7 @@
 #include "Functions.h"
+
 #include "FBX/FBXActor.h"
+#include "OcTree/OcTree.h"
 #include "Wrapper/Dx12Wrapper.h"
 
 //アニメーション名に付与する文字列リテラル
@@ -714,9 +716,8 @@ FBXActor::Update()
 /// 入力時に呼び出される関数
 /// </summary>
 /// <param name="input">入力ベクトル</param>
-/// <param name="objsNearby">近くにいるオブジェクト</param>
 void
-FBXActor::OnKeyPressed(const Vector3& input, vector<shared_ptr<FBXObject>> objsNearby)
+FBXActor::OnKeyPressed(const Vector3& input)
 {
 	//入力されているかどうかに応じて再生するアニメーションを決める
 	if (XMVector3Length(input).m128_f32[0] > 0.0f)
@@ -735,6 +736,7 @@ FBXActor::OnKeyPressed(const Vector3& input, vector<shared_ptr<FBXObject>> objsN
 
 	//当たり判定をチェックし、正面にオブジェクトが存在しなかったら移動処理
 	auto collision = true;
+	auto objsNearby = OcTree::Instance().Get(_collider);
 	for (auto& obj : objsNearby)
 	{
 		if (CollisionDetector::Instance().CheckColAndPoint(*obj->Collider(), FrontVec()))

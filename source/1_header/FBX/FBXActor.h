@@ -137,7 +137,7 @@ public:
 	void Update()override;
 
 	//キーが入力された時に呼び出す関数
-	void OnKeyPressed(const Vector3& input, vector<shared_ptr<FBXObject>> objsNearby);
+	void OnKeyPressed(const Vector3& input);
 
 	//操作開始時に実行する関数
 	void StartControll();				
