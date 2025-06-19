@@ -1,10 +1,19 @@
 #include "Application.h"
 
+
 #include "Collider/BoxCollider.h"
+#include "Manager/ImGuiManager.h"
+#include "Manager/InputManager.h"
+#include "Manager/SoundManager.h"
+#include "Manager/SpriteManager.h"
+#include "OcTree/OcTree.h"
 #include "Package/Package.h"
+#include "Renderer/PeraRenderer.h"
+#include "Renderer/Renderer.h"
 #include "Scene/BaseScene.h"
 #include "Scene/TitleScene.h"
 #include "Scene/PlayScene.h"
+#include "Wrapper/Dx12Wrapper.h"
 
 const unsigned int DISPLAY_WIDTH = GetSystemMetrics(SM_CXSCREEN);		//ディスプレイ幅
 const unsigned int WINDOW_WIDTH = 1280;									//ウィンドウ幅

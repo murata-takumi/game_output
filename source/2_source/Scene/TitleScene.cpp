@@ -1,5 +1,10 @@
 #include "Scene/TitleScene.h"
 
+#include "Manager/InputManager.h"
+#include "Manager/SoundManager.h"
+#include "Manager/SpriteManager.h"
+#include "Wrapper/Dx12Wrapper.h"
+
 /// <summary>
 /// コンストラクタ
 /// </summary>

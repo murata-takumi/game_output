@@ -1,17 +1,6 @@
 #pragma once
 #include "Application.h"
-#include "Vector3.h"
 
-#include "Collider/BoxCollider.h"
-#include "Collider/CollisionDetector.h"
-#include "FBX/AssimpLoader.h"
-#include "FBX/FBXActor.h"
-#include "FBX/FBXBase.h"
-#include "FBX/FBXObject.h"
-#include "Manager/EffectManager.h"
-#include "Manager/ImGuiManager.h"
-#include "OcTree/OcTreeNode.h"
-#include "OcTree/OcTree.h"
 #include "Scene/BaseScene.h"
 
 #include <chrono>
@@ -19,6 +8,17 @@
 /// <summary>
 /// ゲームシーンを管理するクラス
 /// </summary>
+class BoxCollider;
+class collisionDetector;
+class AssimpLoader;
+class FBXActor;
+class FBXBase;
+class FBXObject;
+class EffectManager;
+class ImGuiManager;
+class OcTreeNode;
+class OcTree;
+class Vector3;
 class PlayScene : public BaseScene
 {
 public:

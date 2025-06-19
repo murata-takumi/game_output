@@ -3,6 +3,13 @@
 
 #include "Scene/BaseScene.h"
 
+#include "Manager/InputManager.h"
+#include "Manager/SoundManager.h"
+#include "Manager/SpriteManager.h"
+#include "Renderer/PeraRenderer.h"
+#include "Renderer/Renderer.h"
+#include "Wrapper/Dx12Wrapper.h"
+
 //各シーンでロード中かどうかを識別する真理値
 bool BaseScene::_canInput = false;
 

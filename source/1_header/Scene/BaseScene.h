@@ -1,13 +1,6 @@
 #pragma once
 #include "Application.h"
 
-#include "Manager/InputManager.h"
-#include "Manager/SoundManager.h"
-#include "Manager/SpriteManager.h"
-#include "Renderer/PeraRenderer.h"
-#include "Renderer/Renderer.h"
-#include "Wrapper/Dx12Wrapper.h"
-
 #include <chrono>
 
 /// <summary>

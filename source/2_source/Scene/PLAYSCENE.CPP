@@ -1,7 +1,25 @@
 #pragma once
 #include "Functions.h"
-#include "Scene/PlayScene.h"
 #include "Includes.h"
+#include "Vector3.h"
+
+#include "Scene/PlayScene.h"
+
+#include "Collider/BoxCollider.h"
+#include "Collider/CollisionDetector.h"
+#include "FBX/AssimpLoader.h"
+#include "FBX/FBXActor.h"
+#include "FBX/FBXBase.h"
+#include "FBX/FBXObject.h"
+#include "Manager/EffectManager.h"
+#include "Manager/ImGuiManager.h"
+#include "Manager/InputManager.h"
+#include "Manager/SoundManager.h"
+#include "Manager/SpriteManager.h"
+#include "OcTree/OcTreeNode.h"
+#include "OcTree/OcTree.h"
+#include "Renderer/Renderer.h"
+#include "Wrapper/Dx12Wrapper.h"
 
 //プレイヤーデータが格納されているファイルパス
 const wchar_t* ACTOR_PATH = L"Asset/model/Unitychan.fbx";		
@@ -26,7 +44,8 @@ const Vector3 ACTOR_INIT_POS = Vector3(0.0f, 0.0f, 0.0f);
 //コインの初期座標
 const Vector3 COIN_INIT_POS = Vector3(0.0f, 0.0f, 100.0f);
 //箱の初期座標
-const Vector3 BOX_INIT_POS = Vector3(100.0f, -150.0f, 0.0f);
+//const Vector3 BOX_INIT_POS = Vector3(100.0f, -150.0f, 0.0f);
+const Vector3 BOX_INIT_POS = Vector3(500.0f, 0.0f, 0.0f);
 const Vector3 BOX_INIT_POS_1 = Vector3(-600.0f, 200.0f, -600.0f);
 const Vector3 BOX_INIT_POS_2 = Vector3(0.0f, -200.0f, 600.0f);
 const Vector3 BOX_INIT_POS_3 = Vector3(0.0f, -200.0f, -600.0f);
@@ -79,7 +98,7 @@ PlayScene::SceneStart()
 		InstantiateObject<FBXActor>(ACTOR_PATH,ACTOR_NAME,ACTOR_COLL_SIZE);
 		InstantiateObject<FBXObject>(GROUND_PATH,GROUND_NAME,GROUND_COLL_SIZE);
 		//InstantiateObject<FBXObject>(COIN_PATH,COIN_NAME,COIN_COLL_SIZE,COIN_INIT_POS);
-		InstantiateObject<FBXObject>(BOX_PATH,BOX_NAME,BOX_COLL_SIZE,BOX_INIT_POS);
+		//InstantiateObject<FBXObject>(BOX_PATH,BOX_NAME,BOX_COLL_SIZE,BOX_INIT_POS);
 		//InstantiateObject<FBXObject>(BOX_PATH,BOX_NAME_1,BOX_COLL_SIZE,BOX_INIT_POS_1);
 		//InstantiateObject<FBXObject>(BOX_PATH,BOX_NAME_2,BOX_COLL_SIZE,BOX_INIT_POS_2);
 		//InstantiateObject<FBXObject>(BOX_PATH,BOX_NAME_3,BOX_COLL_SIZE,BOX_INIT_POS_3);
@@ -95,10 +114,10 @@ PlayScene::SceneStart()
 		{
 			assert(0);
 		}
-		if (!OcTree::Instance().AddObject(dynamic_pointer_cast<FBXObject>(_actorAndObjs[BOX_NAME])))
-		{
-			assert(0);
-		}
+		//if (!OcTree::Instance().AddObject(dynamic_pointer_cast<FBXObject>(_actorAndObjs[BOX_NAME])))
+		//{
+		//	assert(0);
+		//}
 		/*if (!OcTree::Instance().AddObject(dynamic_pointer_cast<FBXObject>(_actorAndObjs[BOX_NAME_1])))
 		{
 			assert(0);
@@ -125,14 +144,21 @@ PlayScene::SceneStart()
 					auto ret = false;
 					for (auto& obj : objsNearby)
 					{
-						if (CollisionDetector::Instance().CheckColAndVec(
+						//if (CollisionDetector::Instance().GetLengthBetweenColAndPos(
+						//	*obj->Collider(),
+						//	XMVectorSet(0, 1, 0, 0),
+						//	vec
+						//) < 0.0f)
+						//if(CollisionDetector::Instance().CheckColAndVec(
+						//	*obj->Collider(), 
+						//	vec,
+						//	vec - XMVectorSet(0,85.0f,0,0)))
+						if (CollisionDetector::Instance().CheckColAndPoint(
 							*obj->Collider(),
-							vec,
-							vec - XMVectorSet(0,85,0,0)
-						))
+							vec))
 						{
 							ret = true;
-							//break;
+							break;
 						}
 					}
 
@@ -249,21 +275,8 @@ PlayScene::Update()
 			//移動ベクトルを正規化
 			_direction = XMVector3Normalize(_direction);
 
-			//アクターの近くにあるオブジェクトを取得
-			auto objsNearby = OcTree::Instance().Get(_actor->Collider());
-			//当たり判定をチェック
-			auto collision = true;
-			
-			//アクターを移動させる
-			for(auto& obj : objsNearby)
-			{
-				if (CollisionDetector::Instance().CheckColAndPoint(*obj->Collider(), _actor->FrontVec()))
-				{
-					collision = false;
-					break;
-				}
-			}
-			_actor->Translate(_direction, collision);
+			//入力処理
+			_actor->OnKeyPressed(_direction);
 
 			//移動ベクトルを初期化
 			_direction = XMVectorZero();
