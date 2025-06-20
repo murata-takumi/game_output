@@ -1,7 +1,9 @@
 #pragma once
+#include "Includes.h"
+#include "Vector3.h"
+
 #include "Collider/BoxCollider.h"
 #include "FBX/FBXBase.h"
-#include "Includes.h"
 
 //正面ベクトルの初期値
 const Vector3 INITIAL_FRONT = XMVectorSet(0.0f,0.0f,1.0f,0.0f);

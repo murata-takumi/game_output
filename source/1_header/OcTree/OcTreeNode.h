@@ -1,13 +1,11 @@
 #pragma once
 #include "Application.h"
 
-#include "Collider/CollisionDetector.h"
-#include "Collider/BoxCollider.h"
-#include "FBX/FBXObject.h"
-
 /// <summary>
 /// ”ª•ª–Ø‚ğ\¬‚·‚éƒm[ƒh
 /// </summary>
+class BoxCollider;
+class FBXObject;
 class OcTreeNode
 {
 public:

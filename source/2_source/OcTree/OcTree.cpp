@@ -1,4 +1,9 @@
+#include "Vector3.h"
+
+#include "Collider/BoxCollider.h"
+#include "FBX/FBXObject.h"
 #include "OcTree/OcTree.h"
+#include "OcTree/OcTreeNode.h"
 
 /// <summary>
 /// ƒVƒ“ƒOƒ‹ƒgƒ“‚ð•Ô‚·
