@@ -1,17 +1,17 @@
 #pragma once
 #include "Application.h"
-#include "Vector3.h"
-
-#include "Collider/BoxCollider.h"
-#include "FBX/AssimpLoader.h"
-#include "Manager/ImGuiManager.h"
 
 /// <summary>
 /// FBXƒ‚ƒfƒ‹‚Ì”h¶Œ³‚Æ‚È‚éƒNƒ‰ƒX
 /// </summary>
-class Dx12Wrapper;
 class AssimpLoader;
+class BoxCollider;
+class Dx12Wrapper;
 class ImGuiManager;
+class Vector3;
+class aiScene;
+class Mesh;
+class BoneInfo;
 class FBXBase
 {
 	template<typename T>using ComPtr = ComPtr<T>;

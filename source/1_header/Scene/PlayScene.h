@@ -1,9 +1,5 @@
 #pragma once
-#include "Application.h"
-
 #include "Scene/BaseScene.h"
-
-#include <chrono>
 
 /// <summary>
 /// ゲームシーンを管理するクラス

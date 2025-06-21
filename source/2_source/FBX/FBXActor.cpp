@@ -1,6 +1,13 @@
 #include "Functions.h"
+#include "Vector3.h"
 
-#include "FBX/FBXActor.h"
+#include "Collider/BoxCollider.h"
+#include "Collider/CollisionDetector.h"
+#include "FBX/AssimpLoader.h"
+#include "FBX/FBXObject.h"
+#include "FBX/AnimNodes/AnimNode.h"
+#include "FBX/FBXBase.h"
+#include "Manager/ImGuiManager.h"
 #include "OcTree/OcTree.h"
 #include "Wrapper/Dx12Wrapper.h"
 
@@ -81,6 +88,25 @@ FBXActor::FBXActor(const wchar_t* filePath,const string name, Vector3 size, Vect
 				nextAnimName = FALL;
 			}
 
+			auto objsNearby = OcTree::Instance().Get(_colForGround);
+			auto collision = false;
+			for (auto& obj : objsNearby)
+			{
+				if (CollisionDetector::Instance().CheckContinuousCollisionDetection(
+					*obj->Collider(),
+					XMVectorSet(0, 1, 0, 0),
+					_currentPosition,
+					-45.0f * GRAVITY_ACCERALATION
+				))
+				{
+					collision = true;
+					break;
+				}
+			}
+			if (collision)
+			{
+				auto a = 1;
+			}
 		}
 		if (animTime > TRANSITION_TIME)
 		{
@@ -118,6 +144,26 @@ FBXActor::FBXActor(const wchar_t* filePath,const string name, Vector3 size, Vect
 		{
 			animTime = LOOP_END_TIME;
 			SetAnimationSpeed(-ANIM_SPEED);
+		}
+
+		auto objsNearby = OcTree::Instance().Get(_colForGround);
+		auto collision = false;
+		for (auto& obj : objsNearby)
+		{
+			if (CollisionDetector::Instance().CheckContinuousCollisionDetection(
+				*obj->Collider(),
+				XMVectorSet(0, 1, 0, 0),
+				_currentPosition,
+				-45.0f * GRAVITY_ACCERALATION
+			))
+			{
+				collision = true;
+				break;
+			}
+		}
+		if (collision)
+		{
+			auto a = 1;
 		}
 
 		//地面に着いたら別アニメーションに遷移できるようにする

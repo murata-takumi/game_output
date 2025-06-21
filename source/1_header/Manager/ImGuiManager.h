@@ -9,6 +9,7 @@ class Dx12Wrapper;
 class FBXBase;
 class FBXObject;
 class FBXActor;
+class Vector3;
 class ImGuiManager
 {
 public:

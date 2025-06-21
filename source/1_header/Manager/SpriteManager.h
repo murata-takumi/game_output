@@ -1,6 +1,5 @@
 #pragma once
 #include "Application.h"
-#include "Vector3.h"
 
 #include <DirectXTK12-master/Inc/CommonStates.h>
 #include <DirectXTK12-master/Inc/Effects.h>
@@ -21,6 +20,7 @@ class BoxCollider2D;
 class Dx12Wrapper;
 class FBXBase;
 class FBXActor;
+class Vector3;
 class SpriteManager
 {
 	template<typename T>

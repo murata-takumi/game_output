@@ -1,17 +1,19 @@
 #pragma once
-#include "Vector3.h"
-
-#include "Collider/CollisionDetector.h"
 #include "FBX/AnimNodes/Animations.h"
-#include "FBX/AnimNodes/AnimNode.h"
 #include "FBX/FBXBase.h"
 
 /// <summary>
 /// ゲーム画面上に登場する3Dオブジェクトのクラス（ボーン入り）
 /// </summary>
-class Dx12Wrapper;
-class AssimpLoader;
+class aiAnimation;
+class aiNode;
+class aiNodeAnim;
 class AnimNode;
+class AssimpLoader;
+class BoxCollider;
+class Dx12Wrapper;
+class ImGuiManager;
+class Vector3;
 class FBXActor : public FBXBase
 {	
 	template<typename T>using ComPtr = ComPtr<T>;

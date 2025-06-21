@@ -1,4 +1,6 @@
 #include "Functions.h"
+#include "Vector3.h"
+
 #include "FBX/FBXActor.h"
 #include "FBX/FBXObject.h"
 #include "Manager/ImGuiManager.h"

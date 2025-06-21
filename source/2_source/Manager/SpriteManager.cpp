@@ -1,4 +1,7 @@
 #include "Functions.h"
+#include "Vector3.h"
+
+#include "Collider/BoxCollider.h"
 #include "Collider/BoxCollider2D.h"
 #include "FBX/FBXActor.h"
 #include "Manager/InputManager.h"

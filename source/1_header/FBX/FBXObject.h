@@ -6,8 +6,10 @@
 /// Actor‚Æ‚Íˆá‚¢“®‚©‚È‚¢•¨
 /// </summary>
 class AssimpLoader;
+class BoxCollider;
 class Dx12Wrapper;
 class ImGuiManager;
+class Vector3;
 class FBXObject : public FBXBase
 {
 	template<typename T>using ComPtr = ComPtr<T>;

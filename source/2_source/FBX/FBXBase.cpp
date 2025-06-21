@@ -1,5 +1,10 @@
 #include "Functions.h"
+#include "Vector3.h"
+
+#include "Collider/BoxCollider.h"
+#include "FBX/AssimpLoader.h"
 #include "FBX/FBXBase.h"
+#include "Manager/ImGuiManager.h"
 #include "Wrapper/Dx12Wrapper.h"
 
 /// <summary>
