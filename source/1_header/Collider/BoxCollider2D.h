@@ -1,10 +1,10 @@
 #pragma once
 #include "Application.h"
-#include "Vector3.h"
 
 /// <summary>
 /// ‹éŒ`‚Ì“–‚½‚è”»’è‚ðŽÀ‘•‚·‚éƒNƒ‰ƒX
 /// </summary>
+class Vector3;
 class BoxCollider2D
 {
 private:

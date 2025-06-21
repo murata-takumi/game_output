@@ -6,6 +6,7 @@
 /// </summary>
 class BoxCollider;
 class FBXObject;
+class Vector3;
 class OcTreeNode
 {
 public:

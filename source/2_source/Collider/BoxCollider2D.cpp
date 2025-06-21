@@ -1,3 +1,5 @@
+#include "Vector3.h"
+
 #include "Collider/BoxCollider2D.h"
 
 /// <summary>

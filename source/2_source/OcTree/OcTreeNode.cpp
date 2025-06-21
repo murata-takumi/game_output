@@ -1,5 +1,7 @@
 #include <bitset>
 
+#include "Vector3.h"
+
 #include "Collider/CollisionDetector.h"
 #include "Collider/BoxCollider.h"
 #include "FBX/FBXObject.h"

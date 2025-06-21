@@ -1,4 +1,11 @@
+#include "Vector3.h"
+
+#include "Collider/BoxCollider.h"
 #include "Collider/CollisionDetector.h"
+#include "FBX/FBXActor.h"
+#include "FBX/FBXBase.h"
+#include "FBX/FBXObject.h"
+#include "Wrapper/Dx12Wrapper.h"
 
 /// <summary>
 /// シングルトンを返す
@@ -9,6 +16,60 @@ CollisionDetector::Instance()
 {
 	static CollisionDetector instance;
 	return instance;
+}
+
+/// <summary>
+/// OBBと座標の間の距離を返す関数
+/// </summary>
+/// <param name="col">OBB</param>
+/// <param name="dir">投影するベクトル</param>
+/// <param name="pos">座標</param>
+/// <returns>距離</returns>
+float 
+CollisionDetector::GetLengthBetweenColAndPos(const BoxCollider& col, const Vector3& dir, const Vector3& pos)
+{
+	//座標とOBBの中心の差分
+	Vector3 diff = pos - col.Center();
+	//差分のベクトルへの投影
+	float lenOnDir = abs(XMVector3Dot(diff, dir).m128_f32[0]);
+
+	//OBBの方向ベクトルのベクトルへの投影の和を取得
+	float sumOfVecOnDir = 0.0f;
+	for (int i = 0; i < 3; i++)
+	{
+		sumOfVecOnDir += col.HalfLength()[i] * abs(XMVector3Dot(dir, col.DirectionVectors()[i]).m128_f32[0]);
+	}
+
+	float lenBetColAndPos = lenOnDir - sumOfVecOnDir;
+
+	return lenBetColAndPos;
+}
+
+/// <summary>
+/// 連続的な衝突判定処理
+/// </summary>
+/// <param name="col">衝突対象のOBB</param>
+/// <param name="dir">移動方向</param>
+/// <param name="pos">現在の座標</param>
+/// <param name="speed">移動速度</param>
+/// <returns>衝突するかどうか</returns>
+bool 
+CollisionDetector::CheckContinuousCollisionDetection(
+	const BoxCollider& col, 
+	const Vector3& dir, 
+	const Vector3& currentPos, 
+	const float speed)
+{
+	//1フレーム後の座標を取得
+	Vector3 nextPos = currentPos + (dir * speed * Dx12Wrapper::Instance().GetDeltaTime());
+
+	//現在と1フレーム後の座標のベクトルがOBBと交わる（=1フレーム後に衝突する）なら真
+	if (CheckColAndVec(col, currentPos, nextPos))
+	{
+		return true;
+	}
+
+	return false;
 }
 
 /// <summary>
@@ -56,11 +117,14 @@ CollisionDetector::CheckColAndVec(const BoxCollider& col, const Vector3& startPo
 	Vector3 centerDiff = lineCenter - col.Center();
 
 	float r, r0, r1;
-	//OBBの方向ベクトルに対し分離軸
+	//OBBの方向ベクトルに対し中心差分を投影し、半分長と線分の投影の和を比較して衝突判定
 	for (int i = 0; i < 3; i++)
 	{
+		//中心差分の投影
 		r = abs(XMVector3Dot(centerDiff, col.DirectionVectors()[i]).m128_f32[0]);
+		//方向ベクトルの半分長
 		r0 = col.HalfLength()[i];
+		//線分の方向ベクトルへの投影
 		r1 = lineExtent * abs(XMVector3Dot(lineDir, col.DirectionVectors()[i]).m128_f32[0]);
 		if (r > r0 + r1)
 		{
@@ -68,8 +132,10 @@ CollisionDetector::CheckColAndVec(const BoxCollider& col, const Vector3& startPo
 		}
 	}
 
-	//線分
+	//各方向ベクトルへの投影の和を求め、線分方向ベクトルへの投影と半分長の和と比較
+	//差分の線分ベクトルへの投影
 	r = abs(XMVector3Dot(centerDiff, lineDir).m128_f32[0]);
+	//方向ベクトルへの投影の和
 	r0 = 0.0f;
 	for (int i = 0; i < 3; i++)
 	{
@@ -79,6 +145,9 @@ CollisionDetector::CheckColAndVec(const BoxCollider& col, const Vector3& startPo
 	{
 		return false;
 	}
+
+	//auto lenBetColAndStartPos = GetLengthBetweenColAndPos(col, lineDir, startPos);
+	//ImGuiManager::Instance().AddLabelAndFloat("lenBetColAndStartPos", lenBetColAndStartPos);
 
 	return true;
 }
