@@ -1,6 +1,5 @@
 #pragma once
 #include "Application.h"
-#include "Includes.h"
 
 #include <DirectXTK12-master/Inc/Keyboard.h>
 #include <DirectXTK12-master/Inc/Mouse.h>
