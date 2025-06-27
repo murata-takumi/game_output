@@ -38,11 +38,12 @@ enum SceneNames
 class Dx12Wrapper;
 class EffectManager;
 class InputManager;
-class Package;
-class BaseScene;
-class TitleScene;
+class IScene;
 class PlayScene;
+class Package;
+class SceneComponent;
 class SoundManager;
+class TitleScene;
 /// <summary>
 /// ゲームの初期化・更新・終了を管理するクラス
 /// </summary>
@@ -58,11 +59,11 @@ private:
 	shared_ptr<EffectManager> _effect;								
 	
 	//現在実行しているシーン
-	shared_ptr<BaseScene> _scene;
+	shared_ptr<IScene> _scene;
 	//TitleSceneインスタンス
-	shared_ptr<TitleScene> _title;
+	shared_ptr<IScene> _title;
 	//PlaySceneインスタンス
-	shared_ptr<PlayScene> _play;
+	shared_ptr<IScene> _play;
 
 	//ゲーム内で使用する各種データを管理するインスタンス
 	shared_ptr<Package> _package;									
@@ -103,7 +104,7 @@ public:
 	SIZE GetWindowSize()const;	
 
 	//シーンを切り替える
-	void SetScene(shared_ptr<BaseScene> scene);
+	void SetScene(shared_ptr<IScene> scene);
 	//シーンの設定・終了時の処理・開始時の処理を実行
 	void ChangeScene(SceneNames name);
 	//アプリケーションを終了する

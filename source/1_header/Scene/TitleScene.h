@@ -1,10 +1,11 @@
 #pragma once
-#include "Scene/BaseScene.h"
+#include "Scene/IScene.h"
 
 /// <summary>
 /// タイトルシーンを管理するクラス
 /// </summary>
-class TitleScene : public BaseScene
+class SceneComponent;
+class TitleScene : public IScene
 {
 public:
 	//コンストラクタ
@@ -22,5 +23,9 @@ public:
 
 	//UI描画処理
 	void ModelDraw() override;
+	//エフェクト・UIを描画する関数
+	void EffectAndUIDraw();
 protected:
+	//全シーンに必要な機能をまとめたクラス
+	shared_ptr<SceneComposition> _sceneComp;
 };

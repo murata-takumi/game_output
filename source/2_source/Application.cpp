@@ -10,9 +10,10 @@
 #include "Package/Package.h"
 #include "Renderer/PeraRenderer.h"
 #include "Renderer/Renderer.h"
-#include "Scene/BaseScene.h"
-#include "Scene/TitleScene.h"
+#include "Scene/IScene.h"
 #include "Scene/PlayScene.h"
+#include "Scene/SceneComposition.h"
+#include "Scene/TitleScene.h"
 #include "Wrapper/Dx12Wrapper.h"
 
 const unsigned int DISPLAY_WIDTH = GetSystemMetrics(SM_CXSCREEN);		//ディスプレイ幅
@@ -312,7 +313,7 @@ Application::ChangeScene(SceneNames name)
 /// </summary>
 /// <param name="scene">切り替えたいシーンオブジェクト</param>
 void
-Application::SetScene(shared_ptr<BaseScene> scene)
+Application::SetScene(shared_ptr<IScene> scene)
 {
 	if (_scene != nullptr)_scene->SceneEnd();	//シーン終了時の処理
 

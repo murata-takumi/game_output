@@ -1,16 +1,20 @@
-#include "Scene/TitleScene.h"
-
 #include "Manager/InputManager.h"
 #include "Manager/SoundManager.h"
 #include "Manager/SpriteManager.h"
+#include "Scene/SceneComposition.h"
+#include "Scene/TitleScene.h"
 #include "Wrapper/Dx12Wrapper.h"
 
 /// <summary>
 /// コンストラクタ
 /// </summary>
-TitleScene::TitleScene():BaseScene()
+TitleScene::TitleScene():IScene()
 {
-
+	//シーンの共通機能を初期化
+	_sceneComp = make_shared<SceneComposition>();
+	//関数も上書き
+	_sceneComp->_effectAndUiDraw = std::bind(&TitleScene::EffectAndUIDraw, this);
+	_sceneComp->_modelDraw = std::bind(&TitleScene::ModelDraw, this);
 }
 
 /// <summary>
@@ -27,7 +31,7 @@ TitleScene::~TitleScene()
 void
 TitleScene::SceneStart()
 {
-	BaseScene::SceneStart();
+
 }
 
 /// <summary>
@@ -37,10 +41,10 @@ void
 TitleScene::Update()
 {
 	//入力を更新
-	BaseScene::InputUpdate();
+	_sceneComp->InputUpdate();
 
 	if (InputManager::Instance().MouseTracker().leftButton ==
-		Mouse::ButtonStateTracker::PRESSED && BaseScene::_canInput)
+		Mouse::ButtonStateTracker::PRESSED && _sceneComp->_canInput)
 	{
 		//開始ボタンの上で左クリック
 		if (SpriteManager::Instance().TitleIsOnStart())
@@ -49,7 +53,7 @@ TitleScene::Update()
 			SoundManager::Instance().CallSound(Sounds::BUTTON);
 
 			//ゲームシーンへ遷移
-			BaseScene::ChangeScene(SceneNames::Play);
+			_sceneComp->ChangeScene(SceneNames::Play);
 
 			return;
 		}
@@ -61,7 +65,7 @@ TitleScene::Update()
 			SoundManager::Instance().CallSound(Sounds::BUTTON);
 
 			//操作不可にする
-			BaseScene::_canInput = false;
+			_sceneComp->_canInput = false;
 
 			auto exitFunc = ([&]()
 				{
@@ -74,14 +78,14 @@ TitleScene::Update()
 					return;
 				}
 			);
-			BaseScene::ParallelProcess(exitFunc);
+			_sceneComp->ParallelProcess(exitFunc);
 
 			return;
 		}
 	}
 
 	//描画処理
-	BaseScene::DrawUpdate();
+	_sceneComp->DrawUpdate();
 }
 
 /// <summary>
@@ -100,4 +104,13 @@ void
 TitleScene::ModelDraw()
 {
 	SpriteManager::Instance().ButtonDraw();
+}
+
+/// <summary>
+/// エフェクト上の描画を行う関数
+/// </summary>
+void
+TitleScene::EffectAndUIDraw()
+{
+
 }

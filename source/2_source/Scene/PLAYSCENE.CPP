@@ -18,6 +18,7 @@
 #include "Manager/SpriteManager.h"
 #include "OcTree/OcTreeNode.h"
 #include "OcTree/OcTree.h"
+#include "Scene/SceneComposition.h"
 #include "Renderer/Renderer.h"
 #include "Wrapper/Dx12Wrapper.h"
 
@@ -62,10 +63,13 @@ const string BOX_NAME_3 = "Box3";
 /// <summary>
 /// コンストラクタ
 /// </summary>
-PlayScene::PlayScene()
-	:BaseScene()
+PlayScene::PlayScene() : IScene()
 {
-
+	//シーンの共通機能を初期化
+	_sceneComp = make_shared<SceneComposition>();
+	//関数も上書き
+	_sceneComp->_effectAndUiDraw = std::bind(&PlayScene::EffectAndUIDraw,this);
+	_sceneComp->_modelDraw = std::bind(&PlayScene::ModelDraw, this);
 }
 
 /// <summary>
@@ -92,7 +96,7 @@ PlayScene::SceneStart()
 	auto f = [&]()
 	{
 		//ロード中だと示す
-		BaseScene::_canInput = false;
+		_sceneComp->_canInput = false;
 
 		//スレッドに各オブジェクトの作成処理を追加
 		InstantiateObject<FBXActor>(ACTOR_PATH,ACTOR_NAME,ACTOR_COLL_SIZE);
@@ -153,9 +157,19 @@ PlayScene::SceneStart()
 						//	*obj->Collider(), 
 						//	vec,
 						//	vec - XMVectorSet(0,85.0f,0,0)))
-						if (CollisionDetector::Instance().CheckColAndPoint(
+						//if (CollisionDetector::Instance().CheckColAndPoint(
+						//	*obj->Collider(),
+						//	vec))
+						//if(CollisionDetector::Instance().CheckContinuousCollisionDetection(
+						//	*obj->Collider(),
+						//	XMVectorSet(0,1,0,0),
+						//	vec,
+						//	-45.0f * 9.8f
+						//))
+						if(CollisionDetector::Instance().CheckColAndVec(
 							*obj->Collider(),
-							vec))
+							vec) <= 0.0f
+						)
 						{
 							ret = true;
 							break;
@@ -171,20 +185,20 @@ PlayScene::SceneStart()
 		ImGuiManager::Instance().SetActor(_actorAndObjs);
 
 		//ロード完了
-		BaseScene::_canInput = true;
+		_sceneComp->_canInput = true;
 
 		//フェードイン処理を並列処理
 		auto startFunc = [&]()
 		{
 			Dx12Wrapper::Instance().Fade(1.0f, 0.0f);										
 		};
-		BaseScene::ParallelProcess(startFunc);
+		_sceneComp->ParallelProcess(startFunc);
 
 		//エフェクト実行
 		//Dx12Wrapper::Instance().Effect()->CallEffect();									
 	};
 	//上記の読み込み処理を通常の描画処理と並行して行う
-	BaseScene::ParallelProcess(f);
+	_sceneComp->ParallelProcess(f);
 }
 
 /// <summary>
@@ -194,10 +208,10 @@ void
 PlayScene::Update()
 {
 	//入力を更新
-	BaseScene::InputUpdate();
+	_sceneComp->InputUpdate();
 
 	//操作可能な場合入力を反映する
-	if (BaseScene::_canInput)
+	if (_sceneComp->_canInput)
 	{
 		//コインとアクターが接触したらコインを削除
 		//if (_actorAndObjs[COIN_NAME] && CheckColAndCol(*_actorAndObjs[COIN_NAME]->Collider(), *_actor->Collider()))
@@ -316,7 +330,7 @@ PlayScene::Update()
 	}
 
 	//描画処理
-	BaseScene::DrawUpdate();
+	_sceneComp->DrawUpdate();
 }
 
 /// <summary>
@@ -363,7 +377,7 @@ void
 PlayScene::ModelDraw()
 {
 	//プレイヤーが読み込み完了している場合FBXBaseクラスを基盤とするオブジェクト全般に対し描画・更新処理を行う
-	if (BaseScene::_canInput)
+	if (_sceneComp->_canInput)
 	{
 		//トゥーンテクスチャも描画する
 		Renderer::Instance().Draw();
@@ -386,7 +400,7 @@ void
 PlayScene::EffectAndUIDraw()
 {
 	//ロード中の場合
-	if (!BaseScene::_canInput)
+	if (!_sceneComp->_canInput)
 	{
 		//ロード画面を描画
 		SpriteManager::Instance().LoadingDraw();	
@@ -397,7 +411,7 @@ PlayScene::EffectAndUIDraw()
 		if (ImGuiManager::Instance().IsWriteGrid())SpriteManager::Instance().GridDraw(_actorAndObjs);
 
 		//SceneからImGuiにFPSを渡す
-		ImGuiManager::Instance().SetFPS(_fps);	
+		ImGuiManager::Instance().SetFPS(_sceneComp->_fps);
 		//ImGuiのウィンドウを描画
 		ImGuiManager::Instance().ImGuiDraw();	
 	}

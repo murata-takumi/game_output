@@ -1,75 +1,20 @@
 #include "Functions.h"
 #include "Includes.h"
 
-#include "Scene/BaseScene.h"
-
 #include "Manager/InputManager.h"
 #include "Manager/SoundManager.h"
 #include "Manager/SpriteManager.h"
 #include "Renderer/PeraRenderer.h"
 #include "Renderer/Renderer.h"
+#include "Scene/SceneComposition.h"
 #include "Wrapper/Dx12Wrapper.h"
-
-//各シーンでロード中かどうかを識別する真理値
-bool BaseScene::_canInput = false;
-
-//現フレームの時間
-LARGE_INTEGER BaseScene::_currentTime;	
-//FPS更新時の時間
-LARGE_INTEGER BaseScene::_updatedTime;	
-//前フレームの時間
-LARGE_INTEGER BaseScene::_beforeTime;	
-
-double BaseScene::_fps;
-
-/// <summary>
-/// コンストラクタ
-/// </summary>
-BaseScene::BaseScene()
-{
-
-}
-
-/// <summary>
-/// デストラクタ
-/// </summary>
-BaseScene::~BaseScene()
-{
-
-}
-
-/// <summary>
-/// シーン開始時に実行する処理
-/// </summary>
-void
-BaseScene::SceneStart()
-{
-	auto startFunc = [&]()
-	{	//フェードイン処理
-		Dx12Wrapper::Instance().Fade(1.0f, 0.0f);		
-	};
-	//上記の処理を並列処理する
-	ParallelProcess(startFunc);		
-
-	//操作可能にする
-	_canInput = true;
-}
-
-/// <summary>
-/// シーン終了時に実行する処理
-/// </summary>
-void
-BaseScene::SceneEnd()
-{
-
-}
 
 /// <summary>
 /// シーンを変更する関数
 /// </summary>
 /// <param name="name">変更先のシーンの名前</param>
 void
-BaseScene::ChangeScene(SceneNames name)
+SceneComposition::ChangeScene(SceneNames name)
 {
 	auto changeFunc = [&, name]()
 	{
@@ -83,122 +28,110 @@ BaseScene::ChangeScene(SceneNames name)
 		Application::Instance().ChangeScene(name);
 	};
 	//並列処理
-	ParallelProcess(changeFunc);	
-}
-
-void
-BaseScene::ModelDraw()
-{
-
-}
-
-void
-BaseScene::EffectAndUIDraw()
-{
-
+	ParallelProcess(changeFunc);
 }
 
 /// <summary>
 /// ペラポリゴンの描画処理をまとめた関数
 /// </summary>
 void
-BaseScene::PeraDraw()
+SceneComposition::PeraDraw()
 {
 	//ペラポリゴン描画準備
-	PeraRenderer::Instance().BeginPeraDraw();	
+	PeraRenderer::Instance().BeginPeraDraw();
 
 	//背景を描画
 	SpriteManager::Instance().BackGroundDraw();
 
 	//ペラポリゴン用パイプラインをセット
-	Dx12Wrapper::Instance().SetPipelines(							
+	Dx12Wrapper::Instance().SetPipelines(
 		Renderer::Instance().GetRootSignature(),
 		Renderer::Instance().GetPipelineState(),
 		D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST
 	);
 
 	//ビュー・プロジェクション行列を適用
-	Dx12Wrapper::Instance().SetScene();							
+	Dx12Wrapper::Instance().SetScene();
 
 	//モデル描画処理
-	ModelDraw();								
+	_modelDraw();
 
 	//ペラポリゴン描画後始末
-	PeraRenderer::Instance().EndPeraDraw();				
+	PeraRenderer::Instance().EndPeraDraw();
 }
 
 /// <summary>
 /// ゲーム画面描画処理
 /// </summary>
 void
-BaseScene::GameDraw()
+SceneComposition::GameDraw()
 {
 	//ゲーム画面描画準備
-	Dx12Wrapper::Instance().BeginGameDraw();															
+	Dx12Wrapper::Instance().BeginGameDraw();
 
 	//以下ペラポリゴン用コマンドリスト処理
-	PeraRenderer::Instance().SetPeraPipelines();												
+	PeraRenderer::Instance().SetPeraPipelines();
 
 	//ペラポリゴン用VBVをセット
-	Dx12Wrapper::Instance().CommandList()->IASetVertexBuffers(0, 1, PeraRenderer::Instance().PeraVBView());		
+	Dx12Wrapper::Instance().CommandList()->IASetVertexBuffers(0, 1, PeraRenderer::Instance().PeraVBView());
 	//ペラポリゴンを構成する頂点を描画
-	Dx12Wrapper::Instance().CommandList()->DrawInstanced(4, 1, 0, 0);									
+	Dx12Wrapper::Instance().CommandList()->DrawInstanced(4, 1, 0, 0);
 
 	//ここにエフェクト上の描画処理
-	EffectAndUIDraw();																
+	_effectAndUiDraw();
 
 	//ゲーム画面描画後始末
-	Dx12Wrapper::Instance().EndGameDraw();															
+	Dx12Wrapper::Instance().EndGameDraw();
 
 	//スワップチェーンのフリップ処理
 	Dx12Wrapper::Instance().Swapchain()->Present(Application::Instance().GetInterval(), 0);
 
 	//グラフィックスメモリを設定
-	SpriteManager::Instance().Commit();														
+	SpriteManager::Instance().Commit();
 }
 
 /// <summary>
 /// 各描画の更新をまとめて行う関数
 /// </summary>
 void
-BaseScene::DrawUpdate()
+SceneComposition::DrawUpdate()
 {
 	//FPSを更新
 	FPSUpdate();
 
 	//ペラポリゴン描画処理
-	PeraDraw();				
+	PeraDraw();
 
 	//ゲーム画面描画処理
-	GameDraw();				
+	GameDraw();
 }
 
 /// <summary>
 /// 入力を更新する関数
 /// </summary>
 void
-BaseScene::InputUpdate()
+SceneComposition::InputUpdate()
 {
 	//入力を更新
-	InputManager::Instance().UpdateInput();																	
+	InputManager::Instance().UpdateInput();
 }
 
 /// <summary>
 /// 現在のフレームレートを更新する関数
 /// </summary>
 void
-BaseScene::FPSUpdate()
+SceneComposition::FPSUpdate()
 {
 	//現在フレームの時間を取得
-	QueryPerformanceCounter(&_currentTime);							
+	QueryPerformanceCounter(&_currentTime);
 
 	//前回FPS更新時との差分
-	auto diff = GetLIntDiff(_currentTime,_updatedTime);				
+	auto diff = GetLIntDiff(_currentTime, _updatedTime);
 	//前フレームとの差分
-	auto frameTime = GetLIntDiff(_currentTime, _beforeTime);		
+	auto frameTime = GetLIntDiff(_currentTime, _beforeTime);
 
 	//処理時間に余裕がある場合、待ち合わせを行う
-	if (frameTime < FRAME_TIME)										
+	if (frameTime < FRAME_TIME)
 	{
 		DWORD sleepTime =
 			static_cast<DWORD>((FRAME_TIME - frameTime) * 1000);
@@ -210,17 +143,17 @@ BaseScene::FPSUpdate()
 	}
 
 	//差分が1秒以上だった場合
-	if (diff >= 1)													
+	if (diff >= 1)
 	{
 		//1秒を差分で割り、FPSを取得
-		_fps = 1 / frameTime;										
+		_fps = 1 / frameTime;
 
 		//FPS更新時間を更新
-		_updatedTime = _currentTime;								
+		_updatedTime = _currentTime;
 	}
 
 	//前フレームの時間を更新
-	_beforeTime = _currentTime;										
+	_beforeTime = _currentTime;
 }
 
 /// <summary>
@@ -228,10 +161,10 @@ BaseScene::FPSUpdate()
 /// </summary>
 /// <param name="func">並列に処理したいラムダ式</param>
 void
-BaseScene::ParallelProcess(function<void(void)> func)
+SceneComposition::ParallelProcess(function<void(void)> func)
 {
 	//ラムダ式を処理するスレッドを作成
-	thread th(func);	
+	thread th(func);
 	//スレッドの管理を手放す
-	th.detach();		
+	th.detach();
 }

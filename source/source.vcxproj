@@ -42,8 +42,9 @@
     <ClInclude Include="1_header\Package\Package.h" />
     <ClInclude Include="1_header\Renderer\PeraRenderer.h" />
     <ClInclude Include="1_header\Renderer\Renderer.h" />
-    <ClInclude Include="1_header\Scene\BaseScene.h" />
+    <ClInclude Include="1_header\Scene\IScene.h" />
     <ClInclude Include="1_header\Scene\PlayScene.h" />
+    <ClInclude Include="1_header\Scene\SceneComposition.h" />
     <ClInclude Include="1_header\Scene\TitleScene.h" />
     <ClInclude Include="1_header\Vector3.h" />
     <ClInclude Include="1_header\Wrapper\Dx12Wrapper.h" />
@@ -71,8 +72,8 @@
     <ClCompile Include="2_source\Package\Package.cpp" />
     <ClCompile Include="2_source\Renderer\PeraRenderer.cpp" />
     <ClCompile Include="2_source\Renderer\Renderer.cpp" />
-    <ClCompile Include="2_source\Scene\BaseScene.cpp" />
     <ClCompile Include="2_source\Scene\PlayScene.cpp" />
+    <ClCompile Include="2_source\Scene\SceneComposition.cpp" />
     <ClCompile Include="2_source\Scene\TitleScene.cpp" />
     <ClCompile Include="2_source\Wrapper\Dx12Wrapper.cpp" />
     <ClCompile Include="2_source\Wrapper\SphericalCoordinates.cpp" />

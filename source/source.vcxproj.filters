@@ -135,9 +135,6 @@
     <ClInclude Include="1_header\Scene\TitleScene.h">
       <Filter>1_header\Scene</Filter>
     </ClInclude>
-    <ClInclude Include="1_header\Scene\BaseScene.h">
-      <Filter>1_header\Scene</Filter>
-    </ClInclude>
     <ClInclude Include="1_header\FBX\AnimNodes\AnimNode.h">
       <Filter>1_header\FBX\AnimNodes</Filter>
     </ClInclude>
@@ -158,6 +155,12 @@
     </ClInclude>
     <ClInclude Include="1_header\Vector3.h">
       <Filter>1_header</Filter>
+    </ClInclude>
+    <ClInclude Include="1_header\Scene\SceneComposition.h">
+      <Filter>1_header\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="1_header\Scene\IScene.h">
+      <Filter>1_header\Scene</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -221,9 +224,6 @@
     <ClCompile Include="2_source\Scene\TitleScene.cpp">
       <Filter>2_source\Scene</Filter>
     </ClCompile>
-    <ClCompile Include="2_source\Scene\BaseScene.cpp">
-      <Filter>2_source\Scene</Filter>
-    </ClCompile>
     <ClCompile Include="2_source\Collider\BoxCollider.cpp">
       <Filter>2_source\Collider</Filter>
     </ClCompile>
@@ -238,6 +238,9 @@
     </ClCompile>
     <ClCompile Include="2_source\OcTree\OcTree.cpp">
       <Filter>2_source\OcTree</Filter>
+    </ClCompile>
+    <ClCompile Include="2_source\Scene\SceneComposition.cpp">
+      <Filter>2_source\Scene</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
