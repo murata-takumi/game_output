@@ -13,6 +13,7 @@ class ImGuiManager;
 class SceneComposition
 {
 public:
+	static SceneComposition& Instance();
 
 	//モデルの描画を行う関数ラッパー
 	std::function<void()> _modelDraw;

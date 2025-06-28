@@ -3,8 +3,6 @@
 #include "Includes.h"
 #include "Vector3.h"
 
-#include "Scene/PlayScene.h"
-
 #include "Collider/BoxCollider.h"
 #include "Collider/CollisionDetector.h"
 #include "FBX/AssimpLoader.h"
@@ -18,6 +16,7 @@
 #include "Manager/SpriteManager.h"
 #include "OcTree/OcTreeNode.h"
 #include "OcTree/OcTree.h"
+#include "Scene/PlayScene.h"
 #include "Scene/SceneComposition.h"
 #include "Renderer/Renderer.h"
 #include "Wrapper/Dx12Wrapper.h"
@@ -65,11 +64,7 @@ const string BOX_NAME_3 = "Box3";
 /// </summary>
 PlayScene::PlayScene() : IScene()
 {
-	//シーンの共通機能を初期化
-	_sceneComp = make_shared<SceneComposition>();
-	//関数も上書き
-	_sceneComp->_effectAndUiDraw = std::bind(&PlayScene::EffectAndUIDraw,this);
-	_sceneComp->_modelDraw = std::bind(&PlayScene::ModelDraw, this);
+
 }
 
 /// <summary>
@@ -86,6 +81,12 @@ PlayScene::~PlayScene()
 void
 PlayScene::SceneStart()
 {
+	//関数も上書き
+	SceneComposition::Instance()._effectAndUiDraw = std::bind(
+		&PlayScene::EffectAndUIDraw,
+		this);
+	SceneComposition::Instance()._modelDraw = std::bind(&PlayScene::ModelDraw, this);
+
 	//カメラ位置をリセット
 	Dx12Wrapper::Instance().ResetCoordinates(0,0);	
 
@@ -96,7 +97,7 @@ PlayScene::SceneStart()
 	auto f = [&]()
 	{
 		//ロード中だと示す
-		_sceneComp->_canInput = false;
+		SceneComposition::Instance()._canInput = false;
 
 		//スレッドに各オブジェクトの作成処理を追加
 		InstantiateObject<FBXActor>(ACTOR_PATH,ACTOR_NAME,ACTOR_COLL_SIZE);
@@ -160,16 +161,16 @@ PlayScene::SceneStart()
 						//if (CollisionDetector::Instance().CheckColAndPoint(
 						//	*obj->Collider(),
 						//	vec))
-						//if(CollisionDetector::Instance().CheckContinuousCollisionDetection(
-						//	*obj->Collider(),
-						//	XMVectorSet(0,1,0,0),
-						//	vec,
-						//	-45.0f * 9.8f
-						//))
-						if(CollisionDetector::Instance().CheckColAndVec(
+						if(CollisionDetector::Instance().CheckContinuousCollisionDetection(
 							*obj->Collider(),
-							vec) <= 0.0f
-						)
+							XMVectorSet(0,1,0,0),
+							vec,
+							-45.0f * 9.8f
+						))
+						//if(CollisionDetector::Instance().CheckColAndVec(
+						//	*obj->Collider(),
+						//	vec) <= 0.0f
+						//)
 						{
 							ret = true;
 							break;
@@ -185,20 +186,20 @@ PlayScene::SceneStart()
 		ImGuiManager::Instance().SetActor(_actorAndObjs);
 
 		//ロード完了
-		_sceneComp->_canInput = true;
+		SceneComposition::Instance()._canInput = true;
 
 		//フェードイン処理を並列処理
 		auto startFunc = [&]()
 		{
 			Dx12Wrapper::Instance().Fade(1.0f, 0.0f);										
 		};
-		_sceneComp->ParallelProcess(startFunc);
+		SceneComposition::Instance().ParallelProcess(startFunc);
 
 		//エフェクト実行
 		//Dx12Wrapper::Instance().Effect()->CallEffect();									
 	};
 	//上記の読み込み処理を通常の描画処理と並行して行う
-	_sceneComp->ParallelProcess(f);
+	SceneComposition::Instance().ParallelProcess(f);
 }
 
 /// <summary>
@@ -208,10 +209,10 @@ void
 PlayScene::Update()
 {
 	//入力を更新
-	_sceneComp->InputUpdate();
+	SceneComposition::Instance().InputUpdate();
 
 	//操作可能な場合入力を反映する
-	if (_sceneComp->_canInput)
+	if (SceneComposition::Instance()._canInput)
 	{
 		//コインとアクターが接触したらコインを削除
 		//if (_actorAndObjs[COIN_NAME] && CheckColAndCol(*_actorAndObjs[COIN_NAME]->Collider(), *_actor->Collider()))
@@ -330,7 +331,7 @@ PlayScene::Update()
 	}
 
 	//描画処理
-	_sceneComp->DrawUpdate();
+	SceneComposition::Instance().DrawUpdate();
 }
 
 /// <summary>
@@ -377,7 +378,7 @@ void
 PlayScene::ModelDraw()
 {
 	//プレイヤーが読み込み完了している場合FBXBaseクラスを基盤とするオブジェクト全般に対し描画・更新処理を行う
-	if (_sceneComp->_canInput)
+	if (SceneComposition::Instance()._canInput)
 	{
 		//トゥーンテクスチャも描画する
 		Renderer::Instance().Draw();
@@ -400,7 +401,7 @@ void
 PlayScene::EffectAndUIDraw()
 {
 	//ロード中の場合
-	if (!_sceneComp->_canInput)
+	if (!SceneComposition::Instance()._canInput)
 	{
 		//ロード画面を描画
 		SpriteManager::Instance().LoadingDraw();	
@@ -411,7 +412,7 @@ PlayScene::EffectAndUIDraw()
 		if (ImGuiManager::Instance().IsWriteGrid())SpriteManager::Instance().GridDraw(_actorAndObjs);
 
 		//SceneからImGuiにFPSを渡す
-		ImGuiManager::Instance().SetFPS(_sceneComp->_fps);
+		ImGuiManager::Instance().SetFPS(SceneComposition::Instance()._fps);
 		//ImGuiのウィンドウを描画
 		ImGuiManager::Instance().ImGuiDraw();	
 	}

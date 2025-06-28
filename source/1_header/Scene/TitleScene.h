@@ -26,6 +26,4 @@ public:
 	//エフェクト・UIを描画する関数
 	void EffectAndUIDraw();
 protected:
-	//全シーンに必要な機能をまとめたクラス
-	shared_ptr<SceneComposition> _sceneComp;
 };

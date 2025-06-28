@@ -9,6 +9,13 @@
 #include "Scene/SceneComposition.h"
 #include "Wrapper/Dx12Wrapper.h"
 
+SceneComposition& 
+SceneComposition::Instance()
+{
+	static SceneComposition instance;
+	return instance;
+}
+
 /// <summary>
 /// ƒV[ƒ“‚ğ•ÏX‚·‚éŠÖ”
 /// </summary>

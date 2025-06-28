@@ -10,11 +10,7 @@
 /// </summary>
 TitleScene::TitleScene():IScene()
 {
-	//シーンの共通機能を初期化
-	_sceneComp = make_shared<SceneComposition>();
-	//関数も上書き
-	_sceneComp->_effectAndUiDraw = std::bind(&TitleScene::EffectAndUIDraw, this);
-	_sceneComp->_modelDraw = std::bind(&TitleScene::ModelDraw, this);
+
 }
 
 /// <summary>
@@ -31,7 +27,19 @@ TitleScene::~TitleScene()
 void
 TitleScene::SceneStart()
 {
+	//関数も上書き
+	SceneComposition::Instance()._effectAndUiDraw = std::bind(&TitleScene::EffectAndUIDraw, this);
+	SceneComposition::Instance()._modelDraw = std::bind(&TitleScene::ModelDraw, this);
 
+	//ロード完了
+	SceneComposition::Instance()._canInput = true;
+
+	//フェードイン処理を並列処理
+	auto startFunc = [&]()
+	{
+		Dx12Wrapper::Instance().Fade(1.0f, 0.0f);
+	};
+	SceneComposition::Instance().ParallelProcess(startFunc);
 }
 
 /// <summary>
@@ -41,10 +49,10 @@ void
 TitleScene::Update()
 {
 	//入力を更新
-	_sceneComp->InputUpdate();
+	SceneComposition::Instance().InputUpdate();
 
 	if (InputManager::Instance().MouseTracker().leftButton ==
-		Mouse::ButtonStateTracker::PRESSED && _sceneComp->_canInput)
+		Mouse::ButtonStateTracker::PRESSED && SceneComposition::Instance()._canInput)
 	{
 		//開始ボタンの上で左クリック
 		if (SpriteManager::Instance().TitleIsOnStart())
@@ -53,7 +61,7 @@ TitleScene::Update()
 			SoundManager::Instance().CallSound(Sounds::BUTTON);
 
 			//ゲームシーンへ遷移
-			_sceneComp->ChangeScene(SceneNames::Play);
+			SceneComposition::Instance().ChangeScene(SceneNames::Play);
 
 			return;
 		}
@@ -65,7 +73,7 @@ TitleScene::Update()
 			SoundManager::Instance().CallSound(Sounds::BUTTON);
 
 			//操作不可にする
-			_sceneComp->_canInput = false;
+			SceneComposition::Instance()._canInput = false;
 
 			auto exitFunc = ([&]()
 				{
@@ -78,14 +86,14 @@ TitleScene::Update()
 					return;
 				}
 			);
-			_sceneComp->ParallelProcess(exitFunc);
+			SceneComposition::Instance().ParallelProcess(exitFunc);
 
 			return;
 		}
 	}
 
 	//描画処理
-	_sceneComp->DrawUpdate();
+	SceneComposition::Instance().DrawUpdate();
 }
 
 /// <summary>

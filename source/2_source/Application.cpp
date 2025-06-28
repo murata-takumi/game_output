@@ -207,6 +207,7 @@ Application::Init()
 	//ImGuiü‚è‚ğ‰Šú‰»
 	ImGuiManager::Instance().Init(_hwnd);
 
+	//“–‚½‚è”»’è‚ğŠÇ—‚·‚é”ª•ª–Ø‚à‰Šú‰»
 	OcTree::Instance().Init(
 		make_shared<BoxCollider>(Vector3(2000, 2000, 2000)),
 		4

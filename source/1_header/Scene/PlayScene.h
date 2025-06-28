@@ -39,9 +39,6 @@ protected:
 	//並列処理したいスレッドのベクトル
 	vector<thread> _ths;
 
-	//全シーンに必要な機能をまとめたクラス
-	shared_ptr<SceneComposition> _sceneComp;
-
 	//アクターインスタンス
 	shared_ptr<FBXActor> _actor;
 	//床インスタンス
