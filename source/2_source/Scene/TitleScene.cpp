@@ -6,22 +6,6 @@
 #include "Wrapper/Dx12Wrapper.h"
 
 /// <summary>
-/// コンストラクタ
-/// </summary>
-TitleScene::TitleScene():IScene()
-{
-
-}
-
-/// <summary>
-/// デストラクタ
-/// </summary>
-TitleScene::~TitleScene()
-{
-
-}
-
-/// <summary>
 /// シーン開始時の処理
 /// </summary>
 void

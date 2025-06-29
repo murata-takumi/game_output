@@ -9,9 +9,9 @@ class TitleScene : public IScene
 {
 public:
 	//コンストラクタ
-	TitleScene();
+	TitleScene() = default;
 	//デストラクタ
-	~TitleScene();					
+	~TitleScene() = default;
 
 	//更新処理
 	void Update() override;			

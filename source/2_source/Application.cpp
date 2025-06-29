@@ -221,8 +221,8 @@ Application::Init()
 	ShowWindow(_hwnd, SW_SHOW);													
 
 	//ƒQ[ƒ€ƒV[ƒ“‚Ì‰Šú‰»
-	_title.reset(new TitleScene());
-	_play.reset(new PlayScene());
+	_title = make_shared<TitleScene>();
+	_play = make_shared<PlayScene>();
 	
 	ChangeScene(SceneNames::Play);
 

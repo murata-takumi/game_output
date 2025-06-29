@@ -9,6 +9,7 @@ class collisionDetector;
 class AssimpLoader;
 class FBXActor;
 class FBXBase;
+class FBXComposition;
 class FBXObject;
 class EffectManager;
 class ImGuiManager;
@@ -20,9 +21,9 @@ class PlayScene : public IScene
 {
 public:
 	//コンストラクタ
-	PlayScene();
+	PlayScene() = default;
 	//デストラクタ
-	~PlayScene();						
+	~PlayScene() = default;
 
 	//更新処理
 	void Update() override;						
