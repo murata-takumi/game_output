@@ -3,7 +3,7 @@
 #include "Vector3.h"
 
 #include "Collider/BoxCollider.h"
-#include "FBX/FBXBase.h"
+#include "FBX/IFBX.h"
 
 //正面ベクトルの初期値
 const Vector3 INITIAL_FRONT = XMVectorSet(0.0f,0.0f,1.0f,0.0f);
@@ -14,11 +14,11 @@ const Vector3 INITIAL_FRONT = XMVectorSet(0.0f,0.0f,1.0f,0.0f);
 /// </summary>
 /// <param name="size">当たり判定の幅、高さ、奥行のサイズ</param>
 /// <param name="center">当たり判定の中心ベクトル</param>
-BoxCollider::BoxCollider(const Vector3& size, const Vector3& pos, FBXBase* object)
+BoxCollider::BoxCollider(const Vector3& size, const Vector3& pos, IFBX* object)
 {
 	//渡されたアドレスを基にスマートポインタを生成
 	//管理権をスマートポインタに渡すためdeleter?を渡す
-	_object = shared_ptr<FBXBase>(object, [](FBXBase*)
+	_object = shared_ptr<IFBX>(object, [](IFBX*)
 	{
 
 	});
@@ -156,7 +156,7 @@ BoxCollider::Center()const
 /// 当たり判定を持つオブジェクトを返す
 /// </summary>
 /// <returns>オブジェクト</returns>
-FBXBase&
+IFBX&
 BoxCollider::Object()const
 {
 	return *_object;

@@ -3,7 +3,7 @@
 #include "Collider/BoxCollider.h"
 #include "Collider/CollisionDetector.h"
 #include "FBX/FBXActor.h"
-#include "FBX/FBXBase.h"
+#include "FBX/IFBX.h"
 #include "FBX/FBXObject.h"
 #include "Wrapper/Dx12Wrapper.h"
 
@@ -61,11 +61,13 @@ CollisionDetector::CheckContinuousCollisionDetection(
 	const float speed)
 {
 	//1フレーム後の座標を取得
-	Vector3 nextPos = currentPos + (dir * speed * Dx12Wrapper::Instance().GetDeltaTime());
+	Vector3 nextPos = currentPos + (dir * 3 * speed * Dx12Wrapper::Instance().GetDeltaTime());
 
 	//現在と1フレーム後の座標のベクトルがOBBと交わる（=1フレーム後に衝突する）なら真
 	if (CheckColAndVec(col, currentPos, nextPos))
 	{
+
+
 		return true;
 	}
 
@@ -134,20 +136,17 @@ CollisionDetector::CheckColAndVec(const BoxCollider& col, const Vector3& startPo
 
 	//各方向ベクトルへの投影の和を求め、線分方向ベクトルへの投影と半分長の和と比較
 	//差分の線分ベクトルへの投影
-	r = abs(XMVector3Dot(centerDiff, lineDir).m128_f32[0]);
-	//方向ベクトルへの投影の和
-	r0 = 0.0f;
-	for (int i = 0; i < 3; i++)
-	{
-		r0 += col.HalfLength()[i] * abs(XMVector3Dot(lineDir,col.DirectionVectors()[i]).m128_f32[0]);
-	}
-	if (r > r0 + lineExtent)
-	{
-		return false;
-	}
-
-	//auto lenBetColAndStartPos = GetLengthBetweenColAndPos(col, lineDir, startPos);
-	//ImGuiManager::Instance().AddLabelAndFloat("lenBetColAndStartPos", lenBetColAndStartPos);
+	//r = abs(XMVector3Dot(centerDiff, lineDir).m128_f32[0]);
+	////方向ベクトルへの投影の和
+	//r0 = 0.0f;
+	//for (int i = 0; i < 3; i++)
+	//{
+	//	r0 += col.HalfLength()[i] * abs(XMVector3Dot(lineDir,col.DirectionVectors()[i]).m128_f32[0]);
+	//}
+	//if (r > r0 + lineExtent)
+	//{
+	//	return false;
+	//}
 
 	return true;
 }

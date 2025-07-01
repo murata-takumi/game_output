@@ -2,7 +2,7 @@
 #include "Application.h"
 
 /// <summary>
-/// FBXモデルの派生元となるクラス
+/// FBXモデルの派生元となるインターフェース
 /// </summary>
 class AssimpLoader;
 class BoxCollider;
@@ -12,16 +12,16 @@ class Vector3;
 class aiScene;
 class Mesh;
 class BoneInfo;
-class FBXBase
+class IFBX
 {
 protected:
 	//座標変換行列を作成
 	virtual HRESULT CreateTransformView() = 0;
 public:
 	//コンストラクタ
-	FBXBase() = default;
+	IFBX() = default;
 	//デストラクタ
-	~FBXBase() = default;
+	~IFBX() = default;
 
 	//初期化関数
 	virtual HRESULT Init(const wchar_t* filePath, const string name, 

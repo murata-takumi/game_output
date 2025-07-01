@@ -305,7 +305,7 @@ ImGuiManager::SetFPS(float fps)
 /// </summary>
 /// <param name="actor">アクターのベクトル</param>
 void
-ImGuiManager::SetActor(const map<string, shared_ptr<FBXBase>> actorAndObjs)
+ImGuiManager::SetActor(const map<string, shared_ptr<IFBX>> actorAndObjs)
 {
 	//ベクトルの中からアクターを探して取得
 	for (const auto& object : actorAndObjs)

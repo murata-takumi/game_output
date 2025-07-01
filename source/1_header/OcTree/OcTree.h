@@ -5,7 +5,7 @@
 /// 八分木を管理するクラス
 /// </summary>
 class BoxCollider;
-class FBXBase;
+class IFBX;
 class OcTreeNode;
 class OcTree
 {
@@ -16,10 +16,10 @@ public:
 	void Init(const shared_ptr<BoxCollider> col, int capacity);
 
 	//オブジェクトを追加する関数
-	bool AddObject(const shared_ptr<FBXBase> obj);
+	bool AddObject(const shared_ptr<IFBX> obj);
 
 	//クエリ範囲にあるオブジェクトを取得する関数
-	vector<shared_ptr<FBXBase>> Get(const shared_ptr<BoxCollider> col)noexcept;
+	vector<shared_ptr<IFBX>> Get(const shared_ptr<BoxCollider> col)noexcept;
 
 private:
 	//ノード

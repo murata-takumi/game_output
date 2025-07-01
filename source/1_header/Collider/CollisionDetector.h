@@ -7,7 +7,7 @@
 class BoxCollider;
 class Dx12Wrapper;
 class FBXActor;
-class FBXBase;
+class IFBX;
 class FBXObject;
 class Vector3;
 class CollisionDetector

@@ -8,7 +8,7 @@
 #include "FBX/AssimpLoader.h"
 #include "FBX/AnimNodes/AnimNode.h"
 #include "FBX/FBXActor.h"
-#include "FBX/FBXBase.h"
+#include "FBX/IFBX.h"
 #include "FBX/FBXObject.h"
 #include "Manager/EffectManager.h"
 #include "Manager/ImGuiManager.h"
@@ -345,7 +345,7 @@ void
 PlayScene::InstantiateObject(const wchar_t* path,string name, Vector3 size, Vector3 pos)
 {
 	auto f = [=]() {
-		shared_ptr<FBXBase> object;
+		shared_ptr<IFBX> object;
 
 		object = make_shared<className>();
 		object->Init(path, name, size, pos);
@@ -363,7 +363,7 @@ PlayScene::InstantiateObject(const wchar_t* path,string name, Vector3 size, Vect
 void
 PlayScene::ModelDraw()
 {
-	//プレイヤーが読み込み完了している場合FBXBaseクラスを基盤とするオブジェクト全般に対し描画・更新処理を行う
+	//プレイヤーが読み込み完了している場合IFBXクラスを基盤とするオブジェクト全般に対し描画・更新処理を行う
 	if (SceneComposition::Instance()._canInput)
 	{
 		//トゥーンテクスチャも描画する

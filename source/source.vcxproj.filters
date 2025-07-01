@@ -120,9 +120,6 @@
     <ClInclude Include="1_header\FBX\AssimpLoader.h">
       <Filter>1_header\FBX</Filter>
     </ClInclude>
-    <ClInclude Include="1_header\FBX\FBXBase.h">
-      <Filter>1_header\FBX</Filter>
-    </ClInclude>
     <ClInclude Include="1_header\FBX\FBXObject.h">
       <Filter>1_header\FBX</Filter>
     </ClInclude>
@@ -163,6 +160,9 @@
       <Filter>1_header\Scene</Filter>
     </ClInclude>
     <ClInclude Include="1_header\FBX\FBXComposition.h">
+      <Filter>1_header\FBX</Filter>
+    </ClInclude>
+    <ClInclude Include="1_header\FBX\IFBX.h">
       <Filter>1_header\FBX</Filter>
     </ClInclude>
   </ItemGroup>
@@ -213,9 +213,6 @@
       <Filter>2_source\FBX</Filter>
     </ClCompile>
     <ClCompile Include="2_source\FBX\FBXActor.cpp">
-      <Filter>2_source\FBX</Filter>
-    </ClCompile>
-    <ClCompile Include="2_source\FBX\FBXBase.cpp">
       <Filter>2_source\FBX</Filter>
     </ClCompile>
     <ClCompile Include="2_source\FBX\FBXObject.cpp">

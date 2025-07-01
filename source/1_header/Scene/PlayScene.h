@@ -8,7 +8,7 @@ class BoxCollider;
 class collisionDetector;
 class AssimpLoader;
 class FBXActor;
-class FBXBase;
+class IFBX;
 class FBXComposition;
 class FBXObject;
 class EffectManager;
@@ -35,15 +35,15 @@ public:
 
 protected:
 	//FBXObjectとFBXActorをまとめたベクトル
-	map<string, shared_ptr<FBXBase>> _actorAndObjs;
+	map<string, shared_ptr<IFBX>> _actorAndObjs;
 
 	//並列処理したいスレッドのベクトル
 	vector<thread> _ths;
 
 	//アクターインスタンス
-	shared_ptr<FBXBase> _actor;
+	shared_ptr<IFBX> _actor;
 	//床インスタンス
-	shared_ptr<FBXBase> _ground;
+	shared_ptr<IFBX> _ground;
 
 	//プレイヤー、カメラの進行ベクトル
 	Vector3 _direction;

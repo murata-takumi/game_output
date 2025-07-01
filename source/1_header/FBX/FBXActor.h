@@ -1,6 +1,6 @@
 #pragma once
 #include "FBX/AnimNodes/Animations.h"
-#include "FBX/FBXBase.h"
+#include "FBX/IFBX.h"
 
 /// <summary>
 /// ゲーム画面上に登場する3Dオブジェクトのクラス（ボーン入り）
@@ -15,7 +15,7 @@ class Dx12Wrapper;
 class FBXComposition;
 class ImGuiManager;
 class Vector3;
-class FBXActor : public FBXBase
+class FBXActor : public IFBX
 {	
 	template<typename T>using ComPtr = ComPtr<T>;
 

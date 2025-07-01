@@ -331,7 +331,7 @@ FBXComposition::CreateShaderResourceView()
 /// <param name="obj">紐づけるオブジェクト</param>
 void 
 FBXComposition::CreateCollider(const Vector3& size, const Vector3& pos,
-	FBXBase* obj)
+	IFBX* obj)
 {
 	_collider = make_shared<BoxCollider>(size, pos, obj);
 }

@@ -471,7 +471,7 @@ SpriteManager::BackGroundDraw()
 /// グリッドを描画する関数
 /// </summary>
 void
-SpriteManager::GridDraw(const map<string, shared_ptr<FBXBase>> actorAndObjs)
+SpriteManager::GridDraw(const map<string, shared_ptr<IFBX>> actorAndObjs)
 {
 	//ビュー･プロジェクション行列を取得
 	_view = Dx12Wrapper::Instance().ViewMatrix();											

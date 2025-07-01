@@ -1,5 +1,5 @@
 #pragma once
-#include "FBX/FBXBase.h"
+#include "FBX/IFBX.h"
 
 /// <summary>
 /// FBXオブジェクト
@@ -11,7 +11,7 @@ class Dx12Wrapper;
 class FBXComposition;
 class ImGuiManager;
 class Vector3;
-class FBXObject : public FBXBase
+class FBXObject : public IFBX
 {
 	template<typename T>using ComPtr = ComPtr<T>;
 

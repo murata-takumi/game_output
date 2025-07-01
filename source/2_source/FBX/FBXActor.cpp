@@ -5,7 +5,7 @@
 #include "Collider/CollisionDetector.h"
 #include "FBX/AssimpLoader.h"
 #include "FBX/FBXActor.h"
-#include "FBX/FBXBase.h"
+#include "FBX/IFBX.h"
 #include "FBX/FBXComposition.h"
 #include "FBX/FBXObject.h"
 #include "FBX/AnimNodes/AnimNode.h"
