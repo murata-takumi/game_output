@@ -4,7 +4,7 @@
 
 #include "Collider/CollisionDetector.h"
 #include "Collider/BoxCollider.h"
-#include "FBX/FBXObject.h"
+#include "FBX/FBXBase.h"
 #include "OcTree/OcTreeNode.h"
 
 /// <summary>
@@ -32,7 +32,7 @@ OcTreeNode::~OcTreeNode()
 /// <param name="obj">追加するオブジェクト</param>
 /// <returns></returns>
 bool
-OcTreeNode::AddObject(const shared_ptr<FBXObject> obj)
+OcTreeNode::AddObject(const shared_ptr<FBXBase> obj)
 {
 	//空間内に入ってなかったら処理中断
 	if (!CollisionDetector::Instance().CheckColAndPoint(*_col, obj.get()->CurrentPosition()))
@@ -91,7 +91,7 @@ OcTreeNode::SubDivide()
 /// </summary>
 /// <param name="objs">オブジェクト</param>
 void
-OcTreeNode::AddToChild(const vector<shared_ptr<FBXObject>> objs)
+OcTreeNode::AddToChild(const vector<shared_ptr<FBXBase>> objs)
 {
 	for(auto& obj : objs)
 	{
@@ -110,10 +110,10 @@ OcTreeNode::AddToChild(const vector<shared_ptr<FBXObject>> objs)
 /// </summary>
 /// <param name="bounds">クエリ範囲</param>
 /// <returns>オブジェクト</returns>
-vector<shared_ptr<FBXObject>>
+vector<shared_ptr<FBXBase>>
 OcTreeNode::Get(const shared_ptr<BoxCollider> col)noexcept
 {
-	vector<shared_ptr<FBXObject>> ret;
+	vector<shared_ptr<FBXBase>> ret;
 
 	//全オブジェクトに対しクエリ範囲内に含まれているかチェックを行う
 	for (auto& obj : _objs)

@@ -8,6 +8,7 @@
 class AssimpLoader;
 class BoxCollider;
 class Dx12Wrapper;
+class FBXComposition;
 class ImGuiManager;
 class Vector3;
 class FBXObject : public FBXBase
@@ -19,12 +20,28 @@ private:
 	//座標変換バッファー・ビューを作成する関数
 	HRESULT CreateTransformView()override;
 
+	//FBXクラスの共通処理をまとめたインスタンス
+	shared_ptr<FBXComposition> _fbxComp;
+
 public:
 	//コンストラクタ
-	FBXObject(const wchar_t* filePath,const string name,Vector3 size,Vector3 pos = Vector3(0.0f, 0.0f, 0.0f));
+	FBXObject() = default;
 	//デストラクタ
-	~FBXObject();
+	~FBXObject() = default;
 
-	//更新用関数
+	//初期化関数
+	HRESULT Init(const wchar_t* filePath, const string name, 
+				const Vector3& size, const Vector3& pos)override;
+
+	//当たり判定を取得
+	shared_ptr<BoxCollider>  Collider()override;
+
+	//描画処理
+	void Draw()override;
+
+	//更新処理
 	void Update()override;
+
+	//現在の座標を取得
+	Vector3 CurrentPosition()override;
 };

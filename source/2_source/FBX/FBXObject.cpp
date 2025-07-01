@@ -3,29 +3,44 @@
 
 #include "Collider/BoxCollider.h"
 #include "FBX/AssimpLoader.h"
+#include "FBX/FBXComposition.h"
 #include "FBX/FBXObject.h"
 #include "Manager/ImGuiManager.h"
 #include "Wrapper/Dx12Wrapper.h"
 
 /// <summary>
-/// コンストラクタ
+/// 初期化関数
 /// </summary>
-/// <param name="filePath">モデルパス</param>
-/// <param name="pos">初期座標</param>
-FBXObject::FBXObject(const wchar_t* filePath,const string name, Vector3 size, Vector3 pos)
-	:FBXBase(filePath, name, size, pos)
+/// <param name="filePath">fbxファイルのパス</param>
+/// <param name="name">オブジェクト名</param>
+/// <param name="size">当たり判定のサイズ</param>
+/// <param name="pos">当たり判定の座標</param>
+/// <returns>処理が成功したかどうか</returns>
+HRESULT
+FBXObject::Init(const wchar_t* filePath, const string name,
+	const Vector3& size, const Vector3& pos)
 {
+	//共通処理を初期化
+	_fbxComp = make_shared<FBXComposition>();
+
+	//モデル関連の情報を初期化
+	_fbxComp->InitModel(filePath);
+
+	//頂点バッファー・ビュー作成
+	_fbxComp->CreateVertexBufferView();
+	//インデックスバッファー・ビュー作成
+	_fbxComp->CreateIndexBufferView();
+	//シェーダーリソース・ビュー作成
+	_fbxComp->CreateShaderResourceView();
+
+
+	//当たり判定を作成
+	_fbxComp->CreateCollider(size, Vector3(0, 0, 0), this);
+
 	//座標変換用バッファー・ビュー作成
 	CreateTransformView();
-}
 
-/// <summary>
-/// デストラクタ
-/// 特に何もしない
-/// </summary>
-FBXObject::~FBXObject()
-{
-
+	return S_OK;
 }
 
 /// <summary>
@@ -35,7 +50,7 @@ FBXObject::~FBXObject()
 HRESULT
 FBXObject::CreateTransformView()
 {
-	result = S_OK;
+	HRESULT result = S_OK;
 
 	//ワールド行列用バッファーの作成・書き込み
 	auto buffSize = sizeof(XMMATRIX);												
@@ -48,23 +63,23 @@ FBXObject::CreateTransformView()
 		&resDesc,
 		D3D12_RESOURCE_STATE_GENERIC_READ,
 		nullptr,
-		IID_PPV_ARGS(FBXBase::_transBuffer.ReleaseAndGetAddressOf())
+		IID_PPV_ARGS(_fbxComp->_transBuffer.ReleaseAndGetAddressOf())
 	);
 	if (FAILED(result)) {
 		assert(0);
 		return result;
 	}
-	result = FBXBase::_transBuffer->Map(0, nullptr, (void**)&(FBXBase::_mappedMats));
+	result = _fbxComp->_transBuffer->Map(0, nullptr, (void**)&(_fbxComp->_mappedMats));
 	if (FAILED(result))
 	{
 		assert(0);
 		return result;
 	}
-	FBXBase::_mappedMats[0] = XMMatrixIdentity();
+	_fbxComp->_mappedMats[0] = XMMatrixIdentity();
 	//平行移動
-	FBXBase::_mappedMats[0] *= XMMatrixTranslationFromVector(_translateVector);
+	_fbxComp->_mappedMats[0] *= XMMatrixTranslationFromVector(_fbxComp->_translateVector);
 
-	_collider->Update(FBXBase::_mappedMats[0]);
+	_fbxComp->Collider()->Update(_fbxComp->_mappedMats[0]);
 
 	//ディスクリプタヒープの作成
 	D3D12_DESCRIPTOR_HEAP_DESC transformDescHeapDesc = {};							
@@ -74,7 +89,7 @@ FBXObject::CreateTransformView()
 	transformDescHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
 
 	result = Dx12Wrapper::Instance().Device()->CreateDescriptorHeap(&transformDescHeapDesc,
-		IID_PPV_ARGS(FBXBase::_transHeap.ReleaseAndGetAddressOf()));
+		IID_PPV_ARGS(_fbxComp->_transHeap.ReleaseAndGetAddressOf()));
 	if (FAILED(result)) {
 		assert(0);
 		return result;
@@ -82,19 +97,48 @@ FBXObject::CreateTransformView()
 
 	//ビューの作成
 	D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc = {};									
-	cbvDesc.BufferLocation = FBXBase::_transBuffer->GetGPUVirtualAddress();
-	cbvDesc.SizeInBytes = static_cast<UINT>(FBXBase::_transBuffer->GetDesc().Width);
+	cbvDesc.BufferLocation = _fbxComp->_transBuffer->GetGPUVirtualAddress();
+	cbvDesc.SizeInBytes = static_cast<UINT>(_fbxComp->_transBuffer->GetDesc().Width);
 
-	Dx12Wrapper::Instance().Device()->CreateConstantBufferView(&cbvDesc, FBXBase::_transHeap->GetCPUDescriptorHandleForHeapStart());
+	Dx12Wrapper::Instance().Device()->CreateConstantBufferView(&cbvDesc, _fbxComp->_transHeap->GetCPUDescriptorHandleForHeapStart());
 
 	return result;
 }
 
 /// <summary>
-/// 毎フレームの座標変換処理を実行する関数
+/// 当たり判定を取得
 /// </summary>
-void
+/// <returns>スマートポインタ</returns>
+shared_ptr<BoxCollider> 
+FBXObject::Collider()
+{
+	return _fbxComp->Collider();
+}
+
+/// <summary>
+/// 描画処理
+/// </summary>
+void 
+FBXObject::Draw()
+{
+	_fbxComp->Draw();
+}
+
+/// <summary>
+/// 更新処理
+/// </summary>
+void 
 FBXObject::Update()
 {
-	FBXBase::Update();
+	_fbxComp->Update();
+}
+
+/// <summary>
+/// 現在の座標を取得する関数
+/// </summary>
+/// <returns>座標</returns>
+Vector3
+FBXObject::CurrentPosition()
+{
+	return _fbxComp->CurrentPosition();
 }

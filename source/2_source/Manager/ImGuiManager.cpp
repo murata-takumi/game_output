@@ -146,23 +146,23 @@ ImGuiManager::ImGuiDraw()
 		{
 			if (_canActorControll)															//チェックボックスをtrueにした時
 			{
-				_actor->StartControll();
+				dynamic_pointer_cast<FBXActor>(_actor)->StartControll();
 
 				_canCallAnim = false;
 			}
 			else																			//チェックボックスをfalseにした時
 			{
-				_actor->EndControll();														//アクターの移動・回転を初期化
+				dynamic_pointer_cast<FBXActor>(_actor)->EndControll();														//アクターの移動・回転を初期化
 				Dx12Wrapper::Instance().ResetCoordinates(0.0f,0.0f);											//カメラを初期化
 			}
 		}
 
-		auto onGround = _actor->GetOnGround();
+		auto onGround = dynamic_pointer_cast<FBXActor>(_actor)->GetOnGround();
 		ImGui::Checkbox("IsOnGround", &onGround);
 
-		ImGui::DragFloat("PlayerX", &_actor->CurrentPosition().X());
-		ImGui::DragFloat("PlayerY", &_actor->CurrentPosition().Y());
-		ImGui::DragFloat("PlayerZ", &_actor->CurrentPosition().Z());
+		ImGui::DragFloat("PlayerX", &dynamic_pointer_cast<FBXActor>(_actor)->CurrentPosition().X());
+		ImGui::DragFloat("PlayerY", &dynamic_pointer_cast<FBXActor>(_actor)->CurrentPosition().Y());
+		ImGui::DragFloat("PlayerZ", &dynamic_pointer_cast<FBXActor>(_actor)->CurrentPosition().Z());
 
 		//文字列を表示
 		for (auto& pair : _texts)
@@ -182,7 +182,7 @@ ImGuiManager::ImGuiDraw()
 			ImGui::Checkbox(pair.first, &pair.second);
 		}
 
-		ImGui::Text(_actor->GetCurentAnimStr().c_str());
+		ImGui::Text(dynamic_pointer_cast<FBXActor>(_actor)->GetCurentAnimStr().c_str());
 		
 		ImGui::End();
 	}
@@ -208,12 +208,12 @@ ImGuiManager::ImGuiDraw()
 				{
 					_currentImGuiAnim = _animStr[i].c_str();
 
-					_maxDur = _actor->GetAnimDuration(_currentImGuiAnim) - _actor->GetSecondFrame();
-					_tick = _actor->GetAnimTickPerSpeed(_currentImGuiAnim);
+					_maxDur = dynamic_pointer_cast<FBXActor>(_actor)->GetAnimDuration(_currentImGuiAnim) - dynamic_pointer_cast<FBXActor>(_actor)->GetSecondFrame();
+					_tick = dynamic_pointer_cast<FBXActor>(_actor)->GetAnimTickPerSpeed(_currentImGuiAnim);
 					_animSliderValue = 0.0f;
 
-					_actor->InitPose();
-					_actor->SetAnimationTime(_animSliderValue);										//スライダーの値をアクターに渡す
+					dynamic_pointer_cast<FBXActor>(_actor)->InitPose();
+					dynamic_pointer_cast<FBXActor>(_actor)->SetAnimationTime(_animSliderValue);										//スライダーの値をアクターに渡す
 
 					_canCallAnim = false;
 				}
@@ -236,9 +236,9 @@ ImGuiManager::ImGuiDraw()
 			_animSliderValue = 0.0f;
 
 			//実行するアニメーションを指定
-			_actor->SetAnimStr(_currentImGuiAnim);											
+			dynamic_pointer_cast<FBXActor>(_actor)->SetAnimStr(_currentImGuiAnim);											
 			//実行するアニメーションを指定
-			_actor->SetAnimationTime(_animSliderValue);										
+			dynamic_pointer_cast<FBXActor>(_actor)->SetAnimationTime(_animSliderValue);										
 
 			_canCallAnim = true;
 		}
@@ -249,8 +249,8 @@ ImGuiManager::ImGuiDraw()
 		{
 			_animSliderValue = 0.0f;
 
-			_actor->InitPose();																//アクターのポーズをリセットする
-			_actor->SetAnimationTime(_animSliderValue);										//スライダーの値をアクターに渡す
+			dynamic_pointer_cast<FBXActor>(_actor)->InitPose();																//アクターのポーズをリセットする
+			dynamic_pointer_cast<FBXActor>(_actor)->SetAnimationTime(_animSliderValue);										//スライダーの値をアクターに渡す
 
 			_canCallAnim = false;
 		}
@@ -272,7 +272,7 @@ ImGuiManager::ImGuiDraw()
 			//アニメーション実行中だったら止める
 			if (_canCallAnim)_canCallAnim = false;									
 			//スライダーの値をアクターに渡す
-			_actor->SetAnimationTime(_animSliderValue);								
+			dynamic_pointer_cast<FBXActor>(_actor)->SetAnimationTime(_animSliderValue);								
 		}
 
 		ImGui::EndDisabled();
@@ -325,7 +325,7 @@ ImGuiManager::SetActor(const map<string, shared_ptr<FBXBase>> actorAndObjs)
 	}
 
 	//アクターのアニメーション名をこちら側に格納する
-	for (auto str : _actor->GetAnimstr())							
+	for (auto str : dynamic_pointer_cast<FBXActor>(_actor)->GetAnimstr())							
 	{
 		_animStr.push_back(str);
 	}
@@ -334,10 +334,10 @@ ImGuiManager::SetActor(const map<string, shared_ptr<FBXBase>> actorAndObjs)
 	_currentImGuiAnim = _animStr[0];								
 
 	//アニメーションの総時間を取得
-	_maxDur = _actor->GetAnimDuration(_currentImGuiAnim)			
-				- _actor->GetSecondFrame();
+	_maxDur = dynamic_pointer_cast<FBXActor>(_actor)->GetAnimDuration(_currentImGuiAnim)			
+				- dynamic_pointer_cast<FBXActor>(_actor)->GetSecondFrame();
 	//アニメーションの処理回数を取得
-	_tick = _actor->GetAnimTickPerSpeed(_currentImGuiAnim);			
+	_tick = dynamic_pointer_cast<FBXActor>(_actor)->GetAnimTickPerSpeed(_currentImGuiAnim);			
 	//2個目のフレームを取得
 	_animSliderValue = 0.0f;										
 }
@@ -401,6 +401,6 @@ ImGuiManager::Update()
 
 		_beforeFrameTime = _crrntFrameTime;										//前フレームの時間を更新
 
-		_actor->SetAnimationTime(_animSliderValue);								//スライダーの値をアクターに渡す
+		dynamic_pointer_cast<FBXActor>(_actor)->SetAnimationTime(_animSliderValue);								//スライダーの値をアクターに渡す
 	}
 }

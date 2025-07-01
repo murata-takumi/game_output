@@ -6,6 +6,7 @@
 #include "Collider/BoxCollider.h"
 #include "Collider/CollisionDetector.h"
 #include "FBX/AssimpLoader.h"
+#include "FBX/AnimNodes/AnimNode.h"
 #include "FBX/FBXActor.h"
 #include "FBX/FBXBase.h"
 #include "FBX/FBXObject.h"
@@ -58,22 +59,6 @@ const string BOX_NAME = "Box";
 const string BOX_NAME_1 = "Box1";
 const string BOX_NAME_2 = "Box2";
 const string BOX_NAME_3 = "Box3";
-
-/// <summary>
-/// コンストラクタ
-/// </summary>
-PlayScene::PlayScene() : IScene()
-{
-
-}
-
-/// <summary>
-/// デストラクタ
-/// </summary>
-PlayScene::~PlayScene()
-{
-	
-}
 
 /// <summary>
 /// シーン開始時に実行する関数
@@ -142,10 +127,10 @@ PlayScene::SceneStart()
 			if (_actor = dynamic_pointer_cast<FBXActor>(object.second))
 			{
 				//コールバックを設定
-				_actor->_isOnGround = [&](const XMVECTOR& vec)
+				dynamic_pointer_cast<FBXActor>(_actor)->_isOnGround = [&](const XMVECTOR& vec)
 				{
 					//アクターの近くにあるオブジェクトを取得し当たり判定をチェック
-					auto objsNearby = OcTree::Instance().Get(_actor->GetColForGround());
+					auto objsNearby = OcTree::Instance().Get(dynamic_pointer_cast<FBXActor>(_actor)->GetColForGround());
 					auto ret = false;
 					for (auto& obj : objsNearby)
 					{
@@ -291,7 +276,7 @@ PlayScene::Update()
 			_direction = XMVector3Normalize(_direction);
 
 			//入力処理
-			_actor->OnKeyPressed(_direction);
+			dynamic_pointer_cast<FBXActor>(_actor)->OnKeyPressed(_direction);
 
 			//移動ベクトルを初期化
 			_direction = XMVectorZero();
@@ -300,9 +285,9 @@ PlayScene::Update()
 			Dx12Wrapper::Instance().SetCoordinatesCenter(_actor->Collider()->Center());
 
 			//スペースキーが押されたらジャンプ処理
-			if (InputManager::Instance().KeyTracker().IsKeyPressed(Keyboard::Space) && _actor->GetOnGround())
+			if (InputManager::Instance().KeyTracker().IsKeyPressed(Keyboard::Space) && dynamic_pointer_cast<FBXActor>(_actor)->GetOnGround())
 			{
-				_actor->SetAnimationNode(JUMP00);
+				dynamic_pointer_cast<FBXActor>(_actor)->SetAnimationNode(JUMP00);
 			}
 		}
 
@@ -360,9 +345,10 @@ void
 PlayScene::InstantiateObject(const wchar_t* path,string name, Vector3 size, Vector3 pos)
 {
 	auto f = [=]() {
-		shared_ptr<className> object;
+		shared_ptr<FBXBase> object;
 
-		object = make_shared<className>(path, name, size, pos);
+		object = make_shared<className>();
+		object->Init(path, name, size, pos);
 
 		_actorAndObjs[name] = object;
 	};

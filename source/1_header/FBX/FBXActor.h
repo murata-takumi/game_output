@@ -12,6 +12,7 @@ class AnimNode;
 class AssimpLoader;
 class BoxCollider;
 class Dx12Wrapper;
+class FBXComposition;
 class ImGuiManager;
 class Vector3;
 class FBXActor : public FBXBase
@@ -25,7 +26,10 @@ private:
 	//アニメーション実行用ノードの配列
 	unique_ptr<AnimNode> _animNodes[Length];
 	//現在実行するノード
-	AnimNode* _crntNode = nullptr;												
+	AnimNode* _crntNode = nullptr;
+
+	//FBXクラスの共通処理をまとめたインスタンス
+	shared_ptr<FBXComposition> _fbxComp;
 
 	//ボーン行列のベクトル
 	vector<XMMATRIX> _boneMats;	
@@ -110,9 +114,12 @@ public:
 	function<bool(const Vector3& vec)> _isOnGround;
 
 	//コンストラクタ
-	FBXActor(const wchar_t* filePath,const string name, Vector3 size, Vector3 pos = Vector3(0.0f, 0.0f, 0.0f));
+	FBXActor() = default;
 	//デストラクタ
-	~FBXActor();														
+	~FBXActor() = default;
+
+	HRESULT Init(const wchar_t* filePath, const string name,
+		const Vector3& size, const Vector3& pos)override;
 
 	//アニメーション名のベクトルを返す関数
 	vector<string> GetAnimstr()const;
@@ -133,7 +140,10 @@ public:
 	//アニメーションの再生時間を設定する関数
 	void SetAnimationTime(float time);					
 	//アクターをTポーズにする関数
-	void InitPose();													
+	void InitPose();	
+
+	//描画処理
+	void Draw()override;
 
 	//毎フレームの座標変換処理
 	void Update()override;
@@ -160,8 +170,15 @@ public:
 	//アニメーションループ可能か設定する
 	void SetIsInLoop(bool val);
 
+	//現在の座標を取得
+	Vector3 CurrentPosition()override;
+
+	//本体の当たり判定を返す
+	shared_ptr<BoxCollider>  Collider();
+
 	//接地判定を行うOBBを返す
 	shared_ptr<BoxCollider> GetColForGround()const;
+
 	//地面に接しているかどうかを返す
 	bool GetOnGround()const;
 };

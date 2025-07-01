@@ -5,7 +5,7 @@
 /// 八分木を構成するノード
 /// </summary>
 class BoxCollider;
-class FBXObject;
+class FBXBase;
 class Vector3;
 class OcTreeNode
 {
@@ -16,16 +16,16 @@ public:
 	~OcTreeNode();
 
 	//オブジェクトを追加する関数
-	bool AddObject(const shared_ptr<FBXObject> obj);
+	bool AddObject(const shared_ptr<FBXBase> obj);
 
 	//空間を分割する関数
 	void SubDivide();
 
 	//子ノードに分割する関数
-	void AddToChild(const vector<shared_ptr<FBXObject>> objs);
+	void AddToChild(const vector<shared_ptr<FBXBase>> objs);
 
 	//クエリ範囲にあるオブジェクトを取得する関数
-	vector<shared_ptr<FBXObject>> Get(const shared_ptr<BoxCollider> bounds)noexcept;
+	vector<shared_ptr<FBXBase>> Get(const shared_ptr<BoxCollider> bounds)noexcept;
 private:
 	//管理する空間
 	shared_ptr<BoxCollider> _col;
@@ -34,7 +34,7 @@ private:
 	vector<shared_ptr<OcTreeNode>> _children;
 
 	//格納するオブジェクト
-	vector<shared_ptr<FBXObject>> _objs;
+	vector<shared_ptr<FBXBase>> _objs;
 
 	//容量
 	int _capacity;

@@ -3,62 +3,28 @@
 
 #include "Collider/BoxCollider.h"
 #include "FBX/AssimpLoader.h"
-#include "FBX/FBXBase.h"
+#include "FBX/FBXComposition.h"
 #include "Manager/ImGuiManager.h"
 #include "Wrapper/Dx12Wrapper.h"
-
-/// <summary>
-/// コンストラクタ
-/// </summary>
-/// <param name="filePath">モデル格納ファイル名</param>
-/// <param name="diff">当たり判定の差分</param>
-/// <param name="name">オブジェクトの名前</param>
-/// <param name="size">当たり判定の大きさ</param>
-/// <param name="pos">初期座標</param>
-FBXBase::FBXBase(const wchar_t* filePath, const string name, const Vector3& size, const Vector3& pos)
-	:_shiftColMatrix(XMMatrixIdentity()), _translateVector(pos),_speed(Vector3(0,0,0)),_name(name), _rejectBone(true)
-{
-	//モデル関連の情報を初期化
-	InitModel(filePath);														
-
-	//頂点バッファー・ビュー作成
-	CreateVertexBufferView();													
-	//インデックスバッファー・ビュー作成
-	CreateIndexBufferView();													
-	//シェーダーリソース・ビュー作成
-	CreateShaderResourceView();													
-
-	//当たり判定を作成
-	_collider = make_shared<BoxCollider>(size, Vector3(0,0,0), this);
-}
-
-/// <summary>
-/// デストラクタ
-/// ポインタを開放する
-/// </summary>
-FBXBase::~FBXBase()
-{
-
-}
 
 /// <summary>
 /// モデル関連の初期化を行う関数
 /// </summary>
 /// <param name="filePath">モデルのパス</param>
 void
-FBXBase::InitModel(const wchar_t* filePath)
+FBXComposition::InitModel(const wchar_t* filePath)
 {
 	//モデル読み込み用設定
-	ImportSettings settings =										
+	ImportSettings settings =
 	{
 		//メッシュ情報
-		_meshes,				
+		_meshes,
 		//ボーン名とインデックスの連想配列
-		_boneMapping,												
+		_boneMapping,
 		//行列などのボーン情報のベクトル
-		_boneInfo,													
+		_boneInfo,
 		//U・V座標を反転させるか
-		false,														
+		false,
 		true,
 	};
 
@@ -81,30 +47,30 @@ FBXBase::InitModel(const wchar_t* filePath)
 /// </summary>
 /// <returns>処理が成功したかどうか</returns>
 HRESULT
-FBXBase::CreateVertexBufferView()
+FBXComposition::CreateVertexBufferView()
 {
 	//返り値を初期化
-	result = S_OK;
+	HRESULT result = S_OK;
 
 	//ビュー数をメッシュ数に合わせる
-	_vbViews.reserve(_meshes.size());													
+	_vbViews.reserve(_meshes.size());
 	//全メッシュに対し処理を実行
-	for (size_t i = 0; i < _meshes.size(); i++)											
+	for (size_t i = 0; i < _meshes.size(); i++)
 	{
 		//格納用バッファー・ビュー
-		ID3D12Resource* tmpVertexBuffer = nullptr;										
+		ID3D12Resource* tmpVertexBuffer = nullptr;
 		D3D12_VERTEX_BUFFER_VIEW tmpVBView = {};
 
 		//頂点全体のデータサイズ
 		auto size = sizeof(FBXVertex) * _meshes[i].vertices.size();
 
 		//ヒーププロパティ
-		auto heapProp = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);				
+		auto heapProp = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
 		//リソース設定
-		auto desc = CD3DX12_RESOURCE_DESC::Buffer(size);								
+		auto desc = CD3DX12_RESOURCE_DESC::Buffer(size);
 
 		//バッファー作成
-		result = Dx12Wrapper::Instance().Device()->CreateCommittedResource								
+		result = Dx12Wrapper::Instance().Device()->CreateCommittedResource
 		(
 			&heapProp,
 			D3D12_HEAP_FLAG_NONE,
@@ -127,7 +93,7 @@ FBXBase::CreateVertexBufferView()
 		tmpVertexBuffer->Unmap(0, nullptr);
 
 		//ビューにバッファー情報を書き込む
-		tmpVBView.BufferLocation = tmpVertexBuffer->GetGPUVirtualAddress();				
+		tmpVBView.BufferLocation = tmpVertexBuffer->GetGPUVirtualAddress();
 		tmpVBView.SizeInBytes = static_cast<UINT>(tmpVertexBuffer->GetDesc().Width);
 		tmpVBView.StrideInBytes = sizeof(FBXVertex);
 
@@ -143,31 +109,31 @@ FBXBase::CreateVertexBufferView()
 /// </summary>
 /// <returns></returns>
 HRESULT
-FBXBase::CreateIndexBufferView()
+FBXComposition::CreateIndexBufferView()
 {
 	//返り値を初期化
-	result = S_OK;
+	HRESULT result = S_OK;
 
 	//インデックスバッファービューを用意する									
 	_ibViews.reserve(_meshes.size());
 
 	//全メッシュに対し処理を実行
-	for (size_t i = 0; i < _meshes.size(); i++)										
+	for (size_t i = 0; i < _meshes.size(); i++)
 	{
 		//格納用バッファー・ビュー
-		ID3D12Resource* tmpIndexBuffer = nullptr;									
+		ID3D12Resource* tmpIndexBuffer = nullptr;
 		D3D12_INDEX_BUFFER_VIEW tmpIBView = {};
 
 		//インデックス全体のデータサイズ
-		auto size = sizeof(uint32_t) * _meshes[i].indices.size();					
+		auto size = sizeof(uint32_t) * _meshes[i].indices.size();
 
 		//ヒーププロパティ
-		auto heapProp = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);			
+		auto heapProp = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
 		//リソース設定
-		auto desc = CD3DX12_RESOURCE_DESC::Buffer(size);							
+		auto desc = CD3DX12_RESOURCE_DESC::Buffer(size);
 
 		//バッファー作成
-		result = Dx12Wrapper::Instance().Device()->CreateCommittedResource							
+		result = Dx12Wrapper::Instance().Device()->CreateCommittedResource
 		(
 			&heapProp,
 			D3D12_HEAP_FLAG_NONE,
@@ -190,7 +156,7 @@ FBXBase::CreateIndexBufferView()
 		tmpIndexBuffer->Unmap(0, nullptr);
 
 		//ビューにバッファー情報を書き込む
-		tmpIBView.BufferLocation = tmpIndexBuffer->GetGPUVirtualAddress();			
+		tmpIBView.BufferLocation = tmpIndexBuffer->GetGPUVirtualAddress();
 		tmpIBView.Format = DXGI_FORMAT_R32_UINT;
 		tmpIBView.SizeInBytes = static_cast<UINT>(size);
 
@@ -206,13 +172,13 @@ FBXBase::CreateIndexBufferView()
 /// </summary>
 /// <returns>作成できたかどうか</returns>
 HRESULT
-FBXBase::CreateShaderResourceView()
+FBXComposition::CreateShaderResourceView()
 {
 	//返り値を初期化
-	result = S_OK;
+	HRESULT result = S_OK;
 
 	//ディスクリプタヒープの作成
-	D3D12_DESCRIPTOR_HEAP_DESC texHeapDesc = {};												
+	D3D12_DESCRIPTOR_HEAP_DESC texHeapDesc = {};
 	texHeapDesc.NodeMask = 1;
 	texHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
 	texHeapDesc.NumDescriptors = static_cast<UINT>(_meshes.size());
@@ -221,24 +187,24 @@ FBXBase::CreateShaderResourceView()
 		IID_PPV_ARGS(_texHeap.ReleaseAndGetAddressOf()));
 
 	//SRV用構造体の作成
-	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};												
+	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
 	srvDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
 	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
 	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
 	srvDesc.Texture2D.MipLevels = 1;
 
 	//ヒープの先頭アドレス(CPU)
-	auto CPUHeapHandle = _texHeap->GetCPUDescriptorHandleForHeapStart();						
+	auto CPUHeapHandle = _texHeap->GetCPUDescriptorHandleForHeapStart();
 	//ヒープの先頭アドレス(GPU)	
-	auto GPUHeapHandle = _texHeap->GetGPUDescriptorHandleForHeapStart();					
+	auto GPUHeapHandle = _texHeap->GetGPUDescriptorHandleForHeapStart();
 	//先頭アドレスのずらす幅
-	auto incrementSize =	
+	auto incrementSize =
 		Dx12Wrapper::Instance().Device()->GetDescriptorHandleIncrementSize(texHeapDesc.Type);
 
 	//テクスチャ読み込み用データ
-	TexMetadata meta = {};																		
+	TexMetadata meta = {};
 	ScratchImage scratch = {};
-	DXGI_FORMAT format;																			
+	DXGI_FORMAT format;
 	size_t width;
 	size_t height;
 	UINT16 arraySize;
@@ -248,14 +214,14 @@ FBXBase::CreateShaderResourceView()
 	UINT slicePitch;
 
 	//各メッシュに対しテクスチャの読み込み処理
-	for (size_t i = 0; i < _meshes.size(); i++)													
+	for (size_t i = 0; i < _meshes.size(); i++)
 	{
 		ID3D12Resource* tmpTexBuffer = nullptr;
 
 		//テクスチャのパス
-		wstring path = _meshes[i].diffuseMap;													
+		wstring path = _meshes[i].diffuseMap;
 		//テクスチャが無かったら灰色テクスチャを入れる
-		if (wcscmp(path.c_str(), L"") == 0)														
+		if (wcscmp(path.c_str(), L"") == 0)
 		{
 			vector<unsigned char> data(4 * 4 * 4);
 			fill(data.begin(), data.end(), 0x80);
@@ -271,19 +237,19 @@ FBXBase::CreateShaderResourceView()
 			slicePitch = static_cast<UINT>(data.size());
 		}
 		//通常テクスチャ
-		else																					
+		else
 		{
 			//拡張子を取得
-			auto ext = FileExtension(path);														
+			auto ext = FileExtension(path);
 			//拡張子が"psd"だった場合、"tga"に変換する
-			if (wcscmp(ext.c_str(), L"psd") == 0)												
+			if (wcscmp(ext.c_str(), L"psd") == 0)
 			{
 				path = ReplaceExtension(path, "tga");
 				ext = FileExtension(path);
 			}
 
 			//拡張子に応じて読み込み関数を変える
-			result = Dx12Wrapper::Instance()._loadLambdaTable[ToString(ext)](path, &meta, scratch);				
+			result = Dx12Wrapper::Instance()._loadLambdaTable[ToString(ext)](path, &meta, scratch);
 			if (FAILED(result))
 			{
 				assert(0);
@@ -291,7 +257,7 @@ FBXBase::CreateShaderResourceView()
 			}
 
 			//テクスチャデータの用意
-			auto img = scratch.GetImage(0, 0, 0);												
+			auto img = scratch.GetImage(0, 0, 0);
 			format = meta.format;
 			width = meta.width;
 			height = meta.height;
@@ -304,7 +270,7 @@ FBXBase::CreateShaderResourceView()
 
 		//バッファー用ヒーププロパティ
 		auto heapProp =
-			CD3DX12_HEAP_PROPERTIES(D3D12_CPU_PAGE_PROPERTY_WRITE_BACK, D3D12_MEMORY_POOL_L0);	
+			CD3DX12_HEAP_PROPERTIES(D3D12_CPU_PAGE_PROPERTY_WRITE_BACK, D3D12_MEMORY_POOL_L0);
 		//リソース設定
 		auto desc = CD3DX12_RESOURCE_DESC::Tex2D(
 			format,
@@ -314,7 +280,7 @@ FBXBase::CreateShaderResourceView()
 			mipLevels);
 
 		//バッファーの作成
-		result = Dx12Wrapper::Instance().Device()->CreateCommittedResource										
+		result = Dx12Wrapper::Instance().Device()->CreateCommittedResource
 		(
 			&heapProp,
 			D3D12_HEAP_FLAG_NONE,
@@ -330,7 +296,7 @@ FBXBase::CreateShaderResourceView()
 		}
 
 		//テクスチャの書き込み
-		result = tmpTexBuffer->WriteToSubresource(0,											
+		result = tmpTexBuffer->WriteToSubresource(0,
 			nullptr,
 			pixels,
 			rowPitch,
@@ -343,14 +309,14 @@ FBXBase::CreateShaderResourceView()
 		}
 
 		//ビューのフォーマットをテクスチャに合わせ、作成
-		srvDesc.Format = tmpTexBuffer->GetDesc().Format;										
+		srvDesc.Format = tmpTexBuffer->GetDesc().Format;
 		Dx12Wrapper::Instance().Device()->CreateShaderResourceView(tmpTexBuffer, &srvDesc, CPUHeapHandle);
 
 		//GPUのアドレスを追加
-		_gpuHandles.push_back(GPUHeapHandle);													
+		_gpuHandles.push_back(GPUHeapHandle);
 
 		//CPU・GPUのアドレスをずらす
-		CPUHeapHandle.ptr += incrementSize;														
+		CPUHeapHandle.ptr += incrementSize;
 		GPUHeapHandle.ptr += incrementSize;
 	}
 
@@ -358,10 +324,23 @@ FBXBase::CreateShaderResourceView()
 }
 
 /// <summary>
+/// 当たり判定を作成する関数
+/// </summary>
+/// <param name="size">サイズ</param>
+/// <param name="pos">初期座標</param>
+/// <param name="obj">紐づけるオブジェクト</param>
+void 
+FBXComposition::CreateCollider(const Vector3& size, const Vector3& pos,
+	FBXBase* obj)
+{
+	_collider = make_shared<BoxCollider>(size, pos, obj);
+}
+
+/// <summary>
 /// 毎フレームの描画処理を実行する関数
 /// </summary>
 void
-FBXBase::Draw()
+FBXComposition::Draw()
 {
 	//座標変換用ディスクリプタヒープをセット
 	ID3D12DescriptorHeap* transformHeaps[] = { _transHeap.Get() };
@@ -391,7 +370,7 @@ FBXBase::Draw()
 /// 毎フレームの座標変換を行う
 /// </summary>
 void
-FBXBase::Update()
+FBXComposition::Update()
 {
 	//当たり判定を上にずらす
 	//こう書かないと当たり判定の中心がオブジェクト下になってしまう
@@ -411,7 +390,7 @@ FBXBase::Update()
 /// </summary>
 /// <returns>当たり判定</returns>
 shared_ptr<BoxCollider>
-FBXBase::Collider()const
+FBXComposition::Collider()const
 {
 	return _collider;
 }
@@ -421,7 +400,7 @@ FBXBase::Collider()const
 /// </summary>
 /// <returns>表示用座標</returns>
 Vector3
-FBXBase::CurrentPosition()const
+FBXComposition::CurrentPosition()const
 {
 	return _currentPosition;
 }
@@ -431,7 +410,7 @@ FBXBase::CurrentPosition()const
 /// </summary>
 /// <returns>正面ベクトル</returns>
 Vector3
-FBXBase::FrontVec()const
+FBXComposition::FrontVec()const
 {
 	return _frontVec;
 }
@@ -441,7 +420,7 @@ FBXBase::FrontVec()const
 /// </summary>
 /// <returns>足元ベクトル</returns>
 Vector3
-FBXBase::FootVec()const
+FBXComposition::FootVec()const
 {
 	return _footVec;
 }
@@ -451,7 +430,7 @@ FBXBase::FootVec()const
 /// </summary>
 /// <returns>速度</returns>
 Vector3
-FBXBase::Speed()const
+FBXComposition::Speed()const
 {
 	return _speed;
 }
@@ -461,7 +440,7 @@ FBXBase::Speed()const
 /// </summary>
 /// <returns>名前</returns>
 const string
-FBXBase::Name()
+FBXComposition::Name()
 {
 	return _name;
 }
@@ -471,7 +450,7 @@ FBXBase::Name()
 /// </summary>
 /// <param name="val">ボーン変換を決める真理値</param>
 void
-FBXBase::SetRejectBone(bool val)
+FBXComposition::SetRejectBone(bool val)
 {
 	_rejectBone = val;
 }

@@ -28,6 +28,7 @@
     <ClInclude Include="1_header\FBX\AssimpLoader.h" />
     <ClInclude Include="1_header\FBX\FBXActor.h" />
     <ClInclude Include="1_header\FBX\FBXBase.h" />
+    <ClInclude Include="1_header\FBX\FBXComposition.h" />
     <ClInclude Include="1_header\FBX\FBXObject.h" />
     <ClInclude Include="1_header\Functions.h" />
     <ClInclude Include="1_header\Includes.h" />
@@ -59,6 +60,7 @@
     <ClCompile Include="2_source\FBX\AssimpLoader.cpp" />
     <ClCompile Include="2_source\FBX\FBXActor.cpp" />
     <ClCompile Include="2_source\FBX\FBXBase.cpp" />
+    <ClCompile Include="2_source\FBX\FBXComposition.cpp" />
     <ClCompile Include="2_source\FBX\FBXObject.cpp" />
     <ClCompile Include="2_source\main.cpp" />
     <ClCompile Include="2_source\Manager\EffectManager.cpp" />

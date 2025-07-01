@@ -41,9 +41,9 @@ protected:
 	vector<thread> _ths;
 
 	//アクターインスタンス
-	shared_ptr<FBXActor> _actor;
+	shared_ptr<FBXBase> _actor;
 	//床インスタンス
-	shared_ptr<FBXObject> _ground;
+	shared_ptr<FBXBase> _ground;
 
 	//プレイヤー、カメラの進行ベクトル
 	Vector3 _direction;

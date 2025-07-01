@@ -52,8 +52,10 @@ private:
 	//デストラクタ
 	~ImGuiManager();
 
-	shared_ptr<FBXActor> _actor;					//アクター
-	shared_ptr<FBXObject> _ground;					//地面
+	//アクター
+	shared_ptr<FBXBase> _actor;				
+	//地面
+	shared_ptr<FBXBase> _ground;				
 
 	//文字列
 	map<int,string> _texts;

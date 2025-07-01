@@ -162,6 +162,9 @@
     <ClInclude Include="1_header\Scene\IScene.h">
       <Filter>1_header\Scene</Filter>
     </ClInclude>
+    <ClInclude Include="1_header\FBX\FBXComposition.h">
+      <Filter>1_header\FBX</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="2_source\Application.cpp">
@@ -241,6 +244,9 @@
     </ClCompile>
     <ClCompile Include="2_source\Scene\SceneComposition.cpp">
       <Filter>2_source\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="2_source\FBX\FBXComposition.cpp">
+      <Filter>2_source\FBX</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

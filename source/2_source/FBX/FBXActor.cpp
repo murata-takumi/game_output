@@ -6,6 +6,7 @@
 #include "FBX/AssimpLoader.h"
 #include "FBX/FBXActor.h"
 #include "FBX/FBXBase.h"
+#include "FBX/FBXComposition.h"
 #include "FBX/FBXObject.h"
 #include "FBX/AnimNodes/AnimNode.h"
 #include "Manager/ImGuiManager.h"
@@ -38,17 +39,32 @@ const int ANIM_STR_UNNECESSARY_IDX = 21;
 //当たり判定を付与するボーンのインデックス
 const int COLLIDER_BONE = 0;								
 
-/// <summary>
-/// コンストラクタ
-/// </summary>
-/// <param name="filePath">モデルのパス</param>
-FBXActor::FBXActor(const wchar_t* filePath,const string name, Vector3 size, Vector3 pos)
-	:FBXBase(filePath, name, size, pos),
-	_crntNode(nullptr), _currentFrontVec(XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f)),
-	_canControll(false), _isInBlend(false), _isInLoop(true),
-	_canChangeAnim(true),_blendWeight(0.0f), _animTime(0.0f),
-	_destRad(0.0f), _rotY(0.0f)
+HRESULT
+FBXActor::Init(const wchar_t* filePath, const string name,
+	const Vector3& size, const Vector3& pos)
 {
+	_crntNode = nullptr;
+	_currentFrontVec = XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
+	_canControll = _isInBlend = false;
+	_isInLoop = _canChangeAnim = true;
+	_blendWeight = _animTime = _destRad = _rotY = 0.0f;
+
+	//共通処理を初期化
+	_fbxComp = make_shared<FBXComposition>();
+
+	//モデル関連の情報を初期化
+	_fbxComp->InitModel(filePath);
+
+	//頂点バッファー・ビュー作成
+	_fbxComp->CreateVertexBufferView();
+	//インデックスバッファー・ビュー作成
+	_fbxComp->CreateIndexBufferView();
+	//シェーダーリソース・ビュー作成
+	_fbxComp->CreateShaderResourceView();
+
+	//当たり判定を作成
+	_fbxComp->CreateCollider(size, Vector3(0, 0, 0), this);
+
 	//接地用当たり判定を作成
 	_colForGround = make_shared<BoxCollider>(Vector3(size.X() * 2, size.Y() * 2, size.Z() * 2), Vector3(0, 0, 0), this);
 	auto jumpStart = [&]()
@@ -61,7 +77,7 @@ FBXActor::FBXActor(const wchar_t* filePath,const string name, Vector3 size, Vect
 		//ループしないようにする
 		SetIsInLoop(false);
 		//当たり判定がボーン変換の影響を受けるようにする
-		SetRejectBone(false);
+		_fbxComp->SetRejectBone(false);
 	};
 	auto jumpUpdate = [&](float animTime)
 	{
@@ -96,7 +112,7 @@ FBXActor::FBXActor(const wchar_t* filePath,const string name, Vector3 size, Vect
 				if (CollisionDetector::Instance().CheckContinuousCollisionDetection(
 					*obj->Collider(),
 					XMVectorSet(0, 1, 0, 0),
-					_currentPosition,
+					_fbxComp->_currentPosition,
 					-45.0f * GRAVITY_ACCERALATION
 				))
 				{
@@ -113,13 +129,13 @@ FBXActor::FBXActor(const wchar_t* filePath,const string name, Vector3 size, Vect
 		{
 			SetCanChangeAnim(true);
 			//当たり判定がボーン変換の影響を受けないようにする
-			SetRejectBone(true);
+			_fbxComp->SetRejectBone(true);
 
 			SetAnimationNode(nextAnimName);
 		}
 	};
 	auto jumpEnd = [&]()
-	{		
+	{
 		//ループできるようにする
 		SetIsInLoop(true);
 	};
@@ -154,7 +170,7 @@ FBXActor::FBXActor(const wchar_t* filePath,const string name, Vector3 size, Vect
 			if (CollisionDetector::Instance().CheckContinuousCollisionDetection(
 				*obj->Collider(),
 				XMVectorSet(0, 1, 0, 0),
-				_currentPosition,
+				_fbxComp->_currentPosition,
 				-45.0f * GRAVITY_ACCERALATION
 			))
 			{
@@ -178,28 +194,21 @@ FBXActor::FBXActor(const wchar_t* filePath,const string name, Vector3 size, Vect
 		//アニメーション速度を元に戻す
 		SetAnimationSpeed(1.0f);
 	};
-	
+
 
 	//アニメーションノードを初期化
 	_animNodes[WAIT00] = make_unique<AnimNode>(WAIT00);
 	_animNodes[RUN00_F] = make_unique<AnimNode>(RUN00_F);
-	_animNodes[JUMP00] = make_unique<AnimNode>(JUMP00,jumpStart,jumpUpdate,jumpEnd);
+	_animNodes[JUMP00] = make_unique<AnimNode>(JUMP00, jumpStart, jumpUpdate, jumpEnd);
 	_animNodes[FALL] = make_unique<AnimNode>(FALL, fallStart, fallUpdate, fallEnd);
 
 	//アニメーションに関するデータを初期化
-	InitAnimation();															
+	InitAnimation();
 
 	//座標変換用バッファー・ビュー作成
-	CreateTransformView();														
-}
+	CreateTransformView();
 
-/// <summary>
-/// デストラクタ
-/// ポインタを開放する
-/// </summary>
-FBXActor::~FBXActor()
-{
-
+	return S_OK;
 }
 
 /// <summary>
@@ -210,11 +219,11 @@ FBXActor::InitAnimation()
 {
 	//ボーン行列の個数を決める
 	_beforeMats.resize(_boneMats.size());
-	_boneMats.resize(_boneInfo.size());		
+	_boneMats.resize(_fbxComp->_boneInfo.size());
 	//ブレンド用の行列の個数も決める
-	_blendMats.resize(_boneInfo.size());							
+	_blendMats.resize(_fbxComp->_boneInfo.size());
 	//逆変換用の行列の個数も決める
-	_invMats.resize(_boneInfo.size());
+	_invMats.resize(_fbxComp->_boneInfo.size());
 
 	//各ボーン行列のスケーリング・平行移動を無効化した行列を作成
 	for (UINT i = 0; i < _invMats.size(); i++)
@@ -222,7 +231,7 @@ FBXActor::InitAnimation()
 		//ボーン行列を分解し、クォータニオンをX軸に-90度、Y軸に90度回転
 		XMVECTOR scale, skew, trans;
 		XMMatrixDecompose(&scale, &skew, &trans, 
-			XMMatrixInverse(nullptr, _boneInfo[i]._boneOffset));
+			XMMatrixInverse(nullptr, _fbxComp->_boneInfo[i]._boneOffset));
 
 		auto q1 = XMQuaternionRotationAxis(							
 			XMVectorSet(1.0f, 0.0f, 0.0f, 0.0f), XM_PI / -2);
@@ -241,14 +250,14 @@ FBXActor::InitAnimation()
 	}
 
 	//モデルが持つ全アニメーションに対し実行
-	for (UINT i = 0; i < FBXBase::_scene->mNumAnimations; i++)				
+	for (UINT i = 0; i < _fbxComp->_scene->mNumAnimations; i++)				
 	{
 		//連想配列にアニメーション名とアニメーションデータを格納
-		_anims[FBXBase::_scene->mAnimations[i]->mName.C_Str()]
-			= FBXBase::_scene->mAnimations[i];
+		_anims[_fbxComp->_scene->mAnimations[i]->mName.C_Str()]
+			= _fbxComp->_scene->mAnimations[i];
 
 		//アニメーション名を取得
-		string name = FBXBase::_scene->mAnimations[i]->mName.C_Str();
+		string name = _fbxComp->_scene->mAnimations[i]->mName.C_Str();
 
 		//余分な文字列を削除
 		name = name.erase(0, ANIM_STR_UNNECESSARY_IDX);									
@@ -274,13 +283,13 @@ FBXActor::BoneTransform(float timeInTicks)
 	//経過時間を基に階層構造から変換行列を読み込む
 	if (timeInTicks < GetAnimDuration(_currentActorAnim))									
 	{
-		ReadNodeHeirarchy(timeInTicks, FBXBase::_scene->mRootNode, XMMatrixIdentity());
+		ReadNodeHeirarchy(timeInTicks, _fbxComp->_scene->mRootNode, XMMatrixIdentity());
 	}
 
 	//変換行列を更新する
 	for (size_t i = 0,boneLength = _boneMats.size(); i < boneLength; ++i)					
 	{
-		_boneMats[i] = _boneInfo[i]._finalTrans;
+		_boneMats[i] = _fbxComp->_boneInfo[i]._finalTrans;
 	}
 }
 
@@ -351,11 +360,12 @@ FBXActor::ReadNodeHeirarchy(float animationTime, const aiNode* pNode, const XMMA
 	XMMATRIX globalTrans = nodeTrans * parentTrans;										
 
 	//ボーン名に対応するインデックスを取得し、それを基に最終的な変換行列を取得
-	if (_boneMapping.find(nodeName) != _boneMapping.end())
+	if (_fbxComp->_boneMapping.find(nodeName) != _fbxComp->_boneMapping.end())
 	{
-		unsigned int boneIdx = _boneMapping[nodeName];
+		unsigned int boneIdx = _fbxComp->_boneMapping[nodeName];
 
-		_boneInfo[boneIdx]._finalTrans = _boneInfo[boneIdx]._boneOffset * globalTrans;
+		_fbxComp->_boneInfo[boneIdx]._finalTrans = 
+			_fbxComp->_boneInfo[boneIdx]._boneOffset * globalTrans;
 	}
 
 	//子ノードの方にも再帰処理を行う
@@ -373,7 +383,7 @@ FBXActor::ReadNodeHeirarchy(float animationTime, const aiNode* pNode, const XMMA
 HRESULT
 FBXActor::CreateTransformView()
 {
-	result = S_OK;
+	HRESULT result = S_OK;
 
 	//ワールド行列用バッファーの作成
 	auto buffSize = sizeof(XMMATRIX) * (1 + _boneMats.size());						
@@ -386,7 +396,7 @@ FBXActor::CreateTransformView()
 		&resDesc,
 		D3D12_RESOURCE_STATE_GENERIC_READ,
 		nullptr,
-		IID_PPV_ARGS(FBXBase::_transBuffer.ReleaseAndGetAddressOf())
+		IID_PPV_ARGS(_fbxComp->_transBuffer.ReleaseAndGetAddressOf())
 	);
 	if (FAILED(result)) {
 		assert(0);
@@ -394,15 +404,15 @@ FBXActor::CreateTransformView()
 	}
 
 	//座標変換用行列の書き込み、初期座標に位置するようにする
-	result = FBXBase::_transBuffer->Map(0, nullptr, (void**)&(FBXBase::_mappedMats));
+	result = _fbxComp->_transBuffer->Map(0, nullptr, (void**)&(_fbxComp->_mappedMats));
 	if (FAILED(result))
 	{
 		assert(0);
 		return result;
 	}
-	FBXBase::_mappedMats[0] = XMMatrixIdentity();
-	FBXBase::_mappedMats[0] *= XMMatrixTranslationFromVector(_translateVector);
-	copy(_boneMats.begin(), _boneMats.end(), FBXBase::_mappedMats + 1);
+	_fbxComp->_mappedMats[0] = XMMatrixIdentity();
+	_fbxComp->_mappedMats[0] *= XMMatrixTranslationFromVector(_fbxComp->_translateVector);
+	copy(_boneMats.begin(), _boneMats.end(), _fbxComp->_mappedMats + 1);
 
 	//ディスクリプタヒープの作成
 	D3D12_DESCRIPTOR_HEAP_DESC transformDescHeapDesc = {};							
@@ -411,7 +421,7 @@ FBXActor::CreateTransformView()
 	transformDescHeapDesc.NodeMask = 0;
 	transformDescHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
 	result = Dx12Wrapper::Instance().Device()->CreateDescriptorHeap(&transformDescHeapDesc,
-		IID_PPV_ARGS(FBXBase::_transHeap.ReleaseAndGetAddressOf()));
+		IID_PPV_ARGS(_fbxComp->_transHeap.ReleaseAndGetAddressOf()));
 	if (FAILED(result)) {
 		assert(0);
 		return result;
@@ -419,13 +429,13 @@ FBXActor::CreateTransformView()
 
 	//ビューの作成
 	D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc = {};
-	cbvDesc.BufferLocation = FBXBase::_transBuffer->GetGPUVirtualAddress();
-	cbvDesc.SizeInBytes = static_cast<UINT>(FBXBase::_transBuffer->GetDesc().Width);
+	cbvDesc.BufferLocation = _fbxComp->_transBuffer->GetGPUVirtualAddress();
+	cbvDesc.SizeInBytes = static_cast<UINT>(_fbxComp->_transBuffer->GetDesc().Width);
 	Dx12Wrapper::Instance().Device()->CreateConstantBufferView(&cbvDesc,								
-		FBXBase::_transHeap->GetCPUDescriptorHandleForHeapStart());
+		_fbxComp->_transHeap->GetCPUDescriptorHandleForHeapStart());
 
 	//当たり判定を初期化
-	FBXBase::_collider->Update(FBXBase::_mappedMats[0]);
+	_fbxComp->_collider->Update(_fbxComp->_mappedMats[0]);
 
 	return result;
 }
@@ -699,12 +709,21 @@ FBXActor::InitPose()
 }
 
 /// <summary>
+/// 描画処理
+/// </summary>
+void
+FBXActor::Draw()
+{
+	_fbxComp->Draw();
+}
+
+/// <summary>
 /// 毎フレームの座標変換処理を実行する関数
 /// </summary>
 void
 FBXActor::Update()
 {
-	FBXBase::Update();
+	_fbxComp->Update();
 
 	//操作可能な場合
 	if (_canControll)			
@@ -714,7 +733,7 @@ FBXActor::Update()
 		auto diff = GetLIntDiff(_currFrameTime, _befFrameTime);
 		_animTime += static_cast<float>(diff) * GetAnimTickPerSpeed(_currentActorAnim) * _animSpeed;
 
-		_colForGround->Update(_shiftColMatrix * _mappedMats[0]);
+		_colForGround->Update(_fbxComp->_shiftColMatrix * _fbxComp->_mappedMats[0]);
 
 		//最初のフレームを無視したうえでアニメーションがループするよう設定
 		if (_isInLoop)
@@ -729,31 +748,36 @@ FBXActor::Update()
 		//地面の上にいなかったら落下処理
 		if (!GetOnGround() && !IsAnimationEqual(JUMP00))
 		{
-			_translateVector.Y() -= Dx12Wrapper::Instance().GetDeltaTime() * 45.0f * GRAVITY_ACCERALATION;
-			FBXBase::_speed.Y() = -45.0f * GRAVITY_ACCERALATION;
+			_fbxComp->_translateVector.Y() -= 
+				Dx12Wrapper::Instance().GetDeltaTime() * 45.0f * GRAVITY_ACCERALATION;
+			_fbxComp->_speed.Y() = -45.0f * GRAVITY_ACCERALATION;
 			SetAnimationNode(FALL);
 		}
 
 		//回転、平行移動
-		FBXBase::_mappedMats[0] = XMMatrixRotationY(_rotY);
-		FBXBase::_mappedMats[0] *= XMMatrixTranslationFromVector(_translateVector);
+		_fbxComp->_mappedMats[0] = XMMatrixRotationY(_rotY);
+		_fbxComp->_mappedMats[0] *= 
+			XMMatrixTranslationFromVector(_fbxComp->_translateVector);
 	}
 
 	//スケーリング、回転、平行移動成分を変換行列とボーン行列の積から取得し、回転要素を削除したうえで再度合成
 	XMVECTOR scale, trans, skew;													
 	XMMatrixDecompose(&scale, &skew, &trans, 
-		_invMats[COLLIDER_BONE] * FBXBase::_mappedMats[COLLIDER_BONE + 1]);
+		_invMats[COLLIDER_BONE] * _fbxComp->_mappedMats[COLLIDER_BONE + 1]);
 	skew = XMVectorZero();
-	if (!_rejectBone)
+	if (!_fbxComp->_rejectBone)
 	{
-		_shiftColMatrix = XMMatrixScalingFromVector(scale) * XMMatrixRotationQuaternion(skew) * XMMatrixTranslationFromVector(trans);
+		_fbxComp->_shiftColMatrix = 
+			XMMatrixScalingFromVector(scale) * 
+			XMMatrixRotationQuaternion(skew) * 
+			XMMatrixTranslationFromVector(trans);
 	}
 	//経過時間を渡し、ボーン行列を取得
 	BoneTransform(_animTime);														
 	
 	//ブレンド行列or普通の行列をシェーダーに渡し、アニメーションを実行
-	if (_isInBlend)	copy(_blendMats.begin(), _blendMats.end(), FBXBase::_mappedMats + 1);
-	else copy(_boneMats.begin(), _boneMats.end(), FBXBase::_mappedMats + 1);
+	if (_isInBlend)	copy(_blendMats.begin(), _blendMats.end(), _fbxComp->_mappedMats + 1);
+	else copy(_boneMats.begin(), _boneMats.end(), _fbxComp->_mappedMats + 1);
 
 	//前フレームの時間を更新
 	_befFrameTime = _currFrameTime;
@@ -783,10 +807,11 @@ FBXActor::OnKeyPressed(const Vector3& input)
 
 	//当たり判定をチェックし、正面にオブジェクトが存在しなかったら移動処理
 	auto collision = true;
-	auto objsNearby = OcTree::Instance().Get(_collider);
+	auto objsNearby = OcTree::Instance().Get(_fbxComp->Collider());
 	for (auto& obj : objsNearby)
 	{
-		if (CollisionDetector::Instance().CheckColAndPoint(*obj->Collider(), FrontVec()))
+		if (CollisionDetector::Instance().CheckColAndPoint(
+			*obj->Collider(), _fbxComp->FrontVec()))
 		{
 			collision = false;
 			break;
@@ -795,10 +820,11 @@ FBXActor::OnKeyPressed(const Vector3& input)
 	if (collision)
 	{
 		//座標に入力に応じたベクトルを加算
-		_translateVector += input * Dx12Wrapper::Instance().GetDeltaTime() * MOVE_SPEED;
+		_fbxComp->_translateVector += 
+			input * Dx12Wrapper::Instance().GetDeltaTime() * MOVE_SPEED;
 
-		FBXBase::_speed.X() = input.X() * MOVE_SPEED;
-		FBXBase::_speed.Z() = input.Z() * MOVE_SPEED;
+		_fbxComp->_speed.X() = input.X() * MOVE_SPEED;
+		_fbxComp->_speed.Z() = input.Z() * MOVE_SPEED;
 	}
 
 	//入力ベクトルと正面ベクトルの角度差を取得
@@ -815,9 +841,9 @@ FBXActor::OnKeyPressed(const Vector3& input)
 
 	//正面ベクトルを取得・正規化
 	_currentFrontVec = XMVectorSet(
-		Vector3(FBXBase::_mappedMats[0].r[2]).X(),
-		Vector3(FBXBase::_mappedMats[0].r[2]).Y(),
-		Vector3(FBXBase::_mappedMats[0].r[2]).Z(),
+		Vector3(_fbxComp->_mappedMats[0].r[2]).X(),
+		Vector3(_fbxComp->_mappedMats[0].r[2]).Y(),
+		Vector3(_fbxComp->_mappedMats[0].r[2]).Z(),
 		0.0f
 	);
 	_currentFrontVec = XMVector3Normalize(_currentFrontVec);
@@ -844,8 +870,8 @@ void
 FBXActor::EndControll()
 {
 	//単位行列を代入し、座標や正面ベクトルを初期化
-	FBXBase::_mappedMats[0] = XMMatrixIdentity();
-	_translateVector = XMVectorZero();
+	_fbxComp->_mappedMats[0] = XMMatrixIdentity();
+	_fbxComp->_translateVector = XMVectorZero();
 	_currentFrontVec = XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
 
 	//角度、目的角度も初期化
@@ -1016,6 +1042,26 @@ FBXActor::SetIsInLoop(bool val)
 }
 
 /// <summary>
+/// 現在の座標を取得する関数
+/// </summary>
+/// <returns>座標</returns>
+Vector3
+FBXActor::CurrentPosition()
+{
+	return _fbxComp->CurrentPosition();
+}
+
+/// <summary>
+/// 本体の当たり判定を返す
+/// </summary>
+/// <returns>スマートポインタ</returns>
+shared_ptr<BoxCollider>  
+FBXActor::Collider()
+{
+	return _fbxComp->Collider();
+}
+
+/// <summary>
 /// 接地判定を決める当たり判定を返す
 /// </summary>
 /// <returns>当たり判定</returns>
@@ -1032,7 +1078,7 @@ FBXActor::GetColForGround()const
 bool
 FBXActor::GetOnGround()const
 {
-	return _isOnGround(FBXBase::_currentPosition);
+	return _isOnGround(_fbxComp->_currentPosition);
 }
 
 /// <summary>
