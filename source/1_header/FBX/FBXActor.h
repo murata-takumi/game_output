@@ -1,6 +1,6 @@
 #pragma once
 #include "FBX/AnimNodes/Animations.h"
-#include "FBX/IFBX.h"
+#include "FBX/IFbx.h"
 
 /// <summary>
 /// ゲーム画面上に登場する3Dオブジェクトのクラス（ボーン入り）
@@ -15,7 +15,7 @@ class Dx12Wrapper;
 class FBXComposition;
 class ImGuiManager;
 class Vector3;
-class FBXActor : public IFBX
+class FbxActor : public IFbx
 {	
 	template<typename T>using ComPtr = ComPtr<T>;
 
@@ -114,9 +114,9 @@ public:
 	function<bool(const Vector3& vec)> _isOnGround;
 
 	//コンストラクタ
-	FBXActor() = default;
+	FbxActor() = default;
 	//デストラクタ
-	~FBXActor() = default;
+	~FbxActor() = default;
 
 	HRESULT Init(const wchar_t* filePath, const string name,
 		const Vector3& size, const Vector3& pos)override;

@@ -4,7 +4,7 @@
 #include "Collider/BoxCollider.h"
 #include "FBX/AssimpLoader.h"
 #include "FBX/FBXComposition.h"
-#include "FBX/FBXObject.h"
+#include "FBX/FbxObject.h"
 #include "Manager/ImGuiManager.h"
 #include "Wrapper/Dx12Wrapper.h"
 
@@ -17,7 +17,7 @@
 /// <param name="pos">当たり判定の座標</param>
 /// <returns>処理が成功したかどうか</returns>
 HRESULT
-FBXObject::Init(const wchar_t* filePath, const string name,
+FbxObject::Init(const wchar_t* filePath, const string name,
 	const Vector3& size, const Vector3& pos)
 {
 	//共通処理を初期化
@@ -33,7 +33,6 @@ FBXObject::Init(const wchar_t* filePath, const string name,
 	//シェーダーリソース・ビュー作成
 	_fbxComp->CreateShaderResourceView();
 
-
 	//当たり判定を作成
 	_fbxComp->CreateCollider(size, Vector3(0, 0, 0), this);
 
@@ -48,7 +47,7 @@ FBXObject::Init(const wchar_t* filePath, const string name,
 /// </summary>
 /// <returns>作成できたかどうか</returns>
 HRESULT
-FBXObject::CreateTransformView()
+FbxObject::CreateTransformView()
 {
 	HRESULT result = S_OK;
 
@@ -110,7 +109,7 @@ FBXObject::CreateTransformView()
 /// </summary>
 /// <returns>スマートポインタ</returns>
 shared_ptr<BoxCollider> 
-FBXObject::Collider()
+FbxObject::Collider()
 {
 	return _fbxComp->Collider();
 }
@@ -119,7 +118,7 @@ FBXObject::Collider()
 /// 描画処理
 /// </summary>
 void 
-FBXObject::Draw()
+FbxObject::Draw()
 {
 	_fbxComp->Draw();
 }
@@ -128,7 +127,7 @@ FBXObject::Draw()
 /// 更新処理
 /// </summary>
 void 
-FBXObject::Update()
+FbxObject::Update()
 {
 	_fbxComp->Update();
 }
@@ -138,7 +137,7 @@ FBXObject::Update()
 /// </summary>
 /// <returns>座標</returns>
 Vector3
-FBXObject::CurrentPosition()
+FbxObject::CurrentPosition()
 {
 	return _fbxComp->CurrentPosition();
 }

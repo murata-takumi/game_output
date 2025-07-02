@@ -1,5 +1,5 @@
 #pragma once
-#include "FBX/IFBX.h"
+#include "FBX/IFbx.h"
 
 /// <summary>
 /// FBXオブジェクト
@@ -11,7 +11,7 @@ class Dx12Wrapper;
 class FBXComposition;
 class ImGuiManager;
 class Vector3;
-class FBXObject : public IFBX
+class FbxObject : public IFbx
 {
 	template<typename T>using ComPtr = ComPtr<T>;
 
@@ -25,9 +25,9 @@ private:
 
 public:
 	//コンストラクタ
-	FBXObject() = default;
+	FbxObject() = default;
 	//デストラクタ
-	~FBXObject() = default;
+	~FbxObject() = default;
 
 	//初期化関数
 	HRESULT Init(const wchar_t* filePath, const string name, 

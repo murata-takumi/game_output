@@ -6,9 +6,9 @@
 #include "imgui/imgui_impl_win32.h"
 
 class Dx12Wrapper;
-class IFBX;
-class FBXObject;
-class FBXActor;
+class IFbx;
+class FbxObject;
+class FbxActor;
 class Vector3;
 class ImGuiManager
 {
@@ -31,7 +31,7 @@ public:
 	//PlaySceneから受け取ったデータを反映する関数
 	void SetFPS(float fps);
 	//アクターを受け取る関数
-	void SetActor(const map<string, shared_ptr<IFBX>> actorAndObjs);
+	void SetActor(const map<string, shared_ptr<IFbx>> actorAndObjs);
 	//アニメーション名の配列を初期化する関数
 	void ResetAnimStr();
 
@@ -53,9 +53,9 @@ private:
 	~ImGuiManager();
 
 	//アクター
-	shared_ptr<IFBX> _actor;				
+	shared_ptr<IFbx> _actor;				
 	//地面
-	shared_ptr<IFBX> _ground;				
+	shared_ptr<IFbx> _ground;				
 
 	//文字列
 	map<int,string> _texts;

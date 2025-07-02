@@ -3,7 +3,7 @@
 
 #include "Collider/BoxCollider.h"
 #include "Collider/BoxCollider2D.h"
-#include "FBX/FBXActor.h"
+#include "FBX/FbxActor.h"
 #include "Manager/InputManager.h"
 #include "Manager/SpriteManager.h"
 #include "Package/Package.h"
@@ -471,7 +471,7 @@ SpriteManager::BackGroundDraw()
 /// グリッドを描画する関数
 /// </summary>
 void
-SpriteManager::GridDraw(const map<string, shared_ptr<IFBX>> actorAndObjs)
+SpriteManager::GridDraw(const map<string, shared_ptr<IFbx>> actorAndObjs)
 {
 	//ビュー･プロジェクション行列を取得
 	_view = Dx12Wrapper::Instance().ViewMatrix();											

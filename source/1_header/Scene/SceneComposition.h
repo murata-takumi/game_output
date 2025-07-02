@@ -5,7 +5,7 @@
 /// 各シーンオブジェクトに持たせるコンポジションクラス
 /// </summary>
 class Dx12Wrapper;
-class FBXActor;
+class FbxActor;
 class SpriteManager;
 class InputManager;
 class SoundManager;

@@ -4,13 +4,13 @@
 /// <summary>
 /// 矩形の当たり判定を実装するクラス
 /// </summary>
-class IFBX;
+class IFbx;
 class Vector3;
 class BoxCollider
 {
 private:
 	//この当たり判定を持つオブジェクト
-	shared_ptr<IFBX> _object;
+	shared_ptr<IFbx> _object;
 
 	//頂点の初期値
 	vector<Vector3> _initVerts;
@@ -34,7 +34,7 @@ private:
 public:
 	//コンストラクタ
 	BoxCollider(const Vector3& size, const Vector3& pos = Vector3(0,0,0), 
-		IFBX* object = nullptr);
+		IFbx* object = nullptr);
 	//デストラクタ
 	~BoxCollider();
 
@@ -53,5 +53,5 @@ public:
 	Vector3 Center()const;
 
 	//オブジェクトを返す
-	IFBX& Object()const;
+	IFbx& Object()const;
 };

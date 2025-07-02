@@ -2,9 +2,9 @@
 
 #include "Collider/BoxCollider.h"
 #include "Collider/CollisionDetector.h"
-#include "FBX/FBXActor.h"
-#include "FBX/IFBX.h"
-#include "FBX/FBXObject.h"
+#include "FBX/FbxActor.h"
+#include "FBX/IFbx.h"
+#include "FBX/FbxObject.h"
 #include "Wrapper/Dx12Wrapper.h"
 
 /// <summary>

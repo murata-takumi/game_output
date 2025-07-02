@@ -4,10 +4,10 @@
 #include "Collider/BoxCollider.h"
 #include "Collider/CollisionDetector.h"
 #include "FBX/AssimpLoader.h"
-#include "FBX/FBXActor.h"
-#include "FBX/IFBX.h"
+#include "FBX/FbxActor.h"
+#include "FBX/IFbx.h"
 #include "FBX/FBXComposition.h"
-#include "FBX/FBXObject.h"
+#include "FBX/FbxObject.h"
 #include "FBX/AnimNodes/AnimNode.h"
 #include "Manager/ImGuiManager.h"
 #include "OcTree/OcTree.h"
@@ -40,7 +40,7 @@ const int ANIM_STR_UNNECESSARY_IDX = 21;
 const int COLLIDER_BONE = 0;								
 
 HRESULT
-FBXActor::Init(const wchar_t* filePath, const string name,
+FbxActor::Init(const wchar_t* filePath, const string name,
 	const Vector3& size, const Vector3& pos)
 {
 	_crntNode = nullptr;
@@ -215,7 +215,7 @@ FBXActor::Init(const wchar_t* filePath, const string name,
 /// アニメーション関連の初期化を行う関数
 /// </summary>
 void
-FBXActor::InitAnimation()
+FbxActor::InitAnimation()
 {
 	//ボーン行列の個数を決める
 	_beforeMats.resize(_boneMats.size());
@@ -278,7 +278,7 @@ FBXActor::InitAnimation()
 /// </summary>
 /// <param name="timeInTicks">現在の経過時間</param>
 void
-FBXActor::BoneTransform(float timeInTicks)
+FbxActor::BoneTransform(float timeInTicks)
 {
 	//経過時間を基に階層構造から変換行列を読み込む
 	if (timeInTicks < GetAnimDuration(_currentActorAnim))									
@@ -298,7 +298,7 @@ FBXActor::BoneTransform(float timeInTicks)
 /// </summary>
 /// <param name="anim">呼び出したいアニメーション</param>
 void
-FBXActor::SetAnimationNode(AnimEnum anim)
+FbxActor::SetAnimationNode(AnimEnum anim)
 {
 	//アニメーションを変更できる状態か確認
 	//同じアニメーションの再生しようとした時も関数を終了させる
@@ -324,7 +324,7 @@ FBXActor::SetAnimationNode(AnimEnum anim)
 /// <param name="pNode">親ノード</param>
 /// <param name="parentTrans">親ノードで適用されている行列</param>
 void
-FBXActor::ReadNodeHeirarchy(float animationTime, const aiNode* pNode, const XMMATRIX& parentTrans)
+FbxActor::ReadNodeHeirarchy(float animationTime, const aiNode* pNode, const XMMATRIX& parentTrans)
 {
 	//ノード名
 	string nodeName(pNode->mName.data);													
@@ -381,7 +381,7 @@ FBXActor::ReadNodeHeirarchy(float animationTime, const aiNode* pNode, const XMMA
 /// </summary>
 /// <returns>作成できたかどうか</returns>
 HRESULT
-FBXActor::CreateTransformView()
+FbxActor::CreateTransformView()
 {
 	HRESULT result = S_OK;
 
@@ -447,7 +447,7 @@ FBXActor::CreateTransformView()
 /// <param name="nodeName">アニメーション</param>
 /// <returns>ノード名が一致したアニメーション</returns>
 const aiNodeAnim*
-FBXActor::FindNodeAnim(const aiAnimation* animation, const string nodeName)
+FbxActor::FindNodeAnim(const aiAnimation* animation, const string nodeName)
 {
 	for (UINT i = 0; i < animation->mNumChannels; i++)
 	{
@@ -470,7 +470,7 @@ FBXActor::FindNodeAnim(const aiAnimation* animation, const string nodeName)
 /// <param name="nodeAnim">アニメーション</param>
 /// <returns>スケーリング行列</returns>
 XMMATRIX
-FBXActor::CalcInterpolatedScaling(float animationTime, const aiNodeAnim* nodeAnim)
+FbxActor::CalcInterpolatedScaling(float animationTime, const aiNodeAnim* nodeAnim)
 {
 	//スケーリングで用いるキーが1つの場合、そのキーのベクトルをそのまま取得
 	aiVector3D tempVec;
@@ -522,7 +522,7 @@ FBXActor::CalcInterpolatedScaling(float animationTime, const aiNodeAnim* nodeAni
 /// <param name="nodeAnim">アニメーション</param>
 /// <returns>回転行列</returns>
 XMMATRIX
-FBXActor::CalcInterpolatedRotation(float animationTime, const aiNodeAnim* nodeAnim)
+FbxActor::CalcInterpolatedRotation(float animationTime, const aiNodeAnim* nodeAnim)
 {
 	aiQuaternion tempQuat;
 
@@ -580,7 +580,7 @@ FBXActor::CalcInterpolatedRotation(float animationTime, const aiNodeAnim* nodeAn
 /// <param name="nodeAnim">アニメーション</param>
 /// <returns>平行移動行列</returns>
 XMMATRIX
-FBXActor::CalcInterpolatedPosition(float animationTime, const aiNodeAnim* nodeAnim)
+FbxActor::CalcInterpolatedPosition(float animationTime, const aiNodeAnim* nodeAnim)
 {
 	aiVector3D tempPos;
 
@@ -631,7 +631,7 @@ FBXActor::CalcInterpolatedPosition(float animationTime, const aiNodeAnim* nodeAn
 /// <param name="nodeAnim">アニメーションデータ</param>
 /// <returns>インデックス</returns>
 int
-FBXActor::FindScaling(float animationTime, const aiNodeAnim* nodeAnim)
+FbxActor::FindScaling(float animationTime, const aiNodeAnim* nodeAnim)
 {
 	auto numSclKeys = nodeAnim->mNumScalingKeys;
 	assert(numSclKeys > 0);
@@ -656,7 +656,7 @@ FBXActor::FindScaling(float animationTime, const aiNodeAnim* nodeAnim)
 /// <param name="nodeAnim">アニメーションデータ</param>
 /// <returns>インデックス</returns>
 int 
-FBXActor::FindRotation(float animationTime, const aiNodeAnim* nodeAnim)
+FbxActor::FindRotation(float animationTime, const aiNodeAnim* nodeAnim)
 {
 	auto numRotKeys = nodeAnim->mNumRotationKeys;
 	assert(numRotKeys > 0);
@@ -681,7 +681,7 @@ FBXActor::FindRotation(float animationTime, const aiNodeAnim* nodeAnim)
 /// <param name="nodeAnim">アニメーションデータ</param>
 /// <returns>インデックス</returns>
 int
-FBXActor::FindPosition(float animationTime, const aiNodeAnim* nodeAnim)
+FbxActor::FindPosition(float animationTime, const aiNodeAnim* nodeAnim)
 {
 	auto numPosKeys = nodeAnim->mNumPositionKeys;
 	assert(numPosKeys > 0);
@@ -703,7 +703,7 @@ FBXActor::FindPosition(float animationTime, const aiNodeAnim* nodeAnim)
 /// アクターをTポーズにする関数
 /// </summary>
 void
-FBXActor::InitPose()
+FbxActor::InitPose()
 {
 	_secFrameTime = _anims[CHARA_REF + _currentActorAnim]->mChannels[0]->mPositionKeys[1].mTime;
 }
@@ -712,7 +712,7 @@ FBXActor::InitPose()
 /// 描画処理
 /// </summary>
 void
-FBXActor::Draw()
+FbxActor::Draw()
 {
 	_fbxComp->Draw();
 }
@@ -721,7 +721,7 @@ FBXActor::Draw()
 /// 毎フレームの座標変換処理を実行する関数
 /// </summary>
 void
-FBXActor::Update()
+FbxActor::Update()
 {
 	_fbxComp->Update();
 
@@ -765,13 +765,11 @@ FBXActor::Update()
 	XMMatrixDecompose(&scale, &skew, &trans, 
 		_invMats[COLLIDER_BONE] * _fbxComp->_mappedMats[COLLIDER_BONE + 1]);
 	skew = XMVectorZero();
-	if (!_fbxComp->_rejectBone)
-	{
-		_fbxComp->_shiftColMatrix = 
-			XMMatrixScalingFromVector(scale) * 
-			XMMatrixRotationQuaternion(skew) * 
-			XMMatrixTranslationFromVector(trans);
-	}
+	_fbxComp->_shiftColMatrix = 
+		XMMatrixScalingFromVector(scale) * 
+		XMMatrixRotationQuaternion(skew) * 
+		XMMatrixTranslationFromVector(trans);
+
 	//経過時間を渡し、ボーン行列を取得
 	BoneTransform(_animTime);														
 	
@@ -788,7 +786,7 @@ FBXActor::Update()
 /// </summary>
 /// <param name="input">入力ベクトル</param>
 void
-FBXActor::OnKeyPressed(const Vector3& input)
+FbxActor::OnKeyPressed(const Vector3& input)
 {
 	//入力されているかどうかに応じて再生するアニメーションを決める
 	if (XMVector3Length(input).m128_f32[0] > 0.0f)
@@ -853,7 +851,7 @@ FBXActor::OnKeyPressed(const Vector3& input)
 /// 操作可能かどうかを設定する関数
 /// </summary>
 void
-FBXActor::StartControll()
+FbxActor::StartControll()
 {
 	//アニメーション再生時間も初期化
 	_animTime = 0.0f;				
@@ -867,7 +865,7 @@ FBXActor::StartControll()
 /// 座標を初期化する関数
 /// </summary>
 void
-FBXActor::EndControll()
+FbxActor::EndControll()
 {
 	//単位行列を代入し、座標や正面ベクトルを初期化
 	_fbxComp->_mappedMats[0] = XMMatrixIdentity();
@@ -889,7 +887,7 @@ FBXActor::EndControll()
 /// </summary>
 /// <param name="anim">アニメーション</param>
 void
-FBXActor::BlendAnimation(AnimEnum anim)
+FbxActor::BlendAnimation(AnimEnum anim)
 {
 	//ブレンド用に前アニメーションの行列を保存
 	_beforeMats = _boneMats;
@@ -933,7 +931,7 @@ FBXActor::BlendAnimation(AnimEnum anim)
 /// </summary>
 /// <returns>真理値</returns>
 bool
-FBXActor::GetCanControll()const
+FbxActor::GetCanControll()const
 {
 	return _canControll;
 }
@@ -943,7 +941,7 @@ FBXActor::GetCanControll()const
 /// </summary>
 /// <returns>アニメーション名のベクトル</returns>
 vector<string>
-FBXActor::GetAnimstr()const
+FbxActor::GetAnimstr()const
 {
 	return _animStr;
 }
@@ -953,7 +951,7 @@ FBXActor::GetAnimstr()const
 /// </summary>
 /// <returns>アニメーション名</returns>
 string
-FBXActor::GetCurentAnimStr()const
+FbxActor::GetCurentAnimStr()const
 {
 	return _currentActorAnim;
 }
@@ -964,7 +962,7 @@ FBXActor::GetCurentAnimStr()const
 /// <param name="animation">アニメーション名</param>
 /// <returns>総時間</returns>
 float
-FBXActor::GetAnimDuration(string animation)
+FbxActor::GetAnimDuration(string animation)
 {
 	return static_cast<float>(_anims[CHARA_REF + animation]->mDuration);
 }
@@ -974,7 +972,7 @@ FBXActor::GetAnimDuration(string animation)
 /// </summary>
 /// <returns>処理回数</returns>
 float
-FBXActor::GetAnimTickPerSpeed(string animation)
+FbxActor::GetAnimTickPerSpeed(string animation)
 {
 	//アニメーションの1秒当たりの処理回数が設定されていなかったら30を返す
 	return static_cast<float>(_anims[CHARA_REF + animation]->mTicksPerSecond != 0
@@ -986,7 +984,7 @@ FBXActor::GetAnimTickPerSpeed(string animation)
 /// </summary>
 /// <returns>フレームの秒数</returns>
 float
-FBXActor::GetSecondFrame()
+FbxActor::GetSecondFrame()
 {
 	return _secFrameTime;
 }
@@ -996,7 +994,7 @@ FBXActor::GetSecondFrame()
 /// </summary>
 /// <param name="animStr">アニメーション名</param>
 void
-FBXActor::SetAnimStr(string animStr)
+FbxActor::SetAnimStr(string animStr)
 {
 	_currentActorAnim = animStr;
 }
@@ -1006,7 +1004,7 @@ FBXActor::SetAnimStr(string animStr)
 /// </summary>
 /// <param name="speed">再生速度</param>
 void 
-FBXActor::SetAnimationSpeed(float speed)
+FbxActor::SetAnimationSpeed(float speed)
 {
 	_animSpeed = speed;
 }
@@ -1016,7 +1014,7 @@ FBXActor::SetAnimationSpeed(float speed)
 /// </summary>
 /// <param name="time">再生時間</param>
 void
-FBXActor::SetAnimationTime(float time)
+FbxActor::SetAnimationTime(float time)
 {
 	_animTime = time + GetSecondFrame();
 }
@@ -1026,7 +1024,7 @@ FBXActor::SetAnimationTime(float time)
 /// </summary>
 /// <param name="val">真理値</param>
 void
-FBXActor::SetCanChangeAnim(bool val)
+FbxActor::SetCanChangeAnim(bool val)
 {
 	_canChangeAnim = val;
 }
@@ -1036,7 +1034,7 @@ FBXActor::SetCanChangeAnim(bool val)
 /// </summary>
 /// <param name="val">真理値</param>
 void
-FBXActor::SetIsInLoop(bool val)
+FbxActor::SetIsInLoop(bool val)
 {
 	_isInLoop = val;
 }
@@ -1046,7 +1044,7 @@ FBXActor::SetIsInLoop(bool val)
 /// </summary>
 /// <returns>座標</returns>
 Vector3
-FBXActor::CurrentPosition()
+FbxActor::CurrentPosition()
 {
 	return _fbxComp->CurrentPosition();
 }
@@ -1056,7 +1054,7 @@ FBXActor::CurrentPosition()
 /// </summary>
 /// <returns>スマートポインタ</returns>
 shared_ptr<BoxCollider>  
-FBXActor::Collider()
+FbxActor::Collider()
 {
 	return _fbxComp->Collider();
 }
@@ -1066,7 +1064,7 @@ FBXActor::Collider()
 /// </summary>
 /// <returns>当たり判定</returns>
 shared_ptr<BoxCollider> 
-FBXActor::GetColForGround()const
+FbxActor::GetColForGround()const
 {
 	return _colForGround;
 }
@@ -1076,7 +1074,7 @@ FBXActor::GetColForGround()const
 /// </summary>
 /// <returns>真理値</returns>
 bool
-FBXActor::GetOnGround()const
+FbxActor::GetOnGround()const
 {
 	return _isOnGround(_fbxComp->_currentPosition);
 }
@@ -1087,7 +1085,7 @@ FBXActor::GetOnGround()const
 /// <param name="anim">比較したいアニメーション</param>
 /// <returns>引数と現在のアニメーションが等しいか</returns>
 bool
-FBXActor::IsAnimationEqual(AnimEnum anim)const
+FbxActor::IsAnimationEqual(AnimEnum anim)const
 {
 	if (!_crntNode)
 	{

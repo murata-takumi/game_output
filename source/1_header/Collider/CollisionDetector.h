@@ -6,9 +6,9 @@
 /// </summary>
 class BoxCollider;
 class Dx12Wrapper;
-class FBXActor;
-class IFBX;
-class FBXObject;
+class FbxActor;
+class IFbx;
+class FbxObject;
 class Vector3;
 class CollisionDetector
 {

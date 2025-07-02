@@ -18,8 +18,8 @@
 class BoxCollider;
 class BoxCollider2D;
 class Dx12Wrapper;
-class IFBX;
-class FBXActor;
+class IFbx;
+class FbxActor;
 class Vector3;
 class SpriteManager
 {
@@ -127,7 +127,7 @@ public:
 	void BackGroundDraw();
 
 	//マウスカーソルを描画
-	void GridDraw(const map<string, shared_ptr<IFBX>> actorAndObjs);
+	void GridDraw(const map<string, shared_ptr<IFbx>> actorAndObjs);
 
 	//グラフィックスメモリをコマンドリストにセット
 	void Commit();

@@ -7,9 +7,9 @@
 #include "Collider/CollisionDetector.h"
 #include "FBX/AssimpLoader.h"
 #include "FBX/AnimNodes/AnimNode.h"
-#include "FBX/FBXActor.h"
-#include "FBX/IFBX.h"
-#include "FBX/FBXObject.h"
+#include "FBX/FbxActor.h"
+#include "FBX/IFbx.h"
+#include "FBX/FbxObject.h"
 #include "Manager/EffectManager.h"
 #include "Manager/ImGuiManager.h"
 #include "Manager/InputManager.h"
@@ -85,13 +85,13 @@ PlayScene::SceneStart()
 		SceneComposition::Instance()._canInput = false;
 
 		//スレッドに各オブジェクトの作成処理を追加
-		InstantiateObject<FBXActor>(ACTOR_PATH,ACTOR_NAME,ACTOR_COLL_SIZE);
-		InstantiateObject<FBXObject>(GROUND_PATH,GROUND_NAME,GROUND_COLL_SIZE);
-		//InstantiateObject<FBXObject>(COIN_PATH,COIN_NAME,COIN_COLL_SIZE,COIN_INIT_POS);
-		//InstantiateObject<FBXObject>(BOX_PATH,BOX_NAME,BOX_COLL_SIZE,BOX_INIT_POS);
-		//InstantiateObject<FBXObject>(BOX_PATH,BOX_NAME_1,BOX_COLL_SIZE,BOX_INIT_POS_1);
-		//InstantiateObject<FBXObject>(BOX_PATH,BOX_NAME_2,BOX_COLL_SIZE,BOX_INIT_POS_2);
-		//InstantiateObject<FBXObject>(BOX_PATH,BOX_NAME_3,BOX_COLL_SIZE,BOX_INIT_POS_3);
+		InstantiateObject<FbxActor>(ACTOR_PATH,ACTOR_NAME,ACTOR_COLL_SIZE);
+		InstantiateObject<FbxObject>(GROUND_PATH,GROUND_NAME,GROUND_COLL_SIZE);
+		//InstantiateObject<FbxObject>(COIN_PATH,COIN_NAME,COIN_COLL_SIZE,COIN_INIT_POS);
+		//InstantiateObject<FbxObject>(BOX_PATH,BOX_NAME,BOX_COLL_SIZE,BOX_INIT_POS);
+		//InstantiateObject<FbxObject>(BOX_PATH,BOX_NAME_1,BOX_COLL_SIZE,BOX_INIT_POS_1);
+		//InstantiateObject<FbxObject>(BOX_PATH,BOX_NAME_2,BOX_COLL_SIZE,BOX_INIT_POS_2);
+		//InstantiateObject<FbxObject>(BOX_PATH,BOX_NAME_3,BOX_COLL_SIZE,BOX_INIT_POS_3);
 
 		//スレッドが全て完了するまでここで待機
 		for (auto& th : _ths)							
@@ -100,23 +100,23 @@ PlayScene::SceneStart()
 		}
 
 		//八分木ノードにオブジェクトを追加
-		if (!OcTree::Instance().AddObject(dynamic_pointer_cast<FBXObject>(_actorAndObjs[GROUND_NAME])))
+		if (!OcTree::Instance().AddObject(dynamic_pointer_cast<FbxObject>(_actorAndObjs[GROUND_NAME])))
 		{
 			assert(0);
 		}
-		//if (!OcTree::Instance().AddObject(dynamic_pointer_cast<FBXObject>(_actorAndObjs[BOX_NAME])))
+		//if (!OcTree::Instance().AddObject(dynamic_pointer_cast<FbxObject>(_actorAndObjs[BOX_NAME])))
 		//{
 		//	assert(0);
 		//}
-		/*if (!OcTree::Instance().AddObject(dynamic_pointer_cast<FBXObject>(_actorAndObjs[BOX_NAME_1])))
+		/*if (!OcTree::Instance().AddObject(dynamic_pointer_cast<FbxObject>(_actorAndObjs[BOX_NAME_1])))
 		{
 			assert(0);
 		}
-		if (!OcTree::Instance().AddObject(dynamic_pointer_cast<FBXObject>(_actorAndObjs[BOX_NAME_2])))
+		if (!OcTree::Instance().AddObject(dynamic_pointer_cast<FbxObject>(_actorAndObjs[BOX_NAME_2])))
 		{
 			assert(0);
 		}
-		if (!OcTree::Instance().AddObject(dynamic_pointer_cast<FBXObject>(_actorAndObjs[BOX_NAME_3])))
+		if (!OcTree::Instance().AddObject(dynamic_pointer_cast<FbxObject>(_actorAndObjs[BOX_NAME_3])))
 		{
 			assert(0);
 		}*/
@@ -124,13 +124,13 @@ PlayScene::SceneStart()
 		//オブジェクトの中からアクターを探す
 		for (const auto& object : _actorAndObjs)
 		{
-			if (_actor = dynamic_pointer_cast<FBXActor>(object.second))
+			if (_actor = dynamic_pointer_cast<FbxActor>(object.second))
 			{
 				//コールバックを設定
-				dynamic_pointer_cast<FBXActor>(_actor)->_isOnGround = [&](const XMVECTOR& vec)
+				dynamic_pointer_cast<FbxActor>(_actor)->_isOnGround = [&](const XMVECTOR& vec)
 				{
 					//アクターの近くにあるオブジェクトを取得し当たり判定をチェック
-					auto objsNearby = OcTree::Instance().Get(dynamic_pointer_cast<FBXActor>(_actor)->GetColForGround());
+					auto objsNearby = OcTree::Instance().Get(dynamic_pointer_cast<FbxActor>(_actor)->GetColForGround());
 					auto ret = false;
 					for (auto& obj : objsNearby)
 					{
@@ -276,7 +276,7 @@ PlayScene::Update()
 			_direction = XMVector3Normalize(_direction);
 
 			//入力処理
-			dynamic_pointer_cast<FBXActor>(_actor)->OnKeyPressed(_direction);
+			dynamic_pointer_cast<FbxActor>(_actor)->OnKeyPressed(_direction);
 
 			//移動ベクトルを初期化
 			_direction = XMVectorZero();
@@ -285,9 +285,9 @@ PlayScene::Update()
 			Dx12Wrapper::Instance().SetCoordinatesCenter(_actor->Collider()->Center());
 
 			//スペースキーが押されたらジャンプ処理
-			if (InputManager::Instance().KeyTracker().IsKeyPressed(Keyboard::Space) && dynamic_pointer_cast<FBXActor>(_actor)->GetOnGround())
+			if (InputManager::Instance().KeyTracker().IsKeyPressed(Keyboard::Space) && dynamic_pointer_cast<FbxActor>(_actor)->GetOnGround())
 			{
-				dynamic_pointer_cast<FBXActor>(_actor)->SetAnimationNode(JUMP00);
+				dynamic_pointer_cast<FbxActor>(_actor)->SetAnimationNode(JUMP00);
 			}
 		}
 
@@ -345,7 +345,7 @@ void
 PlayScene::InstantiateObject(const wchar_t* path,string name, Vector3 size, Vector3 pos)
 {
 	auto f = [=]() {
-		shared_ptr<IFBX> object;
+		shared_ptr<IFbx> object;
 
 		object = make_shared<className>();
 		object->Init(path, name, size, pos);
@@ -363,7 +363,7 @@ PlayScene::InstantiateObject(const wchar_t* path,string name, Vector3 size, Vect
 void
 PlayScene::ModelDraw()
 {
-	//プレイヤーが読み込み完了している場合IFBXクラスを基盤とするオブジェクト全般に対し描画・更新処理を行う
+	//プレイヤーが読み込み完了している場合IFbxクラスを基盤とするオブジェクト全般に対し描画・更新処理を行う
 	if (SceneComposition::Instance()._canInput)
 	{
 		//トゥーンテクスチャも描画する

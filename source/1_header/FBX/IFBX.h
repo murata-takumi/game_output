@@ -12,16 +12,16 @@ class Vector3;
 class aiScene;
 class Mesh;
 class BoneInfo;
-class IFBX
+class IFbx
 {
 protected:
 	//座標変換行列を作成
 	virtual HRESULT CreateTransformView() = 0;
 public:
 	//コンストラクタ
-	IFBX() = default;
+	IFbx() = default;
 	//デストラクタ
-	~IFBX() = default;
+	~IFbx() = default;
 
 	//初期化関数
 	virtual HRESULT Init(const wchar_t* filePath, const string name, 
@@ -36,5 +36,6 @@ public:
 	//更新関数
 	virtual void Update() = 0;
 
+	//現在の座標を返す
 	virtual Vector3 CurrentPosition() = 0;
 };

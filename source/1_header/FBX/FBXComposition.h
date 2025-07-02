@@ -80,7 +80,7 @@ public:
 	HRESULT CreateShaderResourceView();
 
 	//“–‚½‚è”»’èì¬ŠÖ”
-	void CreateCollider(const Vector3& size, const Vector3& pos,IFBX* obj);
+	void CreateCollider(const Vector3& size, const Vector3& pos,IFbx* obj);
 
 	//–ˆƒtƒŒ[ƒ€‚Ì•`‰æˆ—
 	void Draw();

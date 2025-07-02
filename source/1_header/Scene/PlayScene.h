@@ -7,10 +7,10 @@
 class BoxCollider;
 class collisionDetector;
 class AssimpLoader;
-class FBXActor;
-class IFBX;
+class FbxActor;
+class IFbx;
 class FBXComposition;
-class FBXObject;
+class FbxObject;
 class EffectManager;
 class ImGuiManager;
 class OcTreeNode;
@@ -34,16 +34,16 @@ public:
 	void SceneEnd() override;
 
 protected:
-	//FBXObjectとFBXActorをまとめたベクトル
-	map<string, shared_ptr<IFBX>> _actorAndObjs;
+	//FbxObjectとFbxActorをまとめたベクトル
+	map<string, shared_ptr<IFbx>> _actorAndObjs;
 
 	//並列処理したいスレッドのベクトル
 	vector<thread> _ths;
 
 	//アクターインスタンス
-	shared_ptr<IFBX> _actor;
+	shared_ptr<IFbx> _actor;
 	//床インスタンス
-	shared_ptr<IFBX> _ground;
+	shared_ptr<IFbx> _ground;
 
 	//プレイヤー、カメラの進行ベクトル
 	Vector3 _direction;

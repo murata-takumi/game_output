@@ -1,7 +1,7 @@
 #include "Vector3.h"
 
 #include "Collider/BoxCollider.h"
-#include "FBX/IFBX.h"
+#include "FBX/IFbx.h"
 #include "OcTree/OcTree.h"
 #include "OcTree/OcTreeNode.h"
 
@@ -47,7 +47,7 @@ OcTree::Init(const shared_ptr<BoxCollider> col, int capacity)
 /// <param name="obj">追加するオブジェクト</param>
 /// <returns>追加で来たかどうか</returns>
 bool 
-OcTree::AddObject(const shared_ptr<IFBX> obj)
+OcTree::AddObject(const shared_ptr<IFbx> obj)
 {
 	//ルートノードに追加処理
 	return _rootNode->AddObject(obj);
@@ -58,7 +58,7 @@ OcTree::AddObject(const shared_ptr<IFBX> obj)
 /// </summary>
 /// <param name="bounds">クエリ範囲</param>
 /// <returns>取得したオブジェクト</returns>
-vector<shared_ptr<IFBX>>
+vector<shared_ptr<IFbx>>
 OcTree::Get(const shared_ptr<BoxCollider> col)noexcept
 {
 	return _rootNode->Get(col);

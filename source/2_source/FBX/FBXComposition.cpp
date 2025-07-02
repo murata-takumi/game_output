@@ -331,9 +331,11 @@ FBXComposition::CreateShaderResourceView()
 /// <param name="obj">紐づけるオブジェクト</param>
 void 
 FBXComposition::CreateCollider(const Vector3& size, const Vector3& pos,
-	IFBX* obj)
+	IFbx* obj)
 {
 	_collider = make_shared<BoxCollider>(size, pos, obj);
+
+	_shiftColMatrix = XMMatrixTranslation(0, _collider->HalfLength().Y(), 0);
 }
 
 /// <summary>
@@ -374,7 +376,6 @@ FBXComposition::Update()
 {
 	//当たり判定を上にずらす
 	//こう書かないと当たり判定の中心がオブジェクト下になってしまう
-	if (_rejectBone) _shiftColMatrix = XMMatrixTranslation(0, _collider->HalfLength().Y(), 0);
 	_collider->Update(_shiftColMatrix * _mappedMats[0]);
 
 	//正面ベクトルを設定

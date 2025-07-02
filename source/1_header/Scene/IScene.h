@@ -7,7 +7,7 @@
 /// 各シーンオブジェクトのインターフェイス
 /// </summary>
 class Dx12Wrapper;
-class FBXActor;
+class FbxActor;
 class SpriteManager;
 class InputManager;
 class SoundManager;
