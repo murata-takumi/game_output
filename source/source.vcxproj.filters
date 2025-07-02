@@ -114,13 +114,7 @@
     <ClInclude Include="1_header\Manager\EffectManager.h">
       <Filter>1_header\Manager</Filter>
     </ClInclude>
-    <ClInclude Include="1_header\FBX\FBXActor.h">
-      <Filter>1_header\FBX</Filter>
-    </ClInclude>
     <ClInclude Include="1_header\FBX\AssimpLoader.h">
-      <Filter>1_header\FBX</Filter>
-    </ClInclude>
-    <ClInclude Include="1_header\FBX\FBXObject.h">
       <Filter>1_header\FBX</Filter>
     </ClInclude>
     <ClInclude Include="1_header\FBX\AnimNodes\Animations.h">
@@ -159,10 +153,16 @@
     <ClInclude Include="1_header\Scene\IScene.h">
       <Filter>1_header\Scene</Filter>
     </ClInclude>
-    <ClInclude Include="1_header\FBX\FBXComposition.h">
+    <ClInclude Include="1_header\FBX\FbxActor.h">
       <Filter>1_header\FBX</Filter>
     </ClInclude>
-    <ClInclude Include="1_header\FBX\IFBX.h">
+    <ClInclude Include="1_header\FBX\FbxObject.h">
+      <Filter>1_header\FBX</Filter>
+    </ClInclude>
+    <ClInclude Include="1_header\FBX\IFbx.h">
+      <Filter>1_header\FBX</Filter>
+    </ClInclude>
+    <ClInclude Include="1_header\Fbx\FbxComposition.h">
       <Filter>1_header\FBX</Filter>
     </ClInclude>
   </ItemGroup>
@@ -212,12 +212,6 @@
     <ClCompile Include="2_source\FBX\AssimpLoader.cpp">
       <Filter>2_source\FBX</Filter>
     </ClCompile>
-    <ClCompile Include="2_source\FBX\FBXActor.cpp">
-      <Filter>2_source\FBX</Filter>
-    </ClCompile>
-    <ClCompile Include="2_source\FBX\FBXObject.cpp">
-      <Filter>2_source\FBX</Filter>
-    </ClCompile>
     <ClCompile Include="2_source\FBX\AnimNodes\AnimNode.cpp">
       <Filter>2_source\FBX\AnimNodes</Filter>
     </ClCompile>
@@ -242,7 +236,13 @@
     <ClCompile Include="2_source\Scene\SceneComposition.cpp">
       <Filter>2_source\Scene</Filter>
     </ClCompile>
-    <ClCompile Include="2_source\FBX\FBXComposition.cpp">
+    <ClCompile Include="2_source\FBX\FbxActor.cpp">
+      <Filter>2_source\FBX</Filter>
+    </ClCompile>
+    <ClCompile Include="2_source\FBX\FbxObject.cpp">
+      <Filter>2_source\FBX</Filter>
+    </ClCompile>
+    <ClCompile Include="2_source\Fbx\FbxComposition.cpp">
       <Filter>2_source\FBX</Filter>
     </ClCompile>
   </ItemGroup>

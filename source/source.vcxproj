@@ -26,10 +26,10 @@
     <ClInclude Include="1_header\FBX\AnimNodes\Animations.h" />
     <ClInclude Include="1_header\FBX\AnimNodes\AnimNode.h" />
     <ClInclude Include="1_header\FBX\AssimpLoader.h" />
-    <ClInclude Include="1_header\FBX\FBXActor.h" />
-    <ClInclude Include="1_header\FBX\FBXComposition.h" />
-    <ClInclude Include="1_header\FBX\FBXObject.h" />
-    <ClInclude Include="1_header\FBX\IFBX.h" />
+    <ClInclude Include="1_header\FBX\FbxActor.h" />
+    <ClInclude Include="1_header\Fbx\FbxComposition.h" />
+    <ClInclude Include="1_header\FBX\FbxObject.h" />
+    <ClInclude Include="1_header\FBX\IFbx.h" />
     <ClInclude Include="1_header\Functions.h" />
     <ClInclude Include="1_header\Includes.h" />
     <ClInclude Include="1_header\Manager\EffectManager.h" />
@@ -58,9 +58,9 @@
     <ClCompile Include="2_source\Collider\CollisionDetector.cpp" />
     <ClCompile Include="2_source\FBX\AnimNodes\AnimNode.cpp" />
     <ClCompile Include="2_source\FBX\AssimpLoader.cpp" />
-    <ClCompile Include="2_source\FBX\FBXActor.cpp" />
-    <ClCompile Include="2_source\FBX\FBXComposition.cpp" />
-    <ClCompile Include="2_source\FBX\FBXObject.cpp" />
+    <ClCompile Include="2_source\FBX\FbxActor.cpp" />
+    <ClCompile Include="2_source\Fbx\FbxComposition.cpp" />
+    <ClCompile Include="2_source\FBX\FbxObject.cpp" />
     <ClCompile Include="2_source\main.cpp" />
     <ClCompile Include="2_source\Manager\EffectManager.cpp" />
     <ClCompile Include="2_source\Manager\ImGuiManager.cpp" />

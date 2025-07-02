@@ -3,7 +3,7 @@
 
 #include "Collider/BoxCollider.h"
 #include "FBX/AssimpLoader.h"
-#include "FBX/FBXComposition.h"
+#include "FBX/FbxComposition.h"
 #include "Manager/ImGuiManager.h"
 #include "Wrapper/Dx12Wrapper.h"
 
@@ -12,7 +12,7 @@
 /// </summary>
 /// <param name="filePath">モデルのパス</param>
 void
-FBXComposition::InitModel(const wchar_t* filePath)
+FbxComposition::InitModel(const wchar_t* filePath)
 {
 	//モデル読み込み用設定
 	ImportSettings settings =
@@ -47,7 +47,7 @@ FBXComposition::InitModel(const wchar_t* filePath)
 /// </summary>
 /// <returns>処理が成功したかどうか</returns>
 HRESULT
-FBXComposition::CreateVertexBufferView()
+FbxComposition::CreateVertexBufferView()
 {
 	//返り値を初期化
 	HRESULT result = S_OK;
@@ -109,7 +109,7 @@ FBXComposition::CreateVertexBufferView()
 /// </summary>
 /// <returns></returns>
 HRESULT
-FBXComposition::CreateIndexBufferView()
+FbxComposition::CreateIndexBufferView()
 {
 	//返り値を初期化
 	HRESULT result = S_OK;
@@ -172,7 +172,7 @@ FBXComposition::CreateIndexBufferView()
 /// </summary>
 /// <returns>作成できたかどうか</returns>
 HRESULT
-FBXComposition::CreateShaderResourceView()
+FbxComposition::CreateShaderResourceView()
 {
 	//返り値を初期化
 	HRESULT result = S_OK;
@@ -330,7 +330,7 @@ FBXComposition::CreateShaderResourceView()
 /// <param name="pos">初期座標</param>
 /// <param name="obj">紐づけるオブジェクト</param>
 void 
-FBXComposition::CreateCollider(const Vector3& size, const Vector3& pos,
+FbxComposition::CreateCollider(const Vector3& size, const Vector3& pos,
 	IFbx* obj)
 {
 	_collider = make_shared<BoxCollider>(size, pos, obj);
@@ -342,7 +342,7 @@ FBXComposition::CreateCollider(const Vector3& size, const Vector3& pos,
 /// 毎フレームの描画処理を実行する関数
 /// </summary>
 void
-FBXComposition::Draw()
+FbxComposition::Draw()
 {
 	//座標変換用ディスクリプタヒープをセット
 	ID3D12DescriptorHeap* transformHeaps[] = { _transHeap.Get() };
@@ -372,7 +372,7 @@ FBXComposition::Draw()
 /// 毎フレームの座標変換を行う
 /// </summary>
 void
-FBXComposition::Update()
+FbxComposition::Update()
 {
 	//当たり判定を上にずらす
 	//こう書かないと当たり判定の中心がオブジェクト下になってしまう
@@ -391,7 +391,7 @@ FBXComposition::Update()
 /// </summary>
 /// <returns>当たり判定</returns>
 shared_ptr<BoxCollider>
-FBXComposition::Collider()const
+FbxComposition::Collider()const
 {
 	return _collider;
 }
@@ -401,7 +401,7 @@ FBXComposition::Collider()const
 /// </summary>
 /// <returns>表示用座標</returns>
 Vector3
-FBXComposition::CurrentPosition()const
+FbxComposition::CurrentPosition()const
 {
 	return _currentPosition;
 }
@@ -411,7 +411,7 @@ FBXComposition::CurrentPosition()const
 /// </summary>
 /// <returns>正面ベクトル</returns>
 Vector3
-FBXComposition::FrontVec()const
+FbxComposition::FrontVec()const
 {
 	return _frontVec;
 }
@@ -421,7 +421,7 @@ FBXComposition::FrontVec()const
 /// </summary>
 /// <returns>足元ベクトル</returns>
 Vector3
-FBXComposition::FootVec()const
+FbxComposition::FootVec()const
 {
 	return _footVec;
 }
@@ -431,7 +431,7 @@ FBXComposition::FootVec()const
 /// </summary>
 /// <returns>速度</returns>
 Vector3
-FBXComposition::Speed()const
+FbxComposition::Speed()const
 {
 	return _speed;
 }
@@ -441,7 +441,7 @@ FBXComposition::Speed()const
 /// </summary>
 /// <returns>名前</returns>
 const string
-FBXComposition::Name()
+FbxComposition::Name()
 {
 	return _name;
 }
@@ -451,7 +451,7 @@ FBXComposition::Name()
 /// </summary>
 /// <param name="val">ボーン変換を決める真理値</param>
 void
-FBXComposition::SetRejectBone(bool val)
+FbxComposition::SetRejectBone(bool val)
 {
 	_rejectBone = val;
 }

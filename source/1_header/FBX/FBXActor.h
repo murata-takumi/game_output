@@ -12,7 +12,7 @@ class AnimNode;
 class AssimpLoader;
 class BoxCollider;
 class Dx12Wrapper;
-class FBXComposition;
+class FbxComposition;
 class ImGuiManager;
 class Vector3;
 class FbxActor : public IFbx
@@ -29,7 +29,7 @@ private:
 	AnimNode* _crntNode = nullptr;
 
 	//FBXクラスの共通処理をまとめたインスタンス
-	shared_ptr<FBXComposition> _fbxComp;
+	shared_ptr<FbxComposition> _fbxComp;
 
 	//ボーン行列のベクトル
 	vector<XMMATRIX> _boneMats;	

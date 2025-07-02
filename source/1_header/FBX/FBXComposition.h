@@ -6,7 +6,7 @@ class BoneInfo;
 class BoxCollider;
 class Mesh;
 class Vector3;
-class FBXComposition
+class FbxComposition
 {
 public:
 	//モデルデータを保持するポインタ
@@ -66,8 +66,8 @@ public:
 	bool _rejectBone;
 
 	//コンストラクタ、デストラクタ
-	FBXComposition() = default;
-	~FBXComposition() = default;
+	FbxComposition() = default;
+	~FbxComposition() = default;
 
 	//モデルを初期化する関数
 	void InitModel(const wchar_t* filePath);

@@ -3,7 +3,7 @@
 
 #include "Collider/BoxCollider.h"
 #include "FBX/AssimpLoader.h"
-#include "FBX/FBXComposition.h"
+#include "FBX/FbxComposition.h"
 #include "FBX/FbxObject.h"
 #include "Manager/ImGuiManager.h"
 #include "Wrapper/Dx12Wrapper.h"
@@ -21,7 +21,7 @@ FbxObject::Init(const wchar_t* filePath, const string name,
 	const Vector3& size, const Vector3& pos)
 {
 	//‹¤’Êˆ—‚ğ‰Šú‰»
-	_fbxComp = make_shared<FBXComposition>();
+	_fbxComp = make_shared<FbxComposition>();
 
 	//ƒ‚ƒfƒ‹ŠÖ˜A‚Ìî•ñ‚ğ‰Šú‰»
 	_fbxComp->InitModel(filePath);

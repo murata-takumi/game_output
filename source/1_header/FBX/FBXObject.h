@@ -8,7 +8,7 @@
 class AssimpLoader;
 class BoxCollider;
 class Dx12Wrapper;
-class FBXComposition;
+class FbxComposition;
 class ImGuiManager;
 class Vector3;
 class FbxObject : public IFbx
@@ -21,7 +21,7 @@ private:
 	HRESULT CreateTransformView()override;
 
 	//FBXクラスの共通処理をまとめたインスタンス
-	shared_ptr<FBXComposition> _fbxComp;
+	shared_ptr<FbxComposition> _fbxComp;
 
 public:
 	//コンストラクタ

@@ -6,7 +6,7 @@
 #include "FBX/AssimpLoader.h"
 #include "FBX/FbxActor.h"
 #include "FBX/IFbx.h"
-#include "FBX/FBXComposition.h"
+#include "FBX/FbxComposition.h"
 #include "FBX/FbxObject.h"
 #include "FBX/AnimNodes/AnimNode.h"
 #include "Manager/ImGuiManager.h"
@@ -50,7 +50,7 @@ FbxActor::Init(const wchar_t* filePath, const string name,
 	_blendWeight = _animTime = _destRad = _rotY = 0.0f;
 
 	//‹¤’Êˆ—‚ğ‰Šú‰»
-	_fbxComp = make_shared<FBXComposition>();
+	_fbxComp = make_shared<FbxComposition>();
 
 	//ƒ‚ƒfƒ‹ŠÖ˜A‚Ìî•ñ‚ğ‰Šú‰»
 	_fbxComp->InitModel(filePath);

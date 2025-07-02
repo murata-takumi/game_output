@@ -9,7 +9,7 @@ class collisionDetector;
 class AssimpLoader;
 class FbxActor;
 class IFbx;
-class FBXComposition;
+class FbxComposition;
 class FbxObject;
 class EffectManager;
 class ImGuiManager;
