@@ -41,7 +41,7 @@ protected:
 	vector<thread> _ths;
 
 	//アクターインスタンス
-	shared_ptr<IFbx> _actor;
+	shared_ptr<FbxActor> _actor;
 	//床インスタンス
 	shared_ptr<IFbx> _ground;
 

@@ -127,10 +127,10 @@ PlayScene::SceneStart()
 			if (_actor = dynamic_pointer_cast<FbxActor>(object.second))
 			{
 				//コールバックを設定
-				dynamic_pointer_cast<FbxActor>(_actor)->_isOnGround = [&](const XMVECTOR& vec)
+				_actor->_isOnGround = [&](const XMVECTOR& vec)
 				{
 					//アクターの近くにあるオブジェクトを取得し当たり判定をチェック
-					auto objsNearby = OcTree::Instance().Get(dynamic_pointer_cast<FbxActor>(_actor)->GetColForGround());
+					auto objsNearby = OcTree::Instance().Get(_actor->GetColForGround());
 					auto ret = false;
 					for (auto& obj : objsNearby)
 					{
@@ -276,7 +276,7 @@ PlayScene::Update()
 			_direction = XMVector3Normalize(_direction);
 
 			//入力処理
-			dynamic_pointer_cast<FbxActor>(_actor)->OnKeyPressed(_direction);
+			_actor->OnKeyPressed(_direction);
 
 			//移動ベクトルを初期化
 			_direction = XMVectorZero();
@@ -285,9 +285,9 @@ PlayScene::Update()
 			Dx12Wrapper::Instance().SetCoordinatesCenter(_actor->Collider()->Center());
 
 			//スペースキーが押されたらジャンプ処理
-			if (InputManager::Instance().KeyTracker().IsKeyPressed(Keyboard::Space) && dynamic_pointer_cast<FbxActor>(_actor)->GetOnGround())
+			if (InputManager::Instance().KeyTracker().IsKeyPressed(Keyboard::Space) && _actor->GetOnGround())
 			{
-				dynamic_pointer_cast<FbxActor>(_actor)->SetAnimationNode(JUMP00);
+				_actor->SetAnimationNode(JUMP00);
 			}
 		}
 
