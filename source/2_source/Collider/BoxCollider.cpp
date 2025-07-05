@@ -3,6 +3,7 @@
 #include "Vector3.h"
 
 #include "Collider/BoxCollider.h"
+#include "Collider/ColliderComposition.h"
 #include "FBX/IFbx.h"
 
 //正面ベクトルの初期値
@@ -16,12 +17,7 @@ const Vector3 INITIAL_FRONT = XMVectorSet(0.0f,0.0f,1.0f,0.0f);
 /// <param name="center">当たり判定の中心ベクトル</param>
 BoxCollider::BoxCollider(const Vector3& size, const Vector3& pos, IFbx* object)
 {
-	//渡されたアドレスを基にスマートポインタを生成
-	//管理権をスマートポインタに渡すためdeleter?を渡す
-	_object = shared_ptr<IFbx>(object, [](IFbx*)
-	{
-
-	});
+	_colliderComp = make_shared<ColliderComposition>(pos,object);
 
 	//ベクトルを初期化
 	SetVec(INITIAL_FRONT);
@@ -35,9 +31,6 @@ BoxCollider::BoxCollider(const Vector3& size, const Vector3& pos, IFbx* object)
 	_halfHeight = y / 2;
 	_halfDepth = z / 2;
 
-	//中心を初期化
-	_initCenter = pos;
-
 	//頂点の初期化
 	_initVerts.emplace_back(XMVectorSet(-_halfWidth, -_halfHeight, -_halfDepth, 0.0f));
 	_initVerts.emplace_back(XMVectorSet(-_halfWidth, -_halfHeight, _halfDepth, 0.0f));
@@ -50,7 +43,6 @@ BoxCollider::BoxCollider(const Vector3& size, const Vector3& pos, IFbx* object)
 	_initVerts.emplace_back(XMVectorSet(_halfWidth, _halfHeight, -_halfDepth, 0.0f));
 
 	//頂点を代入
-	_center = _initCenter;
 	_verts = _initVerts;
 }
 
@@ -102,8 +94,8 @@ BoxCollider::Update(const XMMATRIX& mat)
 	//OBBのベクトルを更新
 	SetVec(inputVec);
 
-	//中心も更新
-	_center = XMVector3Transform(_initCenter, mat);
+	//中心座標を更新
+	_colliderComp->Update(mat);
 
 	//各初期座標に対し座標変換を行い、実際に表示する座標に代入
 	for (int i = 0; i < _initVerts.size(); i++)	
@@ -145,11 +137,11 @@ BoxCollider::HalfLength()const
 /// <summary>
 /// 中心座標を返す関数
 /// </summary>
-/// <returns></returns>
-Vector3
+/// <returns>ポインタ</returns>
+shared_ptr<Vector3>
 BoxCollider::Center()const
 {
-	return _center;
+	return _colliderComp->Center();
 }
 
 /// <summary>
@@ -159,5 +151,5 @@ BoxCollider::Center()const
 IFbx&
 BoxCollider::Object()const
 {
-	return *_object;
+	return _colliderComp->Object();
 }

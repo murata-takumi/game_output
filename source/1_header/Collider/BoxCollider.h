@@ -1,29 +1,27 @@
 #pragma once
 #include "Application.h"
 
+#include "Collider/ICollider.h"
+
 /// <summary>
 /// 矩形の当たり判定を実装するクラス
 /// </summary>
+class ColliderComposition;
 class IFbx;
 class Vector3;
-class BoxCollider
+class BoxCollider : ICollider
 {
 private:
-	//この当たり判定を持つオブジェクト
-	shared_ptr<IFbx> _object;
-
 	//頂点の初期値
 	vector<Vector3> _initVerts;
 	//画面に表示する頂点
 	vector<Vector3> _verts;
 
+	//コンポジションクラス
+	shared_ptr<ColliderComposition> _colliderComp;
+
 	//方向ベクトル
 	Vector3* _directionVecs = new Vector3[3];
-
-	//中心ベクトルの初期値
-	Vector3 _initCenter;
-	//中心ベクトル
-	Vector3 _center;
 
 	//それぞれ幅、高さ、奥行の長さの半分
 	float _halfWidth, _halfHeight, _halfDepth;
@@ -50,7 +48,7 @@ public:
 	Vector3 HalfLength()const;
 
 	//中心座標を返す
-	Vector3 Center()const;
+	shared_ptr<Vector3> Center()const;
 
 	//オブジェクトを返す
 	IFbx& Object()const;

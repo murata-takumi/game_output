@@ -383,7 +383,7 @@ FbxComposition::Update()
 	_frontVec = XMVector3Transform(_frontVec, _mappedMats[0]);
 
 	//•\Ž¦À•W‚ð“–‚½‚è”»’è‚Ì’†S‚©‚ç‚‚³‚Ì”¼•ª‚¾‚¯‚¸‚ç‚µ‚½‰ÓŠ‚É‚·‚é
-	_currentPosition = _collider->Center() - XMVectorSet(0, _collider->HalfLength().Y(), 0, 0);
+	_currentPosition = *_collider->Center() - XMVectorSet(0, _collider->HalfLength().Y(), 0, 0);
 }
 
 /// <summary>

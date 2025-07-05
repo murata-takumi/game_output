@@ -29,7 +29,7 @@ float
 CollisionDetector::GetLengthBetweenColAndPos(const BoxCollider& col, const Vector3& dir, const Vector3& pos)
 {
 	//座標とOBBの中心の差分
-	Vector3 diff = pos - col.Center();
+	Vector3 diff = pos - *col.Center();
 	//差分のベクトルへの投影
 	float lenOnDir = abs(XMVector3Dot(diff, dir).m128_f32[0]);
 
@@ -116,7 +116,7 @@ CollisionDetector::CheckColAndVec(const BoxCollider& col, const Vector3& startPo
 	}
 
 	//OBBと線分の中心の差分
-	Vector3 centerDiff = lineCenter - col.Center();
+	Vector3 centerDiff = lineCenter - *col.Center();
 
 	float r, r0, r1;
 	//OBBの方向ベクトルに対し中心差分を投影し、半分長と線分の投影の和を比較して衝突判定
@@ -161,7 +161,7 @@ bool
 CollisionDetector::CheckColAndPoint(const BoxCollider& col, const Vector3& point)
 {
 	//座標とOBBの中心を結ぶベクトルを取得
-	auto vecBetcolAndPoint = col.Center() - point;
+	auto vecBetcolAndPoint = *col.Center() - point;
 
 	//方向ベクトルからはみ出ているベクトル
 	Vector3 vec = XMVectorSet(0, 0, 0, 0);
@@ -195,8 +195,8 @@ bool
 CollisionDetector::CheckOBBIntersection(const BoxCollider& col1, const BoxCollider& col2)
 {
 	//各OBBの右、上、正面ベクトル
-	Vector3 center1 = col1.Center();
-	Vector3 center2 = col2.Center();
+	Vector3 center1 = *col1.Center();
+	Vector3 center2 = *col2.Center();
 
 	//双方のOBBの中心を結ぶベクトル
 	Vector3 vecBetCenter = center2 - center1;

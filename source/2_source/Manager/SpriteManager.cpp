@@ -511,7 +511,7 @@ SpriteManager::GridDraw(const map<string, shared_ptr<IFbx>> actorAndObjs)
 			ColliderDraw(actor.second->Collider());
 			//XŽ²‚ÌƒOƒŠƒbƒh‚Ì•`‰æ
 			v1 = VertexPositionColor(RightPosToLeftPos(actor.second->CurrentPosition()), {1.0f,0.0f,0.0f,.10f});
-			v2 = VertexPositionColor(RightPosToLeftPos(actor.second->Collider()->Center()), {1.0f,0.0f,0.0f,.10f});
+			v2 = VertexPositionColor(RightPosToLeftPos(*actor.second->Collider()->Center()), {1.0f,0.0f,0.0f,.10f});
 			_batch->DrawLine(v1, v2);
 		}
 	}

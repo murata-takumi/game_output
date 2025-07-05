@@ -282,7 +282,7 @@ PlayScene::Update()
 			_direction = XMVectorZero();
 
 			//カメラを移動
-			Dx12Wrapper::Instance().SetCoordinatesCenter(_actor->Collider()->Center());
+			Dx12Wrapper::Instance().SetCoordinatesCenter(*_actor->Collider()->Center());
 
 			//スペースキーが押されたらジャンプ処理
 			if (InputManager::Instance().KeyTracker().IsKeyPressed(Keyboard::Space) && _actor->GetOnGround())

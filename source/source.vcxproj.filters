@@ -49,14 +49,8 @@
     <Filter Include="1_header\FBX">
       <UniqueIdentifier>{5477b80c-97c1-46a4-aa7c-9d2a70f33008}</UniqueIdentifier>
     </Filter>
-    <Filter Include="2_source\FBX">
-      <UniqueIdentifier>{29eab878-d817-423e-bfea-4a35a84dd1f8}</UniqueIdentifier>
-    </Filter>
     <Filter Include="1_header\FBX\AnimNodes">
       <UniqueIdentifier>{42f4fbe7-d0f3-4a61-9744-afacaeb8b675}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="2_source\FBX\AnimNodes">
-      <UniqueIdentifier>{7a03f491-5709-4282-8078-1b888dfb9408}</UniqueIdentifier>
     </Filter>
     <Filter Include="1_header\Collider">
       <UniqueIdentifier>{98d9ef17-73f2-480a-9cb6-acaa774b786b}</UniqueIdentifier>
@@ -69,6 +63,12 @@
     </Filter>
     <Filter Include="2_source\OcTree">
       <UniqueIdentifier>{e1783631-d363-4fd4-88b0-111fc8a95d42}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="2_source\Fbx">
+      <UniqueIdentifier>{29eab878-d817-423e-bfea-4a35a84dd1f8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="2_source\Fbx\AnimNodes">
+      <UniqueIdentifier>{7a03f491-5709-4282-8078-1b888dfb9408}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -165,6 +165,12 @@
     <ClInclude Include="1_header\Fbx\FbxComposition.h">
       <Filter>1_header\FBX</Filter>
     </ClInclude>
+    <ClInclude Include="1_header\Collider\ICollider.h">
+      <Filter>1_header\Collider</Filter>
+    </ClInclude>
+    <ClInclude Include="1_header\Collider\ColliderComposition.h">
+      <Filter>1_header\Collider</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="2_source\Application.cpp">
@@ -210,10 +216,10 @@
       <Filter>2_source\Manager</Filter>
     </ClCompile>
     <ClCompile Include="2_source\FBX\AssimpLoader.cpp">
-      <Filter>2_source\FBX</Filter>
+      <Filter>2_source\Fbx</Filter>
     </ClCompile>
     <ClCompile Include="2_source\FBX\AnimNodes\AnimNode.cpp">
-      <Filter>2_source\FBX\AnimNodes</Filter>
+      <Filter>2_source\Fbx\AnimNodes</Filter>
     </ClCompile>
     <ClCompile Include="2_source\Scene\TitleScene.cpp">
       <Filter>2_source\Scene</Filter>
@@ -237,13 +243,16 @@
       <Filter>2_source\Scene</Filter>
     </ClCompile>
     <ClCompile Include="2_source\FBX\FbxActor.cpp">
-      <Filter>2_source\FBX</Filter>
+      <Filter>2_source\Fbx</Filter>
     </ClCompile>
     <ClCompile Include="2_source\FBX\FbxObject.cpp">
-      <Filter>2_source\FBX</Filter>
+      <Filter>2_source\Fbx</Filter>
     </ClCompile>
     <ClCompile Include="2_source\Fbx\FbxComposition.cpp">
-      <Filter>2_source\FBX</Filter>
+      <Filter>2_source\Fbx</Filter>
+    </ClCompile>
+    <ClCompile Include="2_source\Collider\ColliderComposition.cpp">
+      <Filter>2_source\Collider</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
