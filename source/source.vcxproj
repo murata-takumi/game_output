@@ -25,6 +25,7 @@
     <ClInclude Include="1_header\Collider\ColliderComposition.h" />
     <ClInclude Include="1_header\Collider\CollisionDetector.h" />
     <ClInclude Include="1_header\Collider\ICollider.h" />
+    <ClInclude Include="1_header\Collider\SphereCollider.h" />
     <ClInclude Include="1_header\FBX\AnimNodes\Animations.h" />
     <ClInclude Include="1_header\FBX\AnimNodes\AnimNode.h" />
     <ClInclude Include="1_header\FBX\AssimpLoader.h" />
@@ -59,6 +60,7 @@
     <ClCompile Include="2_source\Collider\BoxCollider2D.cpp" />
     <ClCompile Include="2_source\Collider\ColliderComposition.cpp" />
     <ClCompile Include="2_source\Collider\CollisionDetector.cpp" />
+    <ClCompile Include="2_source\Collider\SphereCollider.cpp" />
     <ClCompile Include="2_source\FBX\AnimNodes\AnimNode.cpp" />
     <ClCompile Include="2_source\FBX\AssimpLoader.cpp" />
     <ClCompile Include="2_source\FBX\FbxActor.cpp" />

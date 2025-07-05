@@ -171,6 +171,9 @@
     <ClInclude Include="1_header\Collider\ColliderComposition.h">
       <Filter>1_header\Collider</Filter>
     </ClInclude>
+    <ClInclude Include="1_header\Collider\SphereCollider.h">
+      <Filter>1_header\Collider</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="2_source\Application.cpp">
@@ -252,6 +255,9 @@
       <Filter>2_source\Fbx</Filter>
     </ClCompile>
     <ClCompile Include="2_source\Collider\ColliderComposition.cpp">
+      <Filter>2_source\Collider</Filter>
+    </ClCompile>
+    <ClCompile Include="2_source\Collider\SphereCollider.cpp">
       <Filter>2_source\Collider</Filter>
     </ClCompile>
   </ItemGroup>
