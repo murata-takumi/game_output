@@ -36,6 +36,8 @@ FbxObject::Init(const wchar_t* filePath, const string name,
 	//当たり判定を作成
 	_fbxComp->CreateCollider(size, Vector3(0, 0, 0), this);
 
+	_fbxComp->_translateVector = pos;
+
 	//座標変換用バッファー・ビュー作成
 	CreateTransformView();
 
@@ -129,6 +131,7 @@ FbxObject::Draw()
 void 
 FbxObject::Update()
 {
+	//移動処理
 	_fbxComp->Update();
 }
 

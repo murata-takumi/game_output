@@ -337,7 +337,10 @@ FbxComposition::CreateCollider(const Vector3& size, const Vector3& pos,
 	_collider = make_shared<BoxCollider>();
 	dynamic_pointer_cast<BoxCollider>(_collider)->Init(size, pos, obj);
 
-	_shiftColMatrix = XMMatrixTranslation(0, size.Y(), 0);
+	_shiftColMatrix = XMMatrixTranslation(
+		0, 
+		dynamic_pointer_cast<BoxCollider>(_collider)->HalfLength().Y(), 
+		0);
 }
 
 /// <summary>
@@ -390,7 +393,6 @@ FbxComposition::Update()
 
 		//•\Ž¦À•W‚ð“–‚½‚è”»’è‚Ì’†S‚©‚ç‚‚³‚Ì”¼•ª‚¾‚¯‚¸‚ç‚µ‚½‰ÓŠ‚É‚·‚é
 		_currentPosition = *_collider->Center() - XMVectorSet(0, tempBoxCol->HalfLength().Y(), 0, 0);
-
 	}
 }
 
