@@ -4,6 +4,7 @@
 
 #include "Collider/CollisionDetector.h"
 #include "Collider/BoxCollider.h"
+#include "Collider/ICollider.h"
 #include "FBX/IFbx.h"
 #include "OcTree/OcTreeNode.h"
 
@@ -12,7 +13,7 @@
 /// </summary>
 /// <param name="bounds">扱う空間</param>
 /// <param name="capacity">容量</param>
-OcTreeNode::OcTreeNode(const shared_ptr<BoxCollider> col, int capacity):
+OcTreeNode::OcTreeNode(const shared_ptr<ICollider> col, int capacity):
 	_col(col),_capacity(capacity)
 {
 
@@ -35,7 +36,7 @@ bool
 OcTreeNode::AddObject(const shared_ptr<IFbx> obj)
 {
 	//空間内に入ってなかったら処理中断
-	if (!CollisionDetector::Instance().CheckColAndPoint(*_col, obj.get()->CurrentPosition()))
+	if (!CollisionDetector::Instance().CheckColAndPoint(_col, obj.get()->CurrentPosition()))
 	{
 		return false;
 	}
@@ -64,7 +65,7 @@ void
 OcTreeNode::SubDivide()
 {
 	// 空間の半分長さを取得し、更に半分にする
-	auto bh = _col->HalfLength();
+	auto bh = dynamic_pointer_cast<BoxCollider>(_col)->HalfLength();
 
 	//新しい矩形の座標に使用
 	float halfLen = bh.X() / 2.0f;
@@ -79,7 +80,8 @@ OcTreeNode::SubDivide()
 		int z = Convert(decStr[2]) * halfLen;
 
 		//新しい矩形を作成
-		shared_ptr<BoxCollider> newCol = make_shared<BoxCollider>(bh, Vector3(x, y, z));
+		shared_ptr<BoxCollider> newCol = make_shared<BoxCollider>();
+		newCol->Init(bh, Vector3(x, y, z));
 
 		//子ノードを作成し、ベクトルに格納
 		_children.push_back(make_shared<OcTreeNode>(newCol,_capacity));
@@ -111,14 +113,14 @@ OcTreeNode::AddToChild(const vector<shared_ptr<IFbx>> objs)
 /// <param name="bounds">クエリ範囲</param>
 /// <returns>オブジェクト</returns>
 vector<shared_ptr<IFbx>>
-OcTreeNode::Get(const shared_ptr<BoxCollider> col)noexcept
+OcTreeNode::Get(const shared_ptr<ICollider> col)noexcept
 {
 	vector<shared_ptr<IFbx>> ret;
 
 	//全オブジェクトに対しクエリ範囲内に含まれているかチェックを行う
 	for (auto& obj : _objs)
 	{
-		if (CollisionDetector::Instance().CheckColAndCol(*col,*obj->Collider()))
+		if (CollisionDetector::Instance().CheckColAndCol(col,obj->Collider()))
 		{
 			ret.push_back(obj);
 		}

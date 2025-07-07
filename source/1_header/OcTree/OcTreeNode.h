@@ -5,13 +5,14 @@
 /// 八分木を構成するノード
 /// </summary>
 class BoxCollider;
+class ICollider;
 class IFbx;
 class Vector3;
 class OcTreeNode
 {
 public:
 	//コンストラクタ
-	OcTreeNode(const shared_ptr<BoxCollider> col, int capacity);
+	OcTreeNode(const shared_ptr<ICollider> col, int capacity);
 	//デストラクタ
 	~OcTreeNode();
 
@@ -25,10 +26,10 @@ public:
 	void AddToChild(const vector<shared_ptr<IFbx>> objs);
 
 	//クエリ範囲にあるオブジェクトを取得する関数
-	vector<shared_ptr<IFbx>> Get(const shared_ptr<BoxCollider> bounds)noexcept;
+	vector<shared_ptr<IFbx>> Get(const shared_ptr<ICollider> bounds)noexcept;
 private:
 	//管理する空間
-	shared_ptr<BoxCollider> _col;
+	shared_ptr<ICollider> _col;
 
 	//子ノード
 	vector<shared_ptr<OcTreeNode>> _children;

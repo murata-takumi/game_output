@@ -108,7 +108,7 @@ FbxObject::CreateTransformView()
 /// 当たり判定を取得
 /// </summary>
 /// <returns>スマートポインタ</returns>
-shared_ptr<BoxCollider> 
+shared_ptr<ICollider> 
 FbxObject::Collider()
 {
 	return _fbxComp->Collider();

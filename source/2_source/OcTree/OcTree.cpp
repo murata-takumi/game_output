@@ -1,6 +1,7 @@
 #include "Vector3.h"
 
 #include "Collider/BoxCollider.h"
+#include "Collider/ICollider.h"
 #include "FBX/IFbx.h"
 #include "OcTree/OcTree.h"
 #include "OcTree/OcTreeNode.h"
@@ -35,7 +36,7 @@ OcTree::~OcTree()
 /// <param name="col">管理する空間</param>
 /// <param name="capacity">ノードが持てる最大容量</param>
 void
-OcTree::Init(const shared_ptr<BoxCollider> col, int capacity)
+OcTree::Init(const shared_ptr<ICollider> col, int capacity)
 {
 	//ルートノードを初期化
 	_rootNode = make_shared<OcTreeNode>(col, capacity);
@@ -59,7 +60,7 @@ OcTree::AddObject(const shared_ptr<IFbx> obj)
 /// <param name="bounds">クエリ範囲</param>
 /// <returns>取得したオブジェクト</returns>
 vector<shared_ptr<IFbx>>
-OcTree::Get(const shared_ptr<BoxCollider> col)noexcept
+OcTree::Get(const shared_ptr<ICollider> col)noexcept
 {
 	return _rootNode->Get(col);
 }

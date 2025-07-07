@@ -7,6 +7,7 @@
 class AssimpLoader;
 class BoxCollider;
 class Dx12Wrapper;
+class ICollider;
 class ImGuiManager;
 class Vector3;
 class aiScene;
@@ -28,7 +29,7 @@ public:
 		const Vector3& size, const Vector3& pos) = 0;
 
 	//“–‚½‚è”»’è‚ğ•Ô‚·
-	virtual shared_ptr<BoxCollider>  Collider() = 0;
+	virtual shared_ptr<ICollider>  Collider() = 0;
 
 	//•`‰æŠÖ”
 	virtual void Draw() = 0;

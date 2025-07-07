@@ -4,6 +4,7 @@
 class aiScene;
 class BoneInfo;
 class BoxCollider;
+class ICollider;
 class Mesh;
 class Vector3;
 class FbxComposition
@@ -13,7 +14,7 @@ public:
 	const aiScene* _scene;
 
 	//当たり判定のポインタ
-	shared_ptr<BoxCollider> _collider;
+	shared_ptr<ICollider> _collider;
 
 	//モデル読み込み用メッシュ配列
 	vector<Mesh> _meshes;
@@ -89,7 +90,7 @@ public:
 	void Update();
 
 	//当たり判定のポインタを返す関数
-	shared_ptr<BoxCollider>Collider()const;
+	shared_ptr<ICollider>Collider()const;
 
 	//表示用座標を取得
 	Vector3 CurrentPosition()const;

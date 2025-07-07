@@ -3,6 +3,7 @@
 
 #include "Collider/BoxCollider.h"
 #include "Collider/BoxCollider2D.h"
+#include "Collider/ICollider.h"
 #include "FBX/FbxActor.h"
 #include "Manager/InputManager.h"
 #include "Manager/SpriteManager.h"
@@ -228,24 +229,26 @@ SpriteManager::InitSpriteDevices()
 /// </summary>
 /// <param name="collider">“–‚½‚è”»’è‚Ìƒ|ƒCƒ“ƒ^</param>
 void
-SpriteManager::ColliderDraw(const shared_ptr<BoxCollider> collider)
+SpriteManager::ColliderDraw(const shared_ptr<ICollider> collider)
 {
-	if (collider != nullptr)
+	if (dynamic_pointer_cast<BoxCollider>(collider))
 	{
-		auto v_d1 = VertexPositionColor(RightPosToLeftPos(collider->Vertices()[0]), { 0.f,1.0f,0.0f,.10f });
-		auto v_d2 = VertexPositionColor(RightPosToLeftPos(collider->Vertices()[1]), { 0.f,1.0f,0.0f,.10f });
-		auto v_d3 = VertexPositionColor(RightPosToLeftPos(collider->Vertices()[2]), { 0.f,1.0f,0.0f,.10f });
-		auto v_d4 = VertexPositionColor(RightPosToLeftPos(collider->Vertices()[3]), { 0.f,1.0f,0.0f,.10f });
+		auto tempBox = dynamic_pointer_cast<BoxCollider>(collider);
+
+		auto v_d1 = VertexPositionColor(RightPosToLeftPos(tempBox->Vertices()[0]), { 0.f,1.0f,0.0f,.10f });
+		auto v_d2 = VertexPositionColor(RightPosToLeftPos(tempBox->Vertices()[1]), { 0.f,1.0f,0.0f,.10f });
+		auto v_d3 = VertexPositionColor(RightPosToLeftPos(tempBox->Vertices()[2]), { 0.f,1.0f,0.0f,.10f });
+		auto v_d4 = VertexPositionColor(RightPosToLeftPos(tempBox->Vertices()[3]), { 0.f,1.0f,0.0f,.10f });
 
 		_batch->DrawLine(v_d1, v_d2);
 		_batch->DrawLine(v_d2, v_d3);
 		_batch->DrawLine(v_d3, v_d4);
 		_batch->DrawLine(v_d4, v_d1);
 
-		auto v_u1 = VertexPositionColor(RightPosToLeftPos(collider->Vertices()[4]), { 0.f,1.0f,0.0f,.10f });
-		auto v_u2 = VertexPositionColor(RightPosToLeftPos(collider->Vertices()[5]), { 0.f,1.0f,0.0f,.10f });
-		auto v_u3 = VertexPositionColor(RightPosToLeftPos(collider->Vertices()[6]), { 0.f,1.0f,0.0f,.10f });
-		auto v_u4 = VertexPositionColor(RightPosToLeftPos(collider->Vertices()[7]), { 0.f,1.0f,0.0f,.10f });
+		auto v_u1 = VertexPositionColor(RightPosToLeftPos(tempBox->Vertices()[4]), { 0.f,1.0f,0.0f,.10f });
+		auto v_u2 = VertexPositionColor(RightPosToLeftPos(tempBox->Vertices()[5]), { 0.f,1.0f,0.0f,.10f });
+		auto v_u3 = VertexPositionColor(RightPosToLeftPos(tempBox->Vertices()[6]), { 0.f,1.0f,0.0f,.10f });
+		auto v_u4 = VertexPositionColor(RightPosToLeftPos(tempBox->Vertices()[7]), { 0.f,1.0f,0.0f,.10f });
 
 		_batch->DrawLine(v_u1, v_u2);
 		_batch->DrawLine(v_u2, v_u3);

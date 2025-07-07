@@ -147,7 +147,7 @@ PlayScene::SceneStart()
 						//	*obj->Collider(),
 						//	vec))
 						if(CollisionDetector::Instance().CheckContinuousCollisionDetection(
-							*obj->Collider(),
+							obj->Collider(),
 							XMVectorSet(0,1,0,0),
 							vec,
 							-45.0f * 9.8f

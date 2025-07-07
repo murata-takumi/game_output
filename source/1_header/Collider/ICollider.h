@@ -15,8 +15,6 @@ public:
 	ICollider() = default;
 	~ICollider() = default;
 
-	virtual void Init() = 0;
-
 	//XVˆ—
 	virtual void Update(const XMMATRIX& mat) = 0;
 

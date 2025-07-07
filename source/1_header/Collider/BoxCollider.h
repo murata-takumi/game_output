@@ -9,7 +9,7 @@
 class ColliderComposition;
 class IFbx;
 class Vector3;
-class BoxCollider : ICollider
+class BoxCollider : public ICollider
 {
 private:
 	//頂点の初期値
@@ -31,10 +31,13 @@ private:
 
 public:
 	//コンストラクタ
-	BoxCollider(const Vector3& size, const Vector3& pos = Vector3(0,0,0), 
-		IFbx* object = nullptr);
+	BoxCollider() = default;
 	//デストラクタ
-	~BoxCollider();
+	~BoxCollider() = default;
+
+	//初期化関数
+	void Init(const Vector3& size, const Vector3& pos = Vector3(0, 0, 0),
+		IFbx* object = nullptr);
 
 	//座標を更新する関数
 	void Update(const XMMATRIX& mat);

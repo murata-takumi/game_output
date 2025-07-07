@@ -9,6 +9,7 @@ class AssimpLoader;
 class BoxCollider;
 class Dx12Wrapper;
 class FbxComposition;
+class ICollider;
 class ImGuiManager;
 class Vector3;
 class FbxObject : public IFbx
@@ -34,7 +35,7 @@ public:
 				const Vector3& size, const Vector3& pos)override;
 
 	//“–‚½‚è”»’è‚ğæ“¾
-	shared_ptr<BoxCollider>  Collider()override;
+	shared_ptr<ICollider>  Collider()override;
 
 	//•`‰æˆ—
 	void Draw()override;

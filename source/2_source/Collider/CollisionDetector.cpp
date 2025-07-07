@@ -2,6 +2,7 @@
 
 #include "Collider/BoxCollider.h"
 #include "Collider/CollisionDetector.h"
+#include "Collider/ICollider.h"
 #include "FBX/FbxActor.h"
 #include "FBX/IFbx.h"
 #include "FBX/FbxObject.h"
@@ -26,23 +27,29 @@ CollisionDetector::Instance()
 /// <param name="pos">座標</param>
 /// <returns>距離</returns>
 float 
-CollisionDetector::GetLengthBetweenColAndPos(const BoxCollider& col, const Vector3& dir, const Vector3& pos)
+CollisionDetector::GetLengthBetweenColAndPos(shared_ptr<ICollider> col, const Vector3& dir, const Vector3& pos)
 {
-	//座標とOBBの中心の差分
-	Vector3 diff = pos - *col.Center();
-	//差分のベクトルへの投影
-	float lenOnDir = abs(XMVector3Dot(diff, dir).m128_f32[0]);
-
-	//OBBの方向ベクトルのベクトルへの投影の和を取得
-	float sumOfVecOnDir = 0.0f;
-	for (int i = 0; i < 3; i++)
+	if(col == dynamic_pointer_cast<BoxCollider>(col))
 	{
-		sumOfVecOnDir += col.HalfLength()[i] * abs(XMVector3Dot(dir, col.DirectionVectors()[i]).m128_f32[0]);
+		auto tempBox = dynamic_pointer_cast<BoxCollider>(col);
+
+		//座標とOBBの中心の差分
+		Vector3 diff = pos - *col->Center();
+		//差分のベクトルへの投影
+		float lenOnDir = abs(XMVector3Dot(diff, dir).m128_f32[0]);
+
+		//OBBの方向ベクトルのベクトルへの投影の和を取得
+		float sumOfVecOnDir = 0.0f;
+		for (int i = 0; i < 3; i++)
+		{
+			sumOfVecOnDir += tempBox->HalfLength()[i] * abs(XMVector3Dot(
+				dir, tempBox->DirectionVectors()[i]).m128_f32[0]);
+		}
+
+		float lenBetColAndPos = lenOnDir - sumOfVecOnDir;
+
+		return lenBetColAndPos;
 	}
-
-	float lenBetColAndPos = lenOnDir - sumOfVecOnDir;
-
-	return lenBetColAndPos;
 }
 
 /// <summary>
@@ -55,7 +62,7 @@ CollisionDetector::GetLengthBetweenColAndPos(const BoxCollider& col, const Vecto
 /// <returns>衝突するかどうか</returns>
 bool 
 CollisionDetector::CheckContinuousCollisionDetection(
-	const BoxCollider& col, 
+	shared_ptr<ICollider> col, 
 	const Vector3& dir, 
 	const Vector3& currentPos, 
 	const float speed)
@@ -81,7 +88,7 @@ CollisionDetector::CheckContinuousCollisionDetection(
 /// <param name="col2">当たり判定その2</param>
 /// <returns>衝突しているかどうか</returns>
 bool
-CollisionDetector::CheckColAndCol(const BoxCollider& col1, const BoxCollider& col2)
+CollisionDetector::CheckColAndCol(shared_ptr<ICollider> col1, shared_ptr<ICollider> col2)
 {
 	return CheckOBBIntersection(col1, col2) && CheckOBBIntersection(col2, col1);
 }
@@ -94,7 +101,7 @@ CollisionDetector::CheckColAndCol(const BoxCollider& col1, const BoxCollider& co
 /// <param name="endPos">線分の終点</param>
 /// <returns>入っているかどうか</returns>
 bool
-CollisionDetector::CheckColAndVec(const BoxCollider& col, const Vector3& startPos, const Vector3& endPos)
+CollisionDetector::CheckColAndVec(shared_ptr<ICollider> col, const Vector3& startPos, const Vector3& endPos)
 {
 	//線分の中心を取得
 	Vector3 lineCenter = (startPos + endPos) / 2;
@@ -116,37 +123,28 @@ CollisionDetector::CheckColAndVec(const BoxCollider& col, const Vector3& startPo
 	}
 
 	//OBBと線分の中心の差分
-	Vector3 centerDiff = lineCenter - *col.Center();
+	Vector3 centerDiff = lineCenter - *col->Center();
 
-	float r, r0, r1;
-	//OBBの方向ベクトルに対し中心差分を投影し、半分長と線分の投影の和を比較して衝突判定
-	for (int i = 0; i < 3; i++)
+	if (col == dynamic_pointer_cast<BoxCollider>(col))
 	{
-		//中心差分の投影
-		r = abs(XMVector3Dot(centerDiff, col.DirectionVectors()[i]).m128_f32[0]);
-		//方向ベクトルの半分長
-		r0 = col.HalfLength()[i];
-		//線分の方向ベクトルへの投影
-		r1 = lineExtent * abs(XMVector3Dot(lineDir, col.DirectionVectors()[i]).m128_f32[0]);
-		if (r > r0 + r1)
+		auto tempBox = dynamic_pointer_cast<BoxCollider>(col);
+
+		float r, r0, r1;
+		//OBBの方向ベクトルに対し中心差分を投影し、半分長と線分の投影の和を比較して衝突判定
+		for (int i = 0; i < 3; i++)
 		{
-			return false;
+			//中心差分の投影
+			r = abs(XMVector3Dot(centerDiff, tempBox->DirectionVectors()[i]).m128_f32[0]);
+			//方向ベクトルの半分長
+			r0 = tempBox->HalfLength()[i];
+			//線分の方向ベクトルへの投影
+			r1 = lineExtent * abs(XMVector3Dot(lineDir, tempBox->DirectionVectors()[i]).m128_f32[0]);
+			if (r > r0 + r1)
+			{
+				return false;
+			}
 		}
 	}
-
-	//各方向ベクトルへの投影の和を求め、線分方向ベクトルへの投影と半分長の和と比較
-	//差分の線分ベクトルへの投影
-	//r = abs(XMVector3Dot(centerDiff, lineDir).m128_f32[0]);
-	////方向ベクトルへの投影の和
-	//r0 = 0.0f;
-	//for (int i = 0; i < 3; i++)
-	//{
-	//	r0 += col.HalfLength()[i] * abs(XMVector3Dot(lineDir,col.DirectionVectors()[i]).m128_f32[0]);
-	//}
-	//if (r > r0 + lineExtent)
-	//{
-	//	return false;
-	//}
 
 	return true;
 }
@@ -158,28 +156,38 @@ CollisionDetector::CheckColAndVec(const BoxCollider& col, const Vector3& startPo
 /// <param name="point">座標</param>
 /// <returns>入り込んでいるかどうか</returns>
 bool
-CollisionDetector::CheckColAndPoint(const BoxCollider& col, const Vector3& point)
+CollisionDetector::CheckColAndPoint(shared_ptr<ICollider> col, const Vector3& point)
 {
 	//座標とOBBの中心を結ぶベクトルを取得
-	auto vecBetcolAndPoint = *col.Center() - point;
+	auto vecBetcolAndPoint = *col->Center() - point;
 
 	//方向ベクトルからはみ出ているベクトル
 	Vector3 vec = XMVectorSet(0, 0, 0, 0);
 
-	for (int i = 0; i < 3; i++)
+	if (col == dynamic_pointer_cast<BoxCollider>(col))
 	{
-		//方向ベクトルに対する比率を取得し、絶対値が1より大きければ（=はみ出ていたら）距離に加算
-		float s = XMVector3Dot(vecBetcolAndPoint, col.DirectionVectors()[i]).m128_f32[0] / col.HalfLength()[i];
-		if (fabs(s) > 1)
-		{
-			vec += (1 - fabs(s)) * col.HalfLength()[i] * col.DirectionVectors()[i];
-		}
-	}
+		auto tempBox = dynamic_pointer_cast<BoxCollider>(col);
 
-	//距離が0以下だったらOBBの中に座標が入り込んでいる
-	if (XMVector3Length(vec).m128_f32[0] <= 0)
-	{
-		return true;
+		for (int i = 0; i < 3; i++)
+		{
+			//方向ベクトルに対する比率を取得し、絶対値が1より大きければ距離に加算
+			float s = XMVector3Dot(
+				vecBetcolAndPoint, 
+				tempBox->DirectionVectors()[i]).m128_f32[0] / tempBox->HalfLength()[i];
+			if (fabs(s) > 1)
+			{
+				vec += (1 - fabs(s)) * tempBox->HalfLength()[i] * 
+					tempBox->DirectionVectors()[i];
+			}
+		}
+
+		//距離が0以下だったらOBBの中に座標が入り込んでいる
+		if (XMVector3Length(vec).m128_f32[0] <= 0)
+		{
+			return true;
+		}
+
+		return false;
 	}
 
 	return false;
@@ -192,32 +200,42 @@ CollisionDetector::CheckColAndPoint(const BoxCollider& col, const Vector3& point
 /// <param name="col2">OBBその2</param>
 /// <returns>衝突しているか</returns>
 bool 
-CollisionDetector::CheckOBBIntersection(const BoxCollider& col1, const BoxCollider& col2)
+CollisionDetector::CheckOBBIntersection(shared_ptr<ICollider> col1, shared_ptr<ICollider> col2)
 {
 	//各OBBの右、上、正面ベクトル
-	Vector3 center1 = *col1.Center();
-	Vector3 center2 = *col2.Center();
+	Vector3 center1 = *col1->Center();
+	Vector3 center2 = *col2->Center();
 
 	//双方のOBBの中心を結ぶベクトル
 	Vector3 vecBetCenter = center2 - center1;
 
-	for (int i = 0; i < 3; i++)
+	if (col1 == dynamic_pointer_cast<BoxCollider>(col1) &&
+		col2 == dynamic_pointer_cast<BoxCollider>(col2))
 	{
-		//各方向ベクトルの分離軸への投影の和
-		float r = 0;
-		for (int j = 0; j < 3; j++)
+		auto tempBox1 = dynamic_pointer_cast<BoxCollider>(col1);
+		auto tempBox2 = dynamic_pointer_cast<BoxCollider>(col2);
+
+		for (int i = 0; i < 3; i++)
 		{
-			r += LenOnSeparateAxis(col1.DirectionVectors()[i], col2.DirectionVectors()[j] * col2.HalfLength()[j]);
+			//各方向ベクトルの分離軸への投影の和
+			float r = 0;
+			for (int j = 0; j < 3; j++)
+			{
+				r += LenOnSeparateAxis(tempBox1->DirectionVectors()[i], 
+					tempBox2->DirectionVectors()[j] * tempBox2->HalfLength()[j]);
+			}
+
+			//中心間ベクトルの分離軸への投影
+			float s = XMVector3Dot(vecBetCenter, tempBox1->DirectionVectors()[i]).m128_f32[0];
+
+			//比較して、中心間ベクトルの投影の方が大きければ衝突していない
+			if (fabs(s) > r + tempBox1->HalfLength()[i])
+			{
+				return false;
+			}
 		}
 
-		//中心間ベクトルの分離軸への投影
-		float s = XMVector3Dot(vecBetCenter, col1.DirectionVectors()[i]).m128_f32[0];
-
-		//比較して、中心間ベクトルの投影の方が大きければ衝突していない
-		if (fabs(s) > r + col1.HalfLength()[i])
-		{
-			return false;
-		}
+		return true;
 	}
 
 	return true;

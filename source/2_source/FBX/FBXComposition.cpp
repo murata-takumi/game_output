@@ -2,6 +2,7 @@
 #include "Vector3.h"
 
 #include "Collider/BoxCollider.h"
+#include "Collider/ICollider.h"
 #include "FBX/AssimpLoader.h"
 #include "FBX/FbxComposition.h"
 #include "Manager/ImGuiManager.h"
@@ -333,9 +334,10 @@ void
 FbxComposition::CreateCollider(const Vector3& size, const Vector3& pos,
 	IFbx* obj)
 {
-	_collider = make_shared<BoxCollider>(size, pos, obj);
+	_collider = make_shared<BoxCollider>();
+	dynamic_pointer_cast<BoxCollider>(_collider)->Init(size, pos, obj);
 
-	_shiftColMatrix = XMMatrixTranslation(0, _collider->HalfLength().Y(), 0);
+	_shiftColMatrix = XMMatrixTranslation(0, size.Y(), 0);
 }
 
 /// <summary>
@@ -378,19 +380,25 @@ FbxComposition::Update()
 	//こう書かないと当たり判定の中心がオブジェクト下になってしまう
 	_collider->Update(_shiftColMatrix * _mappedMats[0]);
 
-	//正面ベクトルを設定
-	_frontVec = XMVectorSet(0, _collider->HalfLength().Y(), _collider->HalfLength().Z(), 0);
-	_frontVec = XMVector3Transform(_frontVec, _mappedMats[0]);
+	if (dynamic_pointer_cast<BoxCollider>(_collider))
+	{
+		auto tempBoxCol = dynamic_pointer_cast<BoxCollider>(_collider);
 
-	//表示座標を当たり判定の中心から高さの半分だけずらした箇所にする
-	_currentPosition = *_collider->Center() - XMVectorSet(0, _collider->HalfLength().Y(), 0, 0);
+		//正面ベクトルを設定
+		_frontVec = XMVectorSet(0, tempBoxCol->HalfLength().Y(), tempBoxCol->HalfLength().Z(), 0);
+		_frontVec = XMVector3Transform(_frontVec, _mappedMats[0]);
+
+		//表示座標を当たり判定の中心から高さの半分だけずらした箇所にする
+		_currentPosition = *_collider->Center() - XMVectorSet(0, tempBoxCol->HalfLength().Y(), 0, 0);
+
+	}
 }
 
 /// <summary>
 /// 当たり判定を返す
 /// </summary>
 /// <returns>当たり判定</returns>
-shared_ptr<BoxCollider>
+shared_ptr<ICollider>
 FbxComposition::Collider()const
 {
 	return _collider;

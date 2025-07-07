@@ -18,6 +18,7 @@
 class BoxCollider;
 class BoxCollider2D;
 class Dx12Wrapper;
+class ICollider;
 class IFbx;
 class FbxActor;
 class Vector3;
@@ -105,7 +106,7 @@ private:
 	void InitSpriteDevices();												
 
 	//当たり判定を描画する関数
-	void ColliderDraw(const shared_ptr<BoxCollider> collider);
+	void ColliderDraw(const shared_ptr<ICollider> collider);
 
 	//マウスカーソルが矩形内にあるか確認する
 	bool IsCursorInRect(RECT rect);

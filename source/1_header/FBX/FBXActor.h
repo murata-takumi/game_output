@@ -13,6 +13,7 @@ class AssimpLoader;
 class BoxCollider;
 class Dx12Wrapper;
 class FbxComposition;
+class ICollider;
 class ImGuiManager;
 class Vector3;
 class FbxActor : public IFbx
@@ -21,7 +22,7 @@ class FbxActor : public IFbx
 
 private:
 	//着地判定を検出するための当たり判定
-	shared_ptr<BoxCollider> _colForGround;
+	shared_ptr<ICollider> _colForGround;
 
 	//アニメーション実行用ノードの配列
 	unique_ptr<AnimNode> _animNodes[Length];
@@ -174,10 +175,10 @@ public:
 	Vector3 CurrentPosition()override;
 
 	//本体の当たり判定を返す
-	shared_ptr<BoxCollider>  Collider();
+	shared_ptr<ICollider>  Collider();
 
 	//接地判定を行うOBBを返す
-	shared_ptr<BoxCollider> GetColForGround()const;
+	shared_ptr<ICollider> GetColForGround()const;
 
 	//地面に接しているかどうかを返す
 	bool GetOnGround()const;

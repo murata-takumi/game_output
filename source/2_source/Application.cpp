@@ -207,9 +207,12 @@ Application::Init()
 	//ImGuiü‚è‚ğ‰Šú‰»
 	ImGuiManager::Instance().Init(_hwnd);
 
+	auto tempBox = make_shared<BoxCollider>();
+	tempBox->Init(Vector3(2000, 2000, 2000));
+
 	//“–‚½‚è”»’è‚ğŠÇ—‚·‚é”ª•ª–Ø‚à‰Šú‰»
 	OcTree::Instance().Init(
-		make_shared<BoxCollider>(Vector3(2000, 2000, 2000)),
+		tempBox,
 		4
 	);
 

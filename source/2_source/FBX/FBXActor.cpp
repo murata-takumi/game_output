@@ -66,7 +66,9 @@ FbxActor::Init(const wchar_t* filePath, const string name,
 	_fbxComp->CreateCollider(size, Vector3(0, 0, 0), this);
 
 	//接地用当たり判定を作成
-	_colForGround = make_shared<BoxCollider>(Vector3(size.X() * 2, size.Y() * 2, size.Z() * 2), Vector3(0, 0, 0), this);
+	_colForGround = make_shared<BoxCollider>();
+	dynamic_pointer_cast<BoxCollider>(_colForGround)->Init(
+		Vector3(size.X() * 2, size.Y() * 2, size.Z() * 2), Vector3(0, 0, 0), this);
 	auto jumpStart = [&]()
 	{
 		//開始時間を少し後に設定
@@ -110,7 +112,7 @@ FbxActor::Init(const wchar_t* filePath, const string name,
 			for (auto& obj : objsNearby)
 			{
 				if (CollisionDetector::Instance().CheckContinuousCollisionDetection(
-					*obj->Collider(),
+					obj->Collider(),
 					XMVectorSet(0, 1, 0, 0),
 					_fbxComp->_currentPosition,
 					-45.0f * GRAVITY_ACCERALATION
@@ -168,7 +170,7 @@ FbxActor::Init(const wchar_t* filePath, const string name,
 		for (auto& obj : objsNearby)
 		{
 			if (CollisionDetector::Instance().CheckContinuousCollisionDetection(
-				*obj->Collider(),
+				obj->Collider(),
 				XMVectorSet(0, 1, 0, 0),
 				_fbxComp->_currentPosition,
 				-45.0f * GRAVITY_ACCERALATION
@@ -809,7 +811,7 @@ FbxActor::OnKeyPressed(const Vector3& input)
 	for (auto& obj : objsNearby)
 	{
 		if (CollisionDetector::Instance().CheckColAndPoint(
-			*obj->Collider(), _fbxComp->FrontVec()))
+			obj->Collider(), _fbxComp->FrontVec()))
 		{
 			collision = false;
 			break;
@@ -1053,7 +1055,7 @@ FbxActor::CurrentPosition()
 /// 本体の当たり判定を返す
 /// </summary>
 /// <returns>スマートポインタ</returns>
-shared_ptr<BoxCollider>  
+shared_ptr<ICollider>
 FbxActor::Collider()
 {
 	return _fbxComp->Collider();
@@ -1063,7 +1065,7 @@ FbxActor::Collider()
 /// 接地判定を決める当たり判定を返す
 /// </summary>
 /// <returns>当たり判定</returns>
-shared_ptr<BoxCollider> 
+shared_ptr<ICollider>
 FbxActor::GetColForGround()const
 {
 	return _colForGround;

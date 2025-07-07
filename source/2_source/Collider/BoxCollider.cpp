@@ -10,14 +10,16 @@
 const Vector3 INITIAL_FRONT = XMVectorSet(0.0f,0.0f,1.0f,0.0f);
 
 /// <summary>
-/// コンストラクタ
 /// 当たり判定を構成する頂点を作成する
 /// </summary>
 /// <param name="size">当たり判定の幅、高さ、奥行のサイズ</param>
 /// <param name="center">当たり判定の中心ベクトル</param>
-BoxCollider::BoxCollider(const Vector3& size, const Vector3& pos, IFbx* object)
+/// <param name="object">紐づけるオブジェクト</param>
+void 
+BoxCollider::Init(const Vector3& size, const Vector3& pos,
+	IFbx* object)
 {
-	_colliderComp = make_shared<ColliderComposition>(pos,object);
+	_colliderComp = make_shared<ColliderComposition>(pos, object);
 
 	//ベクトルを初期化
 	SetVec(INITIAL_FRONT);
@@ -44,14 +46,6 @@ BoxCollider::BoxCollider(const Vector3& size, const Vector3& pos, IFbx* object)
 
 	//頂点を代入
 	_verts = _initVerts;
-}
-
-/// <summary>
-/// デストラクタ
-/// </summary>
-BoxCollider::~BoxCollider()
-{
-
 }
 
 /// <summary>
