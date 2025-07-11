@@ -9,7 +9,7 @@
 class ColliderComposition;
 class IFbx;
 class Vector3;
-class SphereCollider
+class SphereCollider : public ICollider
 {
 private:
 	//コンポジションクラス

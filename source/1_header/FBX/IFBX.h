@@ -26,7 +26,7 @@ public:
 
 	//‰Šú‰»ŠÖ”
 	virtual HRESULT Init(const wchar_t* filePath, const string name, 
-		const Vector3& size, const Vector3& pos) = 0;
+		const Vector3& size, const Vector3& pos,ColliderType colType) = 0;
 
 	//“–‚½‚è”»’è‚ğ•Ô‚·
 	virtual shared_ptr<ICollider>  Collider() = 0;

@@ -3,6 +3,7 @@
 
 #include "Collider/BoxCollider.h"
 #include "Collider/CollisionDetector.h"
+#include "Collider/ICollider.h"
 #include "FBX/AssimpLoader.h"
 #include "FBX/FbxActor.h"
 #include "FBX/IFbx.h"
@@ -39,9 +40,18 @@ const int ANIM_STR_UNNECESSARY_IDX = 21;
 //当たり判定を付与するボーンのインデックス
 const int COLLIDER_BONE = 0;								
 
+/// <summary>
+/// 初期化関数
+/// </summary>
+/// <param name="filePath">fbxファイルのパス</param>
+/// <param name="name">オブジェクト名</param>
+/// <param name="size">当たり判定のサイズ</param>
+/// <param name="pos">当たり判定の座標</param>
+/// <param name="colType">当たり判定のタイプ</param>
+/// <returns>処理が成功したかどうか</returns>
 HRESULT
 FbxActor::Init(const wchar_t* filePath, const string name,
-	const Vector3& size, const Vector3& pos)
+	const Vector3& size, const Vector3& pos, ColliderType colType)
 {
 	_crntNode = nullptr;
 	_currentFrontVec = XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
@@ -63,7 +73,14 @@ FbxActor::Init(const wchar_t* filePath, const string name,
 	_fbxComp->CreateShaderResourceView();
 
 	//当たり判定を作成
-	_fbxComp->CreateCollider(size, Vector3(0, 0, 0), this);
+	if (colType == ColliderType::Box)
+	{
+		_fbxComp->CreateBoxCollider(size, Vector3(0, 0, 0), this);
+	}
+	else if(colType == ColliderType::Sphere)
+	{
+		_fbxComp->CreateSphereCollider(10.0f, Vector3(0, 0, 0), this);
+	}
 
 	//接地用当たり判定を作成
 	_colForGround = make_shared<BoxCollider>();

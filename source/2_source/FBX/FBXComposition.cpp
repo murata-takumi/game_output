@@ -3,6 +3,7 @@
 
 #include "Collider/BoxCollider.h"
 #include "Collider/ICollider.h"
+#include "Collider/SphereCollider.h"
 #include "FBX/AssimpLoader.h"
 #include "FBX/FbxComposition.h"
 #include "Manager/ImGuiManager.h"
@@ -325,14 +326,13 @@ FbxComposition::CreateShaderResourceView()
 }
 
 /// <summary>
-/// 当たり判定を作成する関数
+/// 矩形の当たり判定を作成する関数
 /// </summary>
 /// <param name="size">サイズ</param>
 /// <param name="pos">初期座標</param>
 /// <param name="obj">紐づけるオブジェクト</param>
 void 
-FbxComposition::CreateCollider(const Vector3& size, const Vector3& pos,
-	IFbx* obj)
+FbxComposition::CreateBoxCollider(const Vector3& size, const Vector3& pos,IFbx* obj)
 {
 	_collider = make_shared<BoxCollider>();
 	dynamic_pointer_cast<BoxCollider>(_collider)->Init(size, pos, obj);
@@ -341,6 +341,19 @@ FbxComposition::CreateCollider(const Vector3& size, const Vector3& pos,
 		0, 
 		dynamic_pointer_cast<BoxCollider>(_collider)->HalfLength().Y(), 
 		0);
+}
+
+/// <summary>
+/// 球体の当たり判定を作成する関数
+/// </summary>
+/// <param name="radius">半径</param>
+/// <param name="pos">初期座標</param>
+/// <param name="obj">紐づけるオブジェクト</param>
+void 
+FbxComposition::CreateSphereCollider(float radius, const Vector3& pos, IFbx* obj)
+{
+	_collider = make_shared<SphereCollider>();
+	dynamic_pointer_cast<SphereCollider>(_collider)->Init(radius, pos, obj);
 }
 
 /// <summary>

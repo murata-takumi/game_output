@@ -5,6 +5,7 @@ class aiScene;
 class BoneInfo;
 class BoxCollider;
 class ICollider;
+class SphereCollider;
 class Mesh;
 class Vector3;
 class FbxComposition
@@ -80,8 +81,11 @@ public:
 	//シェーダーリソース・ビュー作成関数
 	HRESULT CreateShaderResourceView();
 
-	//当たり判定作成関数
-	void CreateCollider(const Vector3& size, const Vector3& pos,IFbx* obj);
+	//当たり判定（矩形）作成関数
+	void CreateBoxCollider(const Vector3& size, const Vector3& pos,IFbx* obj);
+
+	//当たり判定（球）作成関数
+	void CreateSphereCollider(float radius, const Vector3& pos, IFbx* obj);
 
 	//毎フレームの描画処理
 	void Draw();

@@ -32,7 +32,7 @@ public:
 
 	//‰Šú‰»ŠÖ”
 	HRESULT Init(const wchar_t* filePath, const string name, 
-				const Vector3& size, const Vector3& pos)override;
+				const Vector3& size, const Vector3& pos, ColliderType colType)override;
 
 	//“–‚½‚è”»’è‚ğæ“¾
 	shared_ptr<ICollider>  Collider()override;

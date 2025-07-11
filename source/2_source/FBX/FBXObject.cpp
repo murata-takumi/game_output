@@ -2,6 +2,7 @@
 #include "Vector3.h"
 
 #include "Collider/BoxCollider.h"
+#include "Collider/ICollider.h"
 #include "FBX/AssimpLoader.h"
 #include "FBX/FbxComposition.h"
 #include "FBX/FbxObject.h"
@@ -15,10 +16,11 @@
 /// <param name="name">オブジェクト名</param>
 /// <param name="size">当たり判定のサイズ</param>
 /// <param name="pos">当たり判定の座標</param>
+/// <param name="colType">当たり判定のタイプ</param>
 /// <returns>処理が成功したかどうか</returns>
 HRESULT
 FbxObject::Init(const wchar_t* filePath, const string name,
-	const Vector3& size, const Vector3& pos)
+	const Vector3& size, const Vector3& pos, ColliderType colType)
 {
 	//共通処理を初期化
 	_fbxComp = make_shared<FbxComposition>();
@@ -34,8 +36,16 @@ FbxObject::Init(const wchar_t* filePath, const string name,
 	_fbxComp->CreateShaderResourceView();
 
 	//当たり判定を作成
-	_fbxComp->CreateCollider(size, Vector3(0, 0, 0), this);
+	if (colType == ColliderType::Box)
+	{
+		_fbxComp->CreateBoxCollider(size, Vector3(0, 0, 0), this);
+	}
+	else if (colType == ColliderType::Sphere)
+	{
+		_fbxComp->CreateSphereCollider(10.0f, Vector3(0, 0, 0), this);
+	}
 
+	//座標も初期化
 	_fbxComp->_translateVector = pos;
 
 	//座標変換用バッファー・ビュー作成

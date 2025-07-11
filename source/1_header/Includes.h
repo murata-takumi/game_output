@@ -63,3 +63,12 @@ struct FBXVertex
 	XMUINT4 ids;						//ボーンID
 	XMFLOAT4 weights;					//ボーンの影響値
 };
+
+/// <summary>
+/// オブジェクトが持つ当たり判定の型を決める列挙値
+/// </summary>
+enum ColliderType
+{
+	Box,
+	Sphere,
+};

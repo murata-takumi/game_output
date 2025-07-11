@@ -16,6 +16,7 @@ class ImGuiManager;
 class OcTreeNode;
 class OcTree;
 class SceneComposition;
+class SphereCollider;
 class Vector3;
 class PlayScene : public IScene
 {
@@ -49,7 +50,9 @@ protected:
 	Vector3 _direction;
 
 	//オブジェクトを生成する関数
-	template<class className> void InstantiateObject(const wchar_t* path, string name,Vector3 size, Vector3 pos = Vector3(0.0f,0.0f,0.0f));
+	template<class fbxType> void InstantiateObject(
+		const wchar_t* path, string name,Vector3 size, 
+		Vector3 pos = Vector3(0.0f,0.0f,0.0f),ColliderType colType = ColliderType::Box);
 
 	//モデル描画処理
 	void ModelDraw() override;												

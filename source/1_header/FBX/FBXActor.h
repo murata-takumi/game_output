@@ -120,7 +120,7 @@ public:
 	~FbxActor() = default;
 
 	HRESULT Init(const wchar_t* filePath, const string name,
-		const Vector3& size, const Vector3& pos)override;
+		const Vector3& size, const Vector3& pos, ColliderType colType)override;
 
 	//アニメーション名のベクトルを返す関数
 	vector<string> GetAnimstr()const;
