@@ -4,6 +4,7 @@
 #include "Collider/BoxCollider.h"
 #include "Collider/BoxCollider2D.h"
 #include "Collider/ICollider.h"
+#include "Collider/SphereCollider.h"
 #include "FBX/FbxActor.h"
 #include "Manager/InputManager.h"
 #include "Manager/SpriteManager.h"
@@ -174,8 +175,8 @@ SpriteManager::InitSpriteDevices()
 
 	_batch = make_unique<PrimitiveBatch<VertexPositionColor>>(Dx12Wrapper::Instance().Device());
 
-	CD3DX12_RASTERIZER_DESC rastDesc(D3D12_FILL_MODE_SOLID,
-		D3D12_CULL_MODE_NONE,false,D3D12_DEFAULT_DEPTH_BIAS,D3D12_DEFAULT_DEPTH_BIAS_CLAMP,
+	CD3DX12_RASTERIZER_DESC rastDesc(D3D12_FILL_MODE_WIREFRAME,
+		D3D12_CULL_MODE_BACK,false,D3D12_DEFAULT_DEPTH_BIAS,D3D12_DEFAULT_DEPTH_BIAS_CLAMP,
 		D3D12_DEFAULT_SLOPE_SCALED_DEPTH_BIAS,true,false,true,
 		0,D3D12_CONSERVATIVE_RASTERIZATION_MODE_OFF);
 
@@ -231,35 +232,40 @@ SpriteManager::InitSpriteDevices()
 void
 SpriteManager::ColliderDraw(const shared_ptr<ICollider> collider)
 {
+	//ヒープをコマンドリストにセット
+	ID3D12DescriptorHeap* heap[] = { _heapForSpriteFont.Get() };
+	Dx12Wrapper::Instance().CommandList()->SetDescriptorHeaps(1, heap);
+
+	auto transMat = XMMatrixTranslationFromVector(
+		RightPosToLeftPos(Vector3(
+			collider->Center()->X(),
+			collider->Center()->Y(),
+			collider->Center()->Z())));
+
+	//コマンドリストにグリッドを登録
+	_effect->SetWorld(transMat);
+	_effect->Apply(Dx12Wrapper::Instance().CommandList());
+
 	if (dynamic_pointer_cast<BoxCollider>(collider))
 	{
 		auto tempBox = dynamic_pointer_cast<BoxCollider>(collider);
-
-		auto v_d1 = VertexPositionColor(RightPosToLeftPos(tempBox->Vertices()[0]), { 0.f,1.0f,0.0f,.10f });
-		auto v_d2 = VertexPositionColor(RightPosToLeftPos(tempBox->Vertices()[1]), { 0.f,1.0f,0.0f,.10f });
-		auto v_d3 = VertexPositionColor(RightPosToLeftPos(tempBox->Vertices()[2]), { 0.f,1.0f,0.0f,.10f });
-		auto v_d4 = VertexPositionColor(RightPosToLeftPos(tempBox->Vertices()[3]), { 0.f,1.0f,0.0f,.10f });
-
-		_batch->DrawLine(v_d1, v_d2);
-		_batch->DrawLine(v_d2, v_d3);
-		_batch->DrawLine(v_d3, v_d4);
-		_batch->DrawLine(v_d4, v_d1);
-
-		auto v_u1 = VertexPositionColor(RightPosToLeftPos(tempBox->Vertices()[4]), { 0.f,1.0f,0.0f,.10f });
-		auto v_u2 = VertexPositionColor(RightPosToLeftPos(tempBox->Vertices()[5]), { 0.f,1.0f,0.0f,.10f });
-		auto v_u3 = VertexPositionColor(RightPosToLeftPos(tempBox->Vertices()[6]), { 0.f,1.0f,0.0f,.10f });
-		auto v_u4 = VertexPositionColor(RightPosToLeftPos(tempBox->Vertices()[7]), { 0.f,1.0f,0.0f,.10f });
-
-		_batch->DrawLine(v_u1, v_u2);
-		_batch->DrawLine(v_u2, v_u3);
-		_batch->DrawLine(v_u3, v_u4);
-		_batch->DrawLine(v_u4, v_u1);
-
-		_batch->DrawLine(v_d1, v_u1);
-		_batch->DrawLine(v_d2, v_u2);
-		_batch->DrawLine(v_d3, v_u3);
-		_batch->DrawLine(v_d4, v_u4);
+		auto primitive = GeometricPrimitive::CreateBox(
+		Vector3(
+			tempBox->HalfLength().X() * 2,
+			tempBox->HalfLength().Y() * 2,
+			tempBox->HalfLength().Z() * 2));
+		primitive->Draw(Dx12Wrapper::Instance().CommandList());
 	}
+	else if (dynamic_pointer_cast<SphereCollider>(collider))
+	{
+		auto radius = dynamic_pointer_cast<SphereCollider>(collider)->Radius();
+		auto primitive = GeometricPrimitive::CreateSphere(radius, 8);
+		primitive->Draw(Dx12Wrapper::Instance().CommandList());
+	}
+
+	//元に戻す
+	_effect->SetWorld(_world);
+	_effect->Apply(Dx12Wrapper::Instance().CommandList());
 }
 
 /// <summary>

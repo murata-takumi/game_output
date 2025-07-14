@@ -3,6 +3,7 @@
 #include "Collider/BoxCollider.h"
 #include "Collider/CollisionDetector.h"
 #include "Collider/ICollider.h"
+#include "Collider/SphereCollider.h"
 #include "FBX/FbxActor.h"
 #include "FBX/IFbx.h"
 #include "FBX/FbxObject.h"
@@ -73,8 +74,6 @@ CollisionDetector::CheckContinuousCollisionDetection(
 	//現在と1フレーム後の座標のベクトルがOBBと交わる（=1フレーム後に衝突する）なら真
 	if (CheckColAndVec(col, currentPos, nextPos))
 	{
-
-
 		return true;
 	}
 
@@ -144,6 +143,10 @@ CollisionDetector::CheckColAndVec(shared_ptr<ICollider> col, const Vector3& star
 				return false;
 			}
 		}
+	}
+	else if(col == dynamic_pointer_cast<SphereCollider>(col))
+	{
+		return false;
 	}
 
 	return true;

@@ -42,7 +42,7 @@ FbxObject::Init(const wchar_t* filePath, const string name,
 	}
 	else if (colType == ColliderType::Sphere)
 	{
-		_fbxComp->CreateSphereCollider(10.0f, Vector3(0, 0, 0), this);
+		_fbxComp->CreateSphereCollider(25.0f, Vector3(0, 0, 0), this);
 	}
 
 	//À•W‚à‰Šú‰»

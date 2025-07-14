@@ -354,6 +354,11 @@ FbxComposition::CreateSphereCollider(float radius, const Vector3& pos, IFbx* obj
 {
 	_collider = make_shared<SphereCollider>();
 	dynamic_pointer_cast<SphereCollider>(_collider)->Init(radius, pos, obj);
+
+	_shiftColMatrix = XMMatrixTranslation(
+		0,
+		radius / 2,
+		0);
 }
 
 /// <summary>
@@ -405,7 +410,13 @@ FbxComposition::Update()
 		_frontVec = XMVector3Transform(_frontVec, _mappedMats[0]);
 
 		//•\Ž¦À•W‚ð“–‚½‚è”»’è‚Ì’†S‚©‚ç‚‚³‚Ì”¼•ª‚¾‚¯‚¸‚ç‚µ‚½‰ÓŠ‚É‚·‚é
-		_currentPosition = *_collider->Center() - XMVectorSet(0, tempBoxCol->HalfLength().Y(), 0, 0);
+		auto yDiff = tempBoxCol->HalfLength().Y();
+		_currentPosition = *_collider->Center() - Vector3(0, yDiff, 0);
+	}
+	else if (dynamic_pointer_cast<SphereCollider>(_collider))
+	{
+		auto radius = dynamic_pointer_cast<SphereCollider>(_collider)->Radius();
+		_currentPosition = *_collider->Center() - Vector3(0,radius / 2,0);
 	}
 }
 

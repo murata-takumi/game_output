@@ -3,6 +3,7 @@
 
 #include <DirectXTK12-master/Inc/CommonStates.h>
 #include <DirectXTK12-master/Inc/Effects.h>
+#include <DirectXTK12-master/Inc/GeometricPrimitive.h>
 #include <DirectXTK12-master/Inc/PrimitiveBatch.h>
 #include <DirectXTK12-master/Inc/ResourceUploadBatch.h>
 #include <DirectXTK12-master/Inc/SpriteBatch.h>
