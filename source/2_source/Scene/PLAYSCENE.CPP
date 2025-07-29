@@ -43,6 +43,8 @@ const Vector3 COIN_COLL_SIZE = Vector3(25.0f, 25.0f, 25.0f);
 const Vector3 BOX_COLL_SIZE = Vector3(200.0f, 200.0f, 200.0f);
 //プレイヤーの初期座標
 const Vector3 ACTOR_INIT_POS = Vector3(0.0f, 0.0f, 0.0f);
+//地面の初期座標
+const Vector3 GROUND_INIT_POS = Vector3(0.0f, -1.0f, 0.0f);
 //コインの初期座標
 const Vector3 COIN_INIT_POS = Vector3(0.0f, 0.0f, 100.0f);
 //箱の初期座標
@@ -89,7 +91,7 @@ PlayScene::SceneStart()
 		InstantiateObject<FbxActor>(
 			ACTOR_PATH,ACTOR_NAME,ACTOR_COLL_SIZE,ACTOR_INIT_POS,ColliderType::Box);
 		InstantiateObject<FbxObject>(
-			GROUND_PATH,GROUND_NAME,GROUND_COLL_SIZE, ACTOR_INIT_POS, ColliderType::Box);
+			GROUND_PATH,GROUND_NAME,GROUND_COLL_SIZE, GROUND_INIT_POS, ColliderType::Box);
 		InstantiateObject<FbxObject>(
 			COIN_PATH,COIN_NAME,COIN_COLL_SIZE,COIN_INIT_POS, ColliderType::Sphere);
 		InstantiateObject<FbxObject>(
@@ -155,15 +157,15 @@ PlayScene::SceneStart()
 						//	*obj->Collider(), 
 						//	vec,
 						//	vec - XMVectorSet(0,85.0f,0,0)))
-						//if (CollisionDetector::Instance().CheckColAndPoint(
-						//	*obj->Collider(),
-						//	vec))
-						if(CollisionDetector::Instance().CheckContinuousCollisionDetection(
+						if (CollisionDetector::Instance().CheckColAndPoint(
 							obj->Collider(),
-							XMVectorSet(0,1,0,0),
-							vec,
-							-45.0f * 9.8f
-						))
+							vec))
+						//if(CollisionDetector::Instance().CheckContinuousCollisionDetection(
+						//	obj->Collider(),
+						//	XMVectorSet(0,1,0,0),
+						//	vec,
+						//	-45.0f * 9.8f
+						//))
 						//if(CollisionDetector::Instance().CheckColAndVec(
 						//	*obj->Collider(),
 						//	vec) <= 0.0f

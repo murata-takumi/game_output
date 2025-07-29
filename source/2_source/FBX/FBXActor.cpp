@@ -126,9 +126,11 @@ FbxActor::Init(const wchar_t* filePath, const string name,
 
 			auto objsNearby = OcTree::Instance().Get(_colForGround);
 			auto collision = false;
+
 			for (auto& obj : objsNearby)
 			{
 				if (CollisionDetector::Instance().CheckContinuousCollisionDetection(
+					this,
 					obj->Collider(),
 					XMVectorSet(0, 1, 0, 0),
 					_fbxComp->_currentPosition,
@@ -184,28 +186,20 @@ FbxActor::Init(const wchar_t* filePath, const string name,
 
 		auto objsNearby = OcTree::Instance().Get(_colForGround);
 		auto collision = false;
+
 		for (auto& obj : objsNearby)
 		{
 			if (CollisionDetector::Instance().CheckContinuousCollisionDetection(
+				this,
 				obj->Collider(),
 				XMVectorSet(0, 1, 0, 0),
 				_fbxComp->_currentPosition,
 				-45.0f * GRAVITY_ACCERALATION
 			))
 			{
-				collision = true;
+				SetCanChangeAnim(true);
 				break;
 			}
-		}
-		if (collision)
-		{
-			auto a = 1;
-		}
-
-		//地面に着いたら別アニメーションに遷移できるようにする
-		if (GetOnGround())
-		{
-			SetCanChangeAnim(true);
 		}
 	};
 	auto fallEnd = [&]()
@@ -754,6 +748,15 @@ FbxActor::Update()
 
 		_colForGround->Update(_fbxComp->_shiftColMatrix * _fbxComp->_mappedMats[0]);
 
+		//地面の上にいなかったら落下処理
+		if (!GetOnGround() && !IsAnimationEqual(JUMP00))
+		{
+			_fbxComp->_translateVector.Y() -=
+				Dx12Wrapper::Instance().GetDeltaTime() * 45.0f * GRAVITY_ACCERALATION;
+			_fbxComp->_speed.Y() = -45.0f * GRAVITY_ACCERALATION;
+			SetAnimationNode(FALL);
+		}
+
 		//最初のフレームを無視したうえでアニメーションがループするよう設定
 		if (_isInLoop)
 		{
@@ -762,16 +765,7 @@ FbxActor::Update()
 		}
 
 		//アニメーションノードの更新
-		_crntNode->Update(_animTime);												
-
-		//地面の上にいなかったら落下処理
-		if (!GetOnGround() && !IsAnimationEqual(JUMP00))
-		{
-			_fbxComp->_translateVector.Y() -= 
-				Dx12Wrapper::Instance().GetDeltaTime() * 45.0f * GRAVITY_ACCERALATION;
-			_fbxComp->_speed.Y() = -45.0f * GRAVITY_ACCERALATION;
-			SetAnimationNode(FALL);
-		}
+		_crntNode->Update(_animTime);
 
 		//回転、平行移動
 		_fbxComp->_mappedMats[0] = XMMatrixRotationY(_rotY);
@@ -779,18 +773,12 @@ FbxActor::Update()
 			XMMatrixTranslationFromVector(_fbxComp->_translateVector);
 	}
 
-	//スケーリング、回転、平行移動成分を変換行列とボーン行列の積から取得し、回転要素を削除したうえで再度合成
-	XMVECTOR scale, trans, skew;													
-	XMMatrixDecompose(&scale, &skew, &trans, 
-		_invMats[COLLIDER_BONE] * _fbxComp->_mappedMats[COLLIDER_BONE + 1]);
-	skew = XMVectorZero();
-	_fbxComp->_shiftColMatrix = 
-		XMMatrixScalingFromVector(scale) * 
-		XMMatrixRotationQuaternion(skew) * 
-		XMMatrixTranslationFromVector(trans);
+	ImGuiManager::Instance().AddLabelAndFloat("CenterX", _fbxComp->Collider()->Center()->X());
+	ImGuiManager::Instance().AddLabelAndFloat("CenterY", _fbxComp->Collider()->Center()->Y());
+	ImGuiManager::Instance().AddLabelAndFloat("CenterZ", _fbxComp->Collider()->Center()->Z());
 
 	//経過時間を渡し、ボーン行列を取得
-	BoneTransform(_animTime);														
+	BoneTransform(_animTime);		
 	
 	//ブレンド行列or普通の行列をシェーダーに渡し、アニメーションを実行
 	if (_isInBlend)	copy(_blendMats.begin(), _blendMats.end(), _fbxComp->_mappedMats + 1);
@@ -864,6 +852,16 @@ FbxActor::OnKeyPressed(const Vector3& input)
 		0.0f
 	);
 	_currentFrontVec = XMVector3Normalize(_currentFrontVec);
+}
+
+/// <summary>
+/// 座標をずらす
+/// </summary>
+/// <param name="diff"></param>
+void 
+FbxActor::AdjustPos(const Vector3& diff)
+{
+	_fbxComp->_translateVector = diff;
 }
 
 /// <summary>

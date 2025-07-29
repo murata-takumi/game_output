@@ -26,6 +26,7 @@ public:
 
 	//連続的な衝突判定処理
 	bool CheckContinuousCollisionDetection(
+		IFbx* actor,
 		shared_ptr<ICollider> col, 
 		const Vector3& dir, 
 		const Vector3& currentPos,
@@ -36,7 +37,7 @@ public:
 	bool CheckColAndCol(shared_ptr<ICollider> col1, shared_ptr<ICollider> col2);
 
 	//OBBにベクトルが入っているか確認する関数
-	bool CheckColAndVec(
+	Vector3 CheckColAndVec(
 		shared_ptr<ICollider> col, 
 		const Vector3& startPos, 
 		const Vector3& endPos

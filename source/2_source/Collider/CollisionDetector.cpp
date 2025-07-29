@@ -52,10 +52,10 @@ CollisionDetector::GetLengthBetweenColAndPos(shared_ptr<ICollider> col, const Ve
 		return lenBetColAndPos;
 	}
 }
-
 /// <summary>
 /// 連続的な衝突判定処理
 /// </summary>
+/// <param name="actor">座標をズラす対象のアクター</param>
 /// <param name="col">衝突対象のOBB</param>
 /// <param name="dir">移動方向</param>
 /// <param name="pos">現在の座標</param>
@@ -63,17 +63,22 @@ CollisionDetector::GetLengthBetweenColAndPos(shared_ptr<ICollider> col, const Ve
 /// <returns>衝突するかどうか</returns>
 bool 
 CollisionDetector::CheckContinuousCollisionDetection(
+	IFbx* actor,
 	shared_ptr<ICollider> col, 
 	const Vector3& dir, 
 	const Vector3& currentPos, 
 	const float speed)
 {
 	//1フレーム後の座標を取得
-	Vector3 nextPos = currentPos + (dir * 3 * speed * Dx12Wrapper::Instance().GetDeltaTime());
+	Vector3 nextPos = currentPos + (dir * speed * Dx12Wrapper::Instance().GetDeltaTime());
+	//OBBと座標の差
+	Vector3 diffBetColAndVec = CheckColAndVec(col, currentPos, nextPos);
 
 	//現在と1フレーム後の座標のベクトルがOBBと交わる（=1フレーム後に衝突する）なら真
-	if (CheckColAndVec(col, currentPos, nextPos))
+	if (XMVector3Length(diffBetColAndVec).m128_f32[0] > 0.0f)
 	{
+		dynamic_cast<FbxActor*>(actor)->AdjustPos(diffBetColAndVec);
+
 		return true;
 	}
 
@@ -99,30 +104,19 @@ CollisionDetector::CheckColAndCol(shared_ptr<ICollider> col1, shared_ptr<ICollid
 /// <param name="startPos">線分の始点</param>
 /// <param name="endPos">線分の終点</param>
 /// <returns>入っているかどうか</returns>
-bool
+Vector3
 CollisionDetector::CheckColAndVec(shared_ptr<ICollider> col, const Vector3& startPos, const Vector3& endPos)
 {
-	//線分の中心を取得
-	Vector3 lineCenter = (startPos + endPos) / 2;
-	//線分の向きも取得
+	//線分の向き
 	Vector3 lineDir = endPos - startPos;
-	//線分の半分の長さ
-	float lineExtent = XMVector3Length(lineDir).m128_f32[0] * 0.5f;
-
-	//線分が短すぎた場合は点として扱う
-	if (lineExtent < FLT_EPSILON)
-	{
-		//単位ベクトル
-		lineDir = Vector3(1, 0, 0);
-		lineExtent = 0.0f;
-	}
-	else
-	{
-		lineDir = XMVector3Normalize(endPos - startPos);
-	}
-
+	Vector3 center = *col->Center();
 	//OBBと線分の中心の差分
-	Vector3 centerDiff = lineCenter - *col->Center();
+	Vector3 centerDiff = endPos - center;
+	Vector3 a = startPos - center;
+	//OBBと線分が交わる座標
+	Vector3 colPoint = XMVectorZero();
+
+	float dirLength = XMVector3Length(endPos - startPos).m128_f32[0];
 
 	if (col == dynamic_pointer_cast<BoxCollider>(col))
 	{
@@ -137,19 +131,28 @@ CollisionDetector::CheckColAndVec(shared_ptr<ICollider> col, const Vector3& star
 			//方向ベクトルの半分長
 			r0 = tempBox->HalfLength()[i];
 			//線分の方向ベクトルへの投影
-			r1 = lineExtent * abs(XMVector3Dot(lineDir, tempBox->DirectionVectors()[i]).m128_f32[0]);
+			r1 = abs(XMVector3Dot(lineDir, tempBox->DirectionVectors()[i]).m128_f32[0]);
 			if (r > r0 + r1)
 			{
-				return false;
+				return XMVectorZero();
 			}
+			else
+			{
+				colPoint[i] = r - r1;
+				if (i == 1)
+				{
+					colPoint[i] = r0;
+				}
+			}
+
 		}
 	}
 	else if(col == dynamic_pointer_cast<SphereCollider>(col))
 	{
-		return false;
+		return XMVectorZero();
 	}
 
-	return true;
+	return colPoint + *col->Center();
 }
 
 /// <summary>

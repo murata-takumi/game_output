@@ -152,6 +152,8 @@ public:
 	//キーが入力された時に呼び出す関数
 	void OnKeyPressed(const Vector3& input);
 
+	void AdjustPos(const Vector3& diff);
+
 	//操作開始時に実行する関数
 	void StartControll();				
 	//初期化関数
