@@ -4,6 +4,7 @@
 #include "Collider/BoxCollider.h"
 #include "Collider/CollisionDetector.h"
 #include "Collider/ICollider.h"
+#include "Collider/SphereCollider.h"
 #include "FBX/AssimpLoader.h"
 #include "FBX/FbxActor.h"
 #include "FBX/IFbx.h"
@@ -83,9 +84,9 @@ FbxActor::Init(const wchar_t* filePath, const string name,
 	}
 
 	//接地用当たり判定を作成
-	_colForGround = make_shared<BoxCollider>();
-	dynamic_pointer_cast<BoxCollider>(_colForGround)->Init(
-		Vector3(size.X() * 2, size.Y() * 2, size.Z() * 2), Vector3(0, 0, 0), this);
+	_colForGround = make_shared<SphereCollider>();
+	dynamic_pointer_cast<SphereCollider>(_colForGround)->Init(
+		size.Y() * 2, Vector3(0, 0, 0), this);
 	auto jumpStart = [&]()
 	{
 		//開始時間を少し後に設定
@@ -122,28 +123,6 @@ FbxActor::Init(const wchar_t* filePath, const string name,
 			{
 				//落下アニメーション
 				nextAnimName = FALL;
-			}
-
-			auto objsNearby = OcTree::Instance().Get(_colForGround);
-			auto collision = false;
-
-			for (auto& obj : objsNearby)
-			{
-				if (CollisionDetector::Instance().CheckContinuousCollisionDetection(
-					this,
-					obj->Collider(),
-					XMVectorSet(0, 1, 0, 0),
-					_fbxComp->_currentPosition,
-					-45.0f * GRAVITY_ACCERALATION
-				))
-				{
-					collision = true;
-					break;
-				}
-			}
-			if (collision)
-			{
-				auto a = 1;
 			}
 		}
 		if (animTime > TRANSITION_TIME)
@@ -184,22 +163,11 @@ FbxActor::Init(const wchar_t* filePath, const string name,
 			SetAnimationSpeed(-ANIM_SPEED);
 		}
 
-		auto objsNearby = OcTree::Instance().Get(_colForGround);
-		auto collision = false;
-
-		for (auto& obj : objsNearby)
+		//着地したらアニメーション切り替え
+		if (GetContinuousOnGround(XMVectorSet(0, 1, 0, 0),_fbxComp->_currentPosition,
+			-45.0f * GRAVITY_ACCERALATION))
 		{
-			if (CollisionDetector::Instance().CheckContinuousCollisionDetection(
-				this,
-				obj->Collider(),
-				XMVectorSet(0, 1, 0, 0),
-				_fbxComp->_currentPosition,
-				-45.0f * GRAVITY_ACCERALATION
-			))
-			{
-				SetCanChangeAnim(true);
-				break;
-			}
+			SetCanChangeAnim(true);
 		}
 	};
 	auto fallEnd = [&]()
@@ -328,6 +296,29 @@ FbxActor::SetAnimationNode(AnimEnum anim)
 	BlendAnimation(_crntNode->GetAnimEnum());
 	//現ノードの開始処理
 	_crntNode->StartAnimation();
+}
+
+/// <summary>
+/// 落下、ジャンプ時に着地しているか判定する関数
+/// </summary>
+/// <returns>着地しているか</returns>
+bool 
+FbxActor::GetContinuousOnGround(const Vector3& dir,	const Vector3& currentPos,
+	const float speed)
+{
+	auto objsNearby = OcTree::Instance().Get(_colForGround);
+	auto collision = false;
+
+	for (auto& obj : objsNearby)
+	{
+		if (CollisionDetector::Instance().CheckContinuousCollisionDetection(
+			this,obj->Collider(),dir,currentPos,speed))
+		{
+			return true;
+		}
+	}
+
+	return false;
 }
 
 /// <summary>

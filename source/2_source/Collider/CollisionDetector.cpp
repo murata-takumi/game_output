@@ -94,7 +94,7 @@ CollisionDetector::CheckContinuousCollisionDetection(
 bool
 CollisionDetector::CheckColAndCol(shared_ptr<ICollider> col1, shared_ptr<ICollider> col2)
 {
-	return CheckOBBIntersection(col1, col2) && CheckOBBIntersection(col2, col1);
+	return CheckOBBIntersection(col1, col2);
 }
 
 /// <summary>
@@ -215,36 +215,73 @@ CollisionDetector::CheckOBBIntersection(shared_ptr<ICollider> col1, shared_ptr<I
 	//双方のOBBの中心を結ぶベクトル
 	Vector3 vecBetCenter = center2 - center1;
 
-	if (col1 == dynamic_pointer_cast<BoxCollider>(col1) &&
-		col2 == dynamic_pointer_cast<BoxCollider>(col2))
+	//当たり判定が箱状の時
+	if (col1 == dynamic_pointer_cast<BoxCollider>(col1))
 	{
-		auto tempBox1 = dynamic_pointer_cast<BoxCollider>(col1);
-		auto tempBox2 = dynamic_pointer_cast<BoxCollider>(col2);
-
-		for (int i = 0; i < 3; i++)
+		if (col2 == dynamic_pointer_cast<BoxCollider>(col2))
 		{
-			//各方向ベクトルの分離軸への投影の和
-			float r = 0;
-			for (int j = 0; j < 3; j++)
+			auto tempBox1 = dynamic_pointer_cast<BoxCollider>(col1);
+			auto tempBox2 = dynamic_pointer_cast<BoxCollider>(col2);
+
+			for (int i = 0; i < 3; i++)
 			{
-				r += LenOnSeparateAxis(tempBox1->DirectionVectors()[i], 
-					tempBox2->DirectionVectors()[j] * tempBox2->HalfLength()[j]);
+				//各方向ベクトルの分離軸への投影の和
+				float r = 0;
+				for (int j = 0; j < 3; j++)
+				{
+					r += LenOnSeparateAxis(tempBox1->DirectionVectors()[i],
+						tempBox2->DirectionVectors()[j] * tempBox2->HalfLength()[j]);
+				}
+
+				//中心間ベクトルの分離軸への投影
+				float s = XMVector3Dot(vecBetCenter, tempBox1->DirectionVectors()[i]).m128_f32[0];
+
+				//比較して、中心間ベクトルの投影の方が大きければ衝突していない
+				if (fabs(s) > r + tempBox1->HalfLength()[i])
+				{
+					return false;
+				}
 			}
 
-			//中心間ベクトルの分離軸への投影
-			float s = XMVector3Dot(vecBetCenter, tempBox1->DirectionVectors()[i]).m128_f32[0];
+			return true;
+		}
+		else
+		{
+			return true;
+		}
+	}
+	//球状の時
+	else if (col1 == dynamic_pointer_cast<SphereCollider>(col1))
+	{
+		if (col2 == dynamic_pointer_cast<BoxCollider>(col2))
+		{
+			auto tempSphere = dynamic_pointer_cast<SphereCollider>(col1);
+			auto tempBox = dynamic_pointer_cast<BoxCollider>(col2);
+			auto distance = *col2->Center() - *tempSphere->Center();
 
-			//比較して、中心間ベクトルの投影の方が大きければ衝突していない
-			if (fabs(s) > r + tempBox1->HalfLength()[i])
+			float disInBox = 0.0f;
+			Vector3 normalizedDis = XMVector3Normalize(distance);
+			for (int i = 0; i < 3; i++)
+			{
+				disInBox += XMVector3Dot(normalizedDis,
+					tempBox->DirectionVectors()[i] * tempBox->HalfLength()[i]).m128_f32[0];
+			}
+
+			if (fabs(XMVector3Length(distance).m128_f32[0]) <= 
+				fabs(tempSphere->Radius()) + fabs(disInBox))
+			{
+				return true;
+			}
+			else
 			{
 				return false;
 			}
 		}
-
-		return true;
+		else
+		{
+			return true;
+		}		
 	}
-
-	return true;
 }
 
 /// <summary>

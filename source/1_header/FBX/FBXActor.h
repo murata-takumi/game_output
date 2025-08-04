@@ -21,7 +21,7 @@ class FbxActor : public IFbx
 	template<typename T>using ComPtr = ComPtr<T>;
 
 private:
-	//着地判定を検出するための当たり判定
+	//着地判定を行うオブジェクトを検出するための当たり判定
 	shared_ptr<ICollider> _colForGround;
 
 	//アニメーション実行用ノードの配列
@@ -80,13 +80,13 @@ private:
 	//前フレームの時間
 	LARGE_INTEGER _befFrameTime;									
 	//現フレームの時間
-	LARGE_INTEGER _currFrameTime;											
-
-	//ノード階層を読み込む関数
-	void ReadNodeHeirarchy(float animationTime,const aiNode* pNode, const XMMATRIX& parentTrans);
+	LARGE_INTEGER _currFrameTime;										
 
 	//aiAnimationからノード名が一致したaiNodeAnimを取り出す関数
 	const aiNodeAnim* FindNodeAnim(const aiAnimation* animation, const string nodeName);
+
+	//座標変換用バッファー・ビュー作成関数
+	HRESULT CreateTransformView()override;
 
 	//スケーリングアニメーションを補完する関数
 	XMMATRIX CalcInterpolatedScaling(float animationTime,const aiNodeAnim* nodeAnim);
@@ -100,16 +100,20 @@ private:
 	//回転アニメーションのキーを取り出す関数
 	int FindRotation(float animationTime,const aiNodeAnim* nodeAnim);		
 	//座標移動アニメーションのキーを取り出す関数
-	int FindPosition(float animationTime,const aiNodeAnim* nodeAnim);		
+	int FindPosition(float animationTime,const aiNodeAnim* nodeAnim);
+
+	//落下、ジャンプ時に着地しているか判定する関数
+	bool GetContinuousOnGround(const Vector3& dir,const Vector3& currentPos,
+		const float speed);
+
+	//ノード階層を読み込む関数
+	void ReadNodeHeirarchy(float animationTime, const aiNode* pNode, const XMMATRIX& parentTrans);
 
 	//アニメーション関連の初期化を行う関数
 	void InitAnimation();													
 
 	//モデルのアニメーション用行列を求める関数
-	void BoneTransform(float timeInTicks);									
-
-	//座標変換用バッファー・ビュー作成関数
-	HRESULT CreateTransformView()override;									
+	void BoneTransform(float timeInTicks);							
 public:	
 	//アクターが地面の上にいるか判別するためのコールバック
 	function<bool(const Vector3& vec)> _isOnGround;
