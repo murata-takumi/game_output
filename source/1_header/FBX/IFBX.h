@@ -15,6 +15,9 @@ class Mesh;
 class BoneInfo;
 class IFbx
 {
+protected:
+	//座標変換行列を作成
+	virtual HRESULT CreateTransformView() = 0;
 public:
 	//コンストラクタ
 	IFbx() = default;

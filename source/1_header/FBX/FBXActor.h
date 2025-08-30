@@ -39,10 +39,9 @@ private:
 	//アクターの座標系からワールド座標系に戻す転置行列
 	vector<XMMATRIX> _blendMats;			
 	vector<XMMATRIX> _invMats;	
-	vector<XMMATRIX> _finalTrans;
 
 	//アニメーションとその名前の連想配列
-	map<string, aiAnimation*> _anims;					
+	map<string, aiAnimation*> _anims;										
 
 	//現在再生しているアニメーション名
 	string _currentActorAnim;		
@@ -85,6 +84,9 @@ private:
 
 	//aiAnimationからノード名が一致したaiNodeAnimを取り出す関数
 	const aiNodeAnim* FindNodeAnim(const aiAnimation* animation, const string nodeName);
+
+	//座標変換用バッファー・ビュー作成関数
+	HRESULT CreateTransformView()override;
 
 	//スケーリングアニメーションを補完する関数
 	XMMATRIX CalcInterpolatedScaling(float animationTime,const aiNodeAnim* nodeAnim);

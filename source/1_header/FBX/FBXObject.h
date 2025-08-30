@@ -5,11 +5,7 @@
 /// FBXオブジェクト
 /// Actorとは違い動かない物
 /// </summary>
-class aiAnimation;
-class aiNode;
-class aiScene;
 class AssimpLoader;
-class BoneData;
 class BoxCollider;
 class Dx12Wrapper;
 class FbxComposition;
@@ -22,6 +18,9 @@ class FbxObject : public IFbx
 
 	friend ImGuiManager;
 private:
+	//座標変換バッファー・ビューを作成する関数
+	HRESULT CreateTransformView()override;
+
 	//FBXクラスの共通処理をまとめたインスタンス
 	shared_ptr<FbxComposition> _fbxComp;
 

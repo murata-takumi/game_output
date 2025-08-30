@@ -6,7 +6,6 @@
 #include "Collider/SphereCollider.h"
 #include "FBX/AssimpLoader.h"
 #include "FBX/FbxComposition.h"
-#include "FBX/IFbx.h"
 #include "Manager/ImGuiManager.h"
 #include "Wrapper/Dx12Wrapper.h"
 
@@ -363,122 +362,6 @@ FbxComposition::CreateSphereCollider(float radius, const Vector3& pos, IFbx* obj
 }
 
 /// <summary>
-/// オブジェクトの座標変換に用いられるヒープ・ビューを作成する関数
-/// </summary>
-/// <param name="buffLength">ワールド行列用バッファーの個数</param>
-/// <returns>作成できたかどうか</returns>
-HRESULT
-FbxComposition::CreateTransformView(int buffLength)
-{
-	HRESULT result = S_OK;
-
-	//ワールド行列用バッファーの作成
-	auto buffSize = sizeof(XMMATRIX) * buffLength;
-	buffSize = (buffSize + 0xff) & ~0xff;
-	auto resDesc = CD3DX12_RESOURCE_DESC::Buffer(buffSize);
-	result = Dx12Wrapper::Instance().Device()->CreateCommittedResource
-	(
-		&_uploadHeapProp,
-		D3D12_HEAP_FLAG_NONE,
-		&resDesc,
-		D3D12_RESOURCE_STATE_GENERIC_READ,
-		nullptr,
-		IID_PPV_ARGS(_transBuffer.ReleaseAndGetAddressOf())
-	);
-	if (FAILED(result)) {
-		assert(0);
-		return result;
-	}
-
-	//座標変換用行列の書き込み、初期座標に位置するようにする
-	result = _transBuffer->Map(0, nullptr, (void**)&(_mappedMats));
-	if (FAILED(result))
-	{
-		assert(0);
-		return result;
-	}
-	_mappedMats[0] = XMMatrixIdentity();
-	_mappedMats[0] *= XMMatrixTranslationFromVector(_translateVector);
-
-	// copy(_boneMats.begin(), _boneMats.end(), _mappedMats + 1);
-
-	//ディスクリプタヒープの作成
-	D3D12_DESCRIPTOR_HEAP_DESC transformDescHeapDesc = {};
-	transformDescHeapDesc.NumDescriptors = 1;
-	transformDescHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
-	transformDescHeapDesc.NodeMask = 0;
-	transformDescHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
-	result = Dx12Wrapper::Instance().Device()->CreateDescriptorHeap(&transformDescHeapDesc,
-		IID_PPV_ARGS(_transHeap.ReleaseAndGetAddressOf()));
-	if (FAILED(result)) {
-		assert(0);
-		return result;
-	}
-
-	//ビューの作成
-	D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc = {};
-	cbvDesc.BufferLocation = _transBuffer->GetGPUVirtualAddress();
-	cbvDesc.SizeInBytes = static_cast<UINT>(_transBuffer->GetDesc().Width);
-	Dx12Wrapper::Instance().Device()->CreateConstantBufferView(&cbvDesc,
-		_transHeap->GetCPUDescriptorHandleForHeapStart());
-
-	//当たり判定を初期化
-	_collider->Update(_mappedMats[0]);
-
-	return result;
-}
-
-/// <summary>
-/// 座標変換を行う行列を返す関数
-/// </summary>
-/// <returns>行列</returns>
-XMMATRIX*
-FbxComposition::MappedMats()
-{
-	return _mappedMats;
-}
-
-/// <summary>
-/// 移動用座標を返す関数
-/// </summary>
-/// <returns>移動用座標</returns>
-Vector3&
-FbxComposition::TransrateVector()
-{
-	return _translateVector;
-}
-
-/// <summary>
-/// オブジェクトの速度を返す
-/// </summary>
-/// <returns>速度</returns>
-Vector3&
-FbxComposition::Speed()
-{
-	return _speed;
-}
-
-/// <summary>
-/// ボーン名とインデックスを返す
-/// </summary>
-/// <returns>連想配列</returns>
-map<string, unsigned int> &
-FbxComposition::GetBoneMapping()
-{
-	return _boneMapping;
-}
-
-/// <summary>
-/// ボーン情報
-/// </summary>
-/// <returns>ボーン情報のベクトル</returns>
-vector<BoneInfo> &
-FbxComposition::GetBoneInfo()
-{
-	return _boneInfo;
-}
-
-/// <summary>
 /// 毎フレームの描画処理を実行する関数
 /// </summary>
 void
@@ -538,26 +421,6 @@ FbxComposition::Update()
 }
 
 /// <summary>
-/// シーンデータが持つアニメーションを返す関数
-/// </summary>
-/// <returns>アニメーション</returns>
-aiAnimation** 
-FbxComposition::Animations()const
-{
-	return _scene->mAnimations;
-}
-
-/// <summary>
-/// ルートノードを返す
-/// </summary>
-/// <returns>ルートノード</returns>
-aiNode* 
-FbxComposition::RootNode()const
-{
-	return _scene->mRootNode;
-}
-
-/// <summary>
 /// 当たり判定を返す
 /// </summary>
 /// <returns>当たり判定</returns>
@@ -598,13 +461,13 @@ FbxComposition::FootVec()const
 }
 
 /// <summary>
-/// アニメーション数を返す
+/// オブジェクトの速度を返す
 /// </summary>
-/// <returns>アニメーション数</returns>
-int 
-FbxComposition::AnimationNumber()const
+/// <returns>速度</returns>
+Vector3
+FbxComposition::Speed()const
 {
-	return _scene->mNumAnimations;
+	return _speed;
 }
 
 /// <summary>
