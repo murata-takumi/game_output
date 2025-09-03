@@ -106,6 +106,12 @@ PlayScene::SceneStart()
 			th.join();
 		}
 
+		while(!que.empty())
+		{
+			_actorAndObjs[que.front().first] = que.front().second;
+			que.pop();
+		}
+
 		//八分木ノードにオブジェクトを追加
 		if (!OcTree::Instance().AddObject(dynamic_pointer_cast<FbxObject>(
 			_actorAndObjs[GROUND_NAME])))
@@ -359,13 +365,19 @@ void
 PlayScene::InstantiateObject(
 	const wchar_t* path,string name, Vector3 size, Vector3 pos, ColliderType colType)
 {
-	auto f = [=]() {
+	auto f = [this,
+		path_copy = path,
+		name_copy = name,
+		size_copy = size,
+		pos_copy = pos,
+		colType_copy = colType](){
 		shared_ptr<IFbx> object;
 
 		object = make_shared<fbxType>();
-		object->Init(path, name, size, pos,colType);
+		object->Init(path_copy, name_copy, size_copy, pos_copy, colType_copy);
 
-		_actorAndObjs[name] = object;
+		std::pair<std::string, std::shared_ptr<IFbx>> newPair = { name_copy, object };
+		this->que.push(newPair);
 	};
 
 	//スレッドにアクターの作成処理を追加

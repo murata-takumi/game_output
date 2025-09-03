@@ -1,6 +1,8 @@
 #pragma once
 #include "Scene/IScene.h"
 
+#include <queue>
+
 /// <summary>
 /// ゲームシーンを管理するクラス
 /// </summary>
@@ -33,6 +35,8 @@ public:
 	void SceneStart() override;
 	//シーン終了時の処理
 	void SceneEnd() override;
+
+	queue<pair<string, shared_ptr<IFbx>>> que;
 
 protected:
 	//FbxObjectとFbxActorをまとめたベクトル
