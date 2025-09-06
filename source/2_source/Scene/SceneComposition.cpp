@@ -17,6 +17,36 @@ SceneComposition::Instance()
 }
 
 /// <summary>
+/// FPSのゲッター
+/// </summary>
+/// <returns>FPS</returns>
+double 
+SceneComposition::GetFps()const
+{
+	return _fps;
+}
+
+/// <summary>
+/// 入力を受け付けるかどうか
+/// </summary>
+/// <returns>入力状態を判定する真理値</returns>
+bool 
+SceneComposition::GetCanInput()const
+{
+	return _canInput;
+}
+
+/// <summary>
+/// 入力状態を設定する関数
+/// </summary>
+/// <param name="canInput">入力状態</param>
+void 
+SceneComposition::SetCanInput(bool canInput)
+{
+	_canInput = canInput;
+}
+
+/// <summary>
 /// シーンを変更する関数
 /// </summary>
 /// <param name="name">変更先のシーンの名前</param>
@@ -161,6 +191,26 @@ SceneComposition::FPSUpdate()
 
 	//前フレームの時間を更新
 	_beforeTime = _currentTime;
+}
+
+/// <summary>
+/// モデル描画を行う関数を設定する
+/// </summary>
+/// <param name="modelDraw">関数</param>
+void 
+SceneComposition::SetModelDraw(function<void()> modelDraw)
+{
+	_modelDraw = modelDraw;
+}
+
+/// <summary>
+/// エフェクト、UI描画を行う関数を設定する
+/// </summary>
+/// <param name="effectAndUiDraw">関数</param>
+void 
+SceneComposition::SetEffectAndUiDraw(function<void()> effectAndUiDraw)
+{
+	_effectAndUiDraw = effectAndUiDraw;
 }
 
 /// <summary>

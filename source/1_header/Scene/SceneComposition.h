@@ -15,26 +15,17 @@ class SceneComposition
 public:
 	static SceneComposition& Instance();
 
-	//モデルの描画を行う関数ラッパー
-	std::function<void()> _modelDraw;
-	//エフェクト、UIの描画を行う関数ラッパー
-	std::function<void()> _effectAndUiDraw;
-
 	//並列処理を行う時、リソースを排他制御する為の変数
 	mutex _mtx;
 
-	//ゲームの現在時間を格納する値
-	LARGE_INTEGER _currentTime;
-	//ゲームの直前の時間を格納する値
-	LARGE_INTEGER _updatedTime;
-	//ゲームの時間を一時保存しておくための値
-	LARGE_INTEGER _beforeTime;
+	//FPSのゲッター
+	double GetFps()const;
 
-	//1秒当たりに画面が切り替わる回数
-	double _fps;
+	//入力を受け付けるかどうか
+	bool GetCanInput()const;
 
-	//ロード中であることを示す真理値
-	bool _canInput;
+	//入力状態を設定する
+	void SetCanInput(bool canInput);
 
 	//シーン遷移する為の関数
 	void ChangeScene(SceneNames name);
@@ -51,6 +42,32 @@ public:
 	//フレームレートを更新する関数
 	void FPSUpdate();
 
+	//モデル描画を行う関数を設定する
+	void SetModelDraw(function<void()> modelDraw);
+
+	//エフェクト、UI描画を行う関数を設定する
+	void SetEffectAndUiDraw(function<void()> effectAndUiDraw);
+
 	//ラムダ式を受け取り並列処理を行う関数
 	void ParallelProcess(function<void(void)> func);
+
+private:
+	//モデルの描画を行う関数ラッパー
+	function<void()> _modelDraw;
+	//エフェクト、UIの描画を行う関数ラッパー
+	function<void()> _effectAndUiDraw;
+
+	//ゲームの現在時間を格納する値
+	LARGE_INTEGER _currentTime;
+	//ゲームの直前の時間を格納する値
+	LARGE_INTEGER _updatedTime;
+	//ゲームの時間を一時保存しておくための値
+	LARGE_INTEGER _beforeTime;
+
+	//1秒当たりに画面が切り替わる回数
+	double _fps;
+
+	//ロード中であることを示す真理値
+	bool _canInput;
+
 };

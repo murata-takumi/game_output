@@ -12,11 +12,12 @@ void
 TitleScene::SceneStart()
 {
 	//関数も上書き
-	SceneComposition::Instance()._effectAndUiDraw = std::bind(&TitleScene::EffectAndUIDraw, this);
-	SceneComposition::Instance()._modelDraw = std::bind(&TitleScene::ModelDraw, this);
+	SceneComposition::Instance().SetEffectAndUiDraw(std::bind(
+		&TitleScene::EffectAndUIDraw, this));
+	SceneComposition::Instance().SetModelDraw(std::bind(&TitleScene::ModelDraw, this));
 
 	//ロード完了
-	SceneComposition::Instance()._canInput = true;
+	SceneComposition::Instance().SetCanInput(true);
 
 	//フェードイン処理を並列処理
 	auto startFunc = [&]()
@@ -36,7 +37,7 @@ TitleScene::Update()
 	SceneComposition::Instance().InputUpdate();
 
 	if (InputManager::Instance().MouseTracker().leftButton ==
-		Mouse::ButtonStateTracker::PRESSED && SceneComposition::Instance()._canInput)
+		Mouse::ButtonStateTracker::PRESSED && SceneComposition::Instance().GetCanInput())
 	{
 		//開始ボタンの上で左クリック
 		if (SpriteManager::Instance().TitleIsOnStart())
@@ -57,7 +58,7 @@ TitleScene::Update()
 			SoundManager::Instance().CallSound(Sounds::BUTTON);
 
 			//操作不可にする
-			SceneComposition::Instance()._canInput = false;
+			SceneComposition::Instance().SetCanInput(false);
 
 			auto exitFunc = ([&]()
 				{

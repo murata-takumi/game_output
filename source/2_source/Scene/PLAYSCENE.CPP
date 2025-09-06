@@ -70,10 +70,9 @@ void
 PlayScene::SceneStart()
 {
 	//関数も上書き
-	SceneComposition::Instance()._effectAndUiDraw = std::bind(
-		&PlayScene::EffectAndUIDraw,
-		this);
-	SceneComposition::Instance()._modelDraw = std::bind(&PlayScene::ModelDraw, this);
+	SceneComposition::Instance().SetEffectAndUiDraw(std::bind(
+		&PlayScene::EffectAndUIDraw,this));
+	SceneComposition::Instance().SetModelDraw(std::bind(&PlayScene::ModelDraw, this));
 
 	//カメラ位置をリセット
 	Dx12Wrapper::Instance().ResetCoordinates(0,0);	
@@ -85,7 +84,7 @@ PlayScene::SceneStart()
 	auto f = [&]()
 	{
 		//ロード中だと示す
-		SceneComposition::Instance()._canInput = false;
+		SceneComposition::Instance().SetCanInput(false);
 
 		//スレッドに各オブジェクトの作成処理を追加
 		InstantiateObject<FbxActor>(
@@ -191,7 +190,7 @@ PlayScene::SceneStart()
 		ImGuiManager::Instance().SetActor(_actorAndObjs);
 
 		//ロード完了
-		SceneComposition::Instance()._canInput = true;
+		SceneComposition::Instance().SetCanInput(true);
 
 		//フェードイン処理を並列処理
 		auto startFunc = [&]()
@@ -217,7 +216,7 @@ PlayScene::Update()
 	SceneComposition::Instance().InputUpdate();
 
 	//操作可能な場合入力を反映する
-	if (SceneComposition::Instance()._canInput)
+	if (SceneComposition::Instance().GetCanInput())
 	{
 		//コインとアクターが接触したらコインを削除
 		//if (_actorAndObjs[COIN_NAME] && CheckColAndCol(*_actorAndObjs[COIN_NAME]->Collider(), *_actor->Collider()))
@@ -391,7 +390,7 @@ void
 PlayScene::ModelDraw()
 {
 	//プレイヤーが読み込み完了している場合IFbxクラスを基盤とするオブジェクト全般に対し描画・更新処理を行う
-	if (SceneComposition::Instance()._canInput)
+	if (SceneComposition::Instance().GetCanInput())
 	{
 		//トゥーンテクスチャも描画する
 		Renderer::Instance().Draw();
@@ -414,7 +413,7 @@ void
 PlayScene::EffectAndUIDraw()
 {
 	//ロード中の場合
-	if (!SceneComposition::Instance()._canInput)
+	if (!SceneComposition::Instance().GetCanInput())
 	{
 		//ロード画面を描画
 		SpriteManager::Instance().LoadingDraw();	
@@ -425,7 +424,7 @@ PlayScene::EffectAndUIDraw()
 		if (ImGuiManager::Instance().IsWriteGrid())SpriteManager::Instance().GridDraw(_actorAndObjs);
 
 		//SceneからImGuiにFPSを渡す
-		ImGuiManager::Instance().SetFPS(SceneComposition::Instance()._fps);
+		ImGuiManager::Instance().SetFPS(SceneComposition::Instance().GetFps());
 		//ImGuiのウィンドウを描画
 		ImGuiManager::Instance().ImGuiDraw();	
 	}
