@@ -263,8 +263,8 @@ CollisionDetector::CheckOBBIntersection(shared_ptr<ICollider> col1, shared_ptr<I
 			Vector3 normalizedDis = XMVector3Normalize(distance);
 			for (int i = 0; i < 3; i++)
 			{
-				disInBox += XMVector3Dot(normalizedDis,
-					tempBox->DirectionVectors()[i] * tempBox->HalfLength()[i]).m128_f32[0];
+				disInBox += LenOnSeparateAxis(normalizedDis,
+					tempBox->DirectionVectors()[i] * tempBox->HalfLength()[i]);
 			}
 
 			if (fabs(XMVector3Length(distance).m128_f32[0]) <= 
