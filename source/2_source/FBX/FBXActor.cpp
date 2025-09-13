@@ -189,26 +189,6 @@ FbxActor::Init(const wchar_t* filePath, const string name,
 	//ワールド行列の数は移動用+ボーン本数分
 	_fbxComp->CreateTransformView(1 + _boneMats.size());
 
-	//接地判定を行うラムダ式
-	_isOnGround = [&](const XMVECTOR& vec)
-	{
-		//アクターの近くにあるオブジェクトを取得し当たり判定をチェック
-		auto objsNearby = OcTree::Instance().Get(_colForGround);
-		auto ret = false;
-		for (auto& obj : objsNearby)
-		{
-			if (CollisionDetector::Instance().CheckColAndPoint(
-				obj->Collider(),
-				vec))
-			{
-				ret = true;
-				break;
-			}
-		}
-
-		return ret;
-	};
-
 	return S_OK;
 }
 

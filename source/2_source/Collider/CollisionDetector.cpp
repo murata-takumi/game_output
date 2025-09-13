@@ -127,7 +127,7 @@ CollisionDetector::CheckColAndVec(shared_ptr<ICollider> col, const Vector3& star
 		for (int i = 0; i < 3; i++)
 		{
 			//中心差分の投影
-			r = XMVector3Dot(centerDiff, tempBox->DirectionVectors()[i]).m128_f32[0];
+			r = abs(XMVector3Dot(centerDiff, tempBox->DirectionVectors()[i]).m128_f32[0]);
 			//方向ベクトルの半分長
 			r0 = tempBox->HalfLength()[i];
 			//線分の方向ベクトルへの投影
