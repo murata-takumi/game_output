@@ -36,9 +36,9 @@ public:
 	//シーン終了時の処理
 	void SceneEnd() override;
 
+protected:
 	queue<pair<string, shared_ptr<IFbx>>> que;
 
-protected:
 	//FbxObjectとFbxActorをまとめたベクトル
 	map<string, shared_ptr<IFbx>> _actorAndObjs;
 

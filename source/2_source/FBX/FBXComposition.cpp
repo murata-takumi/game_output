@@ -425,6 +425,8 @@ FbxComposition::CreateTransformView(int buffLength)
 	//当たり判定を初期化
 	_collider->Update(_mappedMats[0]);
 
+	_rejectBone = true;
+
 	return result;
 }
 
@@ -516,7 +518,14 @@ FbxComposition::Update()
 {
 	//当たり判定を上にずらす
 	//こう書かないと当たり判定の中心がオブジェクト下になってしまう
-	_collider->Update(_shiftColMatrix * _mappedMats[0]);
+	if (_rejectBone)
+	{
+		_collider->Update(_shiftColMatrix * _mappedMats[0]);
+	}
+	else
+	{
+		_collider->Update(_shiftColMatrix * _mappedMats[1] * _mappedMats[0]);
+	}
 
 	if (dynamic_pointer_cast<BoxCollider>(_collider))
 	{
