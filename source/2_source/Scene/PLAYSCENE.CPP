@@ -48,7 +48,7 @@ const Vector3 GROUND_INIT_POS = Vector3(0.0f, -1.0f, 0.0f);
 //コインの初期座標
 const Vector3 COIN_INIT_POS = Vector3(0.0f, 0.0f, 100.0f);
 //箱の初期座標
-//const Vector3 BOX_INIT_POS = Vector3(100.0f, -150.0f, 0.0f);
+//const Vector3 BOX_INIT_POS = Vector3(100.0f, 00.0f, 0.0f);
 const Vector3 BOX_INIT_POS = Vector3(500.0f, -500.0f, 0.0f);
 const Vector3 BOX_INIT_POS_1 = Vector3(-600.0f, 200.0f, -600.0f);
 const Vector3 BOX_INIT_POS_2 = Vector3(0.0f, -200.0f, 600.0f);
@@ -91,8 +91,8 @@ PlayScene::SceneStart()
 			ACTOR_PATH,ACTOR_NAME,ACTOR_COLL_SIZE,ACTOR_INIT_POS,ColliderType::Box);
 		InstantiateObject<FbxObject>(
 			GROUND_PATH,GROUND_NAME,GROUND_COLL_SIZE, GROUND_INIT_POS, ColliderType::Box);
-		InstantiateObject<FbxObject>(
-			COIN_PATH,COIN_NAME,COIN_COLL_SIZE,COIN_INIT_POS, ColliderType::Sphere);
+		//InstantiateObject<FbxObject>(
+		//	COIN_PATH,COIN_NAME,COIN_COLL_SIZE,COIN_INIT_POS, ColliderType::Sphere);
 		InstantiateObject<FbxObject>(
 			BOX_PATH,BOX_NAME,BOX_COLL_SIZE,BOX_INIT_POS,ColliderType::Box);
 		//InstantiateObject<FbxObject>(BOX_PATH,BOX_NAME_1,BOX_COLL_SIZE,BOX_INIT_POS_1);
@@ -117,11 +117,11 @@ PlayScene::SceneStart()
 		{
 			assert(0);
 		}
-		if (!OcTree::Instance().AddObject(dynamic_pointer_cast<FbxObject>(
-			_actorAndObjs[COIN_NAME])))
-		{
-			assert(0);
-		}
+		//if (!OcTree::Instance().AddObject(dynamic_pointer_cast<FbxObject>(
+		//	_actorAndObjs[COIN_NAME])))
+		//{
+		//	assert(0);
+		//}
 		if (!OcTree::Instance().AddObject(dynamic_pointer_cast<FbxObject>(
 			_actorAndObjs[BOX_NAME])))
 		{
@@ -143,46 +143,13 @@ PlayScene::SceneStart()
 		//オブジェクトの中からアクターを探す
 		for (const auto& object : _actorAndObjs)
 		{
-			if (_actor = dynamic_pointer_cast<FbxActor>(object.second))
-			{
-				//コールバックを設定
-				_actor->_isOnGround = [&](const XMVECTOR& vec)
-				{
-					//アクターの近くにあるオブジェクトを取得し当たり判定をチェック
-					auto objsNearby = OcTree::Instance().Get(_actor->GetColForGround());
-					auto ret = false;
-					for (auto& obj : objsNearby)
-					{
-						//if (CollisionDetector::Instance().GetLengthBetweenColAndPos(
-						//	*obj->Collider(),
-						//	XMVectorSet(0, 1, 0, 0),
-						//	vec
-						//) < 0.0f)
-						//if(CollisionDetector::Instance().CheckColAndVec(
-						//	*obj->Collider(), 
-						//	vec,
-						//	vec - XMVectorSet(0,85.0f,0,0)))
-						if (CollisionDetector::Instance().CheckColAndPoint(
-							obj->Collider(),
-							vec))
-						//if(CollisionDetector::Instance().CheckContinuousCollisionDetection(
-						//	obj->Collider(),
-						//	XMVectorSet(0,1,0,0),
-						//	vec,
-						//	-45.0f * 9.8f
-						//))
-						//if(CollisionDetector::Instance().CheckColAndVec(
-						//	*obj->Collider(),
-						//	vec) <= 0.0f
-						//)
-						{
-							ret = true;
-							break;
-						}
-					}
+			shared_ptr<FbxActor> actorPtr = dynamic_pointer_cast<FbxActor>(object.second);
 
-					return ret;
-				};
+			// キャストが成功したかを確認
+			if (actorPtr)
+			{
+				// 成功したら、_actorに代入してループを抜ける
+				_actor = actorPtr;
 				break;
 			}
 		}

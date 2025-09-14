@@ -61,10 +61,10 @@ BoxCollider::SetVec(const Vector3& vec)
 	//XZ平面に対し鉛直なベクトルをとり、それと正面ベクトルの外積を取り右ベクトルとする
 	auto vertical = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
 	_directionVecs[0] = XMVector3Normalize(XMVector3Cross(_directionVecs[2], vertical));
+	_directionVecs[0] *= -1.0f;
 
 	//正面ベクトル、右ベクトルの外積を上ベクトルとする
 	_directionVecs[1] = XMVector3Normalize(XMVector3Cross(_directionVecs[2], _directionVecs[0]));
-	_directionVecs[1] *= -1.0f;
 }
 
 /// <summary>

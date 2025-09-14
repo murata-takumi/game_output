@@ -106,7 +106,8 @@ FbxActor::Init(const wchar_t* filePath, const string name,
 		AnimEnum nextAnimName;
 		if (animTime > SELECT_NEXT_ANIM_TIME)
 		{
-			if (GetOnGround())
+			if (GetContinuousOnGround(XMVectorSet(0, 1, 0, 0), _fbxComp->CurrentPosition(),
+				-45.0f * GRAVITY_ACCERALATION))
 			{
 				//入力されているかどうかで遷移先のアニメーションを決める
 				if (XMVector3Length(_inputVec).m128_f32[0] > 0.0f)
@@ -188,6 +189,26 @@ FbxActor::Init(const wchar_t* filePath, const string name,
 
 	//ワールド行列の数は移動用+ボーン本数分
 	_fbxComp->CreateTransformView(1 + _boneMats.size());
+
+	//接地判定を行うラムダ式
+	_isOnGround = [&](const XMVECTOR& vec)
+	{
+		//アクターの近くにあるオブジェクトを取得し当たり判定をチェック
+		auto objsNearby = OcTree::Instance().Get(_colForGround);
+		auto ret = false;
+		for (auto& obj : objsNearby)
+		{
+			if (CollisionDetector::Instance().CheckColAndPoint(
+				obj->Collider(),
+				vec))
+			{
+				ret = true;
+				break;
+			}
+		}
+
+		return ret;
+	};
 
 	return S_OK;
 }
