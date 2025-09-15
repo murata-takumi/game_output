@@ -829,9 +829,7 @@ FbxActor::StartControll()
 	//アニメーション再生時間も初期化
 	_animTime = 0.0f;				
 	//真理値を設定
-	_canControll = true;			
-	//アニメーションを待機モーションに設定
-	SetAnimationNode(WAIT00);		
+	_canControll = true;	
 }
 
 /// <summary>
@@ -852,7 +850,11 @@ FbxActor::EndControll()
 	//真理値も初期化
 	_canControll = false;					
 	//ポーズも初期化
-	InitPose();											
+	InitPose();
+
+	//アニメーションを待機モーションに設定
+	_canChangeAnim = true;
+	SetAnimationNode(WAIT00);
 }
 
 /// <summary>

@@ -37,21 +37,28 @@ CollisionDetector::GetLengthBetweenColAndPos(shared_ptr<ICollider> col, const Ve
 		//座標とOBBの中心の差分
 		Vector3 diff = pos - *col->Center();
 		//差分のベクトルへの投影
-		float lenOnDir = abs(XMVector3Dot(diff, dir).m128_f32[0]);
+		float lenOnDiff = abs(XMVector3Dot(diff, dir).m128_f32[0]);
 
 		//OBBの方向ベクトルのベクトルへの投影の和を取得
-		float sumOfVecOnDir = 0.0f;
+		float sumOfLenOnDir = 0.0f;
 		for (int i = 0; i < 3; i++)
 		{
-			sumOfVecOnDir += tempBox->HalfLength()[i] * abs(XMVector3Dot(
+			sumOfLenOnDir += tempBox->HalfLength()[i] * abs(XMVector3Dot(
 				dir, tempBox->DirectionVectors()[i]).m128_f32[0]);
 		}
 
-		float lenBetColAndPos = lenOnDir - sumOfVecOnDir;
+		//OBB内の距離と差分の差
+		float lenBetColAndPos = lenOnDiff - sumOfLenOnDir;
 
 		return lenBetColAndPos;
 	}
+	else
+	{
+		//OBBでなかったら0を返す
+		return 0.0f;
+	}
 }
+
 /// <summary>
 /// 連続的な衝突判定処理
 /// </summary>
@@ -77,6 +84,7 @@ CollisionDetector::CheckContinuousCollisionDetection(
 	//現在と1フレーム後の座標のベクトルがOBBと交わる（=1フレーム後に衝突する）なら真
 	if (XMVector3Length(diffBetColAndVec).m128_f32[0] > 0.0f)
 	{
+		//アクターの座標を調整する
 		dynamic_cast<FbxActor*>(actor)->AdjustPos(diffBetColAndVec);
 
 		return true;
@@ -98,50 +106,47 @@ CollisionDetector::CheckColAndCol(shared_ptr<ICollider> col1, shared_ptr<ICollid
 }
 
 /// <summary>
-/// OBBに線分が入っているか確認する関数
+/// 当たり判定に線分が連続的に入っているか確認する関数
 /// </summary>
-/// <param name="col">OBB</param>
+/// <param name="col">当たり判定</param>
 /// <param name="startPos">線分の始点</param>
 /// <param name="endPos">線分の終点</param>
 /// <returns>入っているかどうか</returns>
 Vector3
 CollisionDetector::CheckColAndVec(shared_ptr<ICollider> col, const Vector3& startPos, const Vector3& endPos)
 {
-	//線分の向き
-	Vector3 lineDir = endPos - startPos;
-	Vector3 center = *col->Center();
+	//線分
+	Vector3 line = endPos - startPos;
 	//OBBと線分の中心の差分
-	Vector3 centerDiff = endPos - center;
-	Vector3 a = startPos - center;
+	Vector3 diffBetCenter = endPos - *col->Center();
 	//OBBと線分が交わる座標
 	Vector3 colPoint = XMVectorZero();
-
-	float dirLength = XMVector3Length(endPos - startPos).m128_f32[0];
 
 	if (col == dynamic_pointer_cast<BoxCollider>(col))
 	{
 		auto tempBox = dynamic_pointer_cast<BoxCollider>(col);
 
-		float r, r0, r1;
+		float lenOnDiffBetCenter, halfLen, lineLenOnDir;
 		//OBBの方向ベクトルに対し中心差分を投影し、半分長と線分の投影の和を比較して衝突判定
 		for (int i = 0; i < 3; i++)
 		{
 			//中心差分の投影
-			r = XMVector3Dot(centerDiff, tempBox->DirectionVectors()[i]).m128_f32[0];
+			lenOnDiffBetCenter = XMVector3Dot(diffBetCenter, tempBox->DirectionVectors()[i]).m128_f32[0];
 			//方向ベクトルの半分長
-			r0 = tempBox->HalfLength()[i];
+			halfLen = tempBox->HalfLength()[i];
 			//線分の方向ベクトルへの投影
-			r1 = abs(XMVector3Dot(lineDir, tempBox->DirectionVectors()[i]).m128_f32[0]);
-			if (abs(r) > r0 + r1)
+			lineLenOnDir = abs(XMVector3Dot(line, tempBox->DirectionVectors()[i]).m128_f32[0]);
+
+			if (abs(lenOnDiffBetCenter) > halfLen + lineLenOnDir)
 			{
 				return XMVectorZero();
 			}
 			else
 			{
-				colPoint[i] = r - r1;
+				colPoint[i] = lenOnDiffBetCenter - lineLenOnDir;
 				if (i == 1)
 				{
-					colPoint[i] = r0;
+					colPoint[i] = halfLen;
 				}
 			}
 
