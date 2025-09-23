@@ -33,7 +33,7 @@ public:
 		const float speed
 	);
 
-	//OBB同士の当たり判定を確認する関数
+	//Collider同士の当たり判定を確認する関数
 	bool CheckColAndCol(shared_ptr<ICollider> col1, shared_ptr<ICollider> col2);
 
 	//OBBにベクトルが入っているか確認する関数
@@ -47,8 +47,15 @@ public:
 	bool CheckColAndPoint(shared_ptr<ICollider> col, const Vector3& point);
 
 private:
-	//ループを回してOBB同士が接触しているか判断する
-	bool CheckOBBIntersection(shared_ptr<ICollider> col1, shared_ptr<ICollider> col2);
+	//矩形同士の当たり判定を確認する関数
+	bool CheckBoxAndBox(shared_ptr<ICollider> col1, shared_ptr<ICollider> col2, Vector3 vecBetCenter);
+
+	//球形同士の当たり判定を確認する関数
+	bool CheckSphereAndSphere(shared_ptr<ICollider> col1, shared_ptr<ICollider> col2, Vector3 vecBetCenter);
+
+	//矩形と球形の当たり判定を確認する関数
+	bool CheckBoxAndSphere(shared_ptr<ICollider> col1, shared_ptr<ICollider> col2, Vector3 vecBetCenter);
+
 
 	//分離軸に投影された線分の長さを取得する
 	float LenOnSeparateAxis(const Vector3& sep, const Vector3& dirVec);
