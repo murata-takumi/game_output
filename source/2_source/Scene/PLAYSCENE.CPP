@@ -48,7 +48,7 @@ const Vector3 GROUND_INIT_POS = Vector3(0.0f, -1.0f, 0.0f);
 //コインの初期座標
 const Vector3 COIN_INIT_POS = Vector3(0.0f, 0.0f, 100.0f);
 //箱の初期座標
-//const Vector3 BOX_INIT_POS = Vector3(100.0f, 00.0f, 0.0f);
+//const Vector3 BOX_INIT_POS = Vector3(200.0f, 00.0f, 0.0f);
 const Vector3 BOX_INIT_POS = Vector3(500.0f, -500.0f, 0.0f);
 const Vector3 BOX_INIT_POS_1 = Vector3(-600.0f, 200.0f, -600.0f);
 const Vector3 BOX_INIT_POS_2 = Vector3(0.0f, -200.0f, 600.0f);
@@ -105,40 +105,20 @@ PlayScene::SceneStart()
 			th.join();
 		}
 
+		//並列処理で追加したオブジェクトを本流に反映
 		while(!que.empty())
 		{
 			_actorAndObjs[que.front().first] = que.front().second;
+
+			//八分木ノードにオブジェクトを追加
+			if (dynamic_pointer_cast<FbxObject>(_actorAndObjs[que.front().first]))
+			{
+				OcTree::Instance().AddObject(dynamic_pointer_cast<FbxObject>(
+					_actorAndObjs[que.front().first]));
+			}
+
 			que.pop();
 		}
-
-		//八分木ノードにオブジェクトを追加
-		if (!OcTree::Instance().AddObject(dynamic_pointer_cast<FbxObject>(
-			_actorAndObjs[GROUND_NAME])))
-		{
-			assert(0);
-		}
-		//if (!OcTree::Instance().AddObject(dynamic_pointer_cast<FbxObject>(
-		//	_actorAndObjs[COIN_NAME])))
-		//{
-		//	assert(0);
-		//}
-		if (!OcTree::Instance().AddObject(dynamic_pointer_cast<FbxObject>(
-			_actorAndObjs[BOX_NAME])))
-		{
-			assert(0);
-		}
-		/*if (!OcTree::Instance().AddObject(dynamic_pointer_cast<FbxObject>(_actorAndObjs[BOX_NAME_1])))
-		{
-			assert(0);
-		}
-		if (!OcTree::Instance().AddObject(dynamic_pointer_cast<FbxObject>(_actorAndObjs[BOX_NAME_2])))
-		{
-			assert(0);
-		}
-		if (!OcTree::Instance().AddObject(dynamic_pointer_cast<FbxObject>(_actorAndObjs[BOX_NAME_3])))
-		{
-			assert(0);
-		}*/
 
 		//オブジェクトの中からアクターを探す
 		for (const auto& object : _actorAndObjs)
