@@ -142,4 +142,7 @@ private:
 
 	//当たり判定の更新からボーンの座標変換を排除するか
 	bool _rejectBone;	
+
+	//行列がゼロ行列か判定する
+	bool IsZeroMatrix(const XMMATRIX& mat);
 };

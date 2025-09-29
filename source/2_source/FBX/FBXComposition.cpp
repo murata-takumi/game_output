@@ -518,10 +518,7 @@ FbxComposition::Update()
 {
 	//当たり判定を上にずらす
 	//こう書かないと当たり判定の中心がオブジェクト下になってしまう
-	if (XMVector4Equal(_mappedMats[1].r[0], XMVectorZero()) &&
-		XMVector4Equal(_mappedMats[1].r[1], XMVectorZero()) &&
-		XMVector4Equal(_mappedMats[1].r[2], XMVectorZero()) &&
-		XMVector4Equal(_mappedMats[1].r[3], XMVectorZero()))
+	if (IsZeroMatrix(_mappedMats[1]))
 	{
 		_collider->Update(_shiftColMatrix * _mappedMats[0]);
 	}
@@ -637,4 +634,19 @@ void
 FbxComposition::SetRejectBone(bool val)
 {
 	_rejectBone = val;
+}
+
+/// <summary>
+/// 行列がゼロ行列か判定する関数
+/// </summary>
+/// <param name="mat">行列</param>
+/// <returns>ゼロ行列行列か</returns>
+bool 
+FbxComposition::IsZeroMatrix(const XMMATRIX& mat)
+{
+	 return 
+		 XMVector4Equal(mat.r[0], XMVectorZero()) &&	
+		 XMVector4Equal(mat.r[1], XMVectorZero()) &&
+		 XMVector4Equal(mat.r[2], XMVectorZero()) &&
+		 XMVector4Equal(mat.r[3], XMVectorZero());
 }
