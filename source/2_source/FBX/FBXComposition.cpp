@@ -518,7 +518,10 @@ FbxComposition::Update()
 {
 	//当たり判定を上にずらす
 	//こう書かないと当たり判定の中心がオブジェクト下になってしまう
-	if (_rejectBone)
+	if (XMVector4Equal(_mappedMats[1].r[0], XMVectorZero()) &&
+		XMVector4Equal(_mappedMats[1].r[1], XMVectorZero()) &&
+		XMVector4Equal(_mappedMats[1].r[2], XMVectorZero()) &&
+		XMVector4Equal(_mappedMats[1].r[3], XMVectorZero()))
 	{
 		_collider->Update(_shiftColMatrix * _mappedMats[0]);
 	}
