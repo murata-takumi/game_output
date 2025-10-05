@@ -86,7 +86,7 @@ FbxActor::Init(const wchar_t* filePath, const string name,
 	//接地用当たり判定を作成
 	_colForGround = make_shared<SphereCollider>();
 	dynamic_pointer_cast<SphereCollider>(_colForGround)->Init(
-		size.Y() * 2, Vector3(0, 0, 0), this);
+		10, Vector3(0, 0, 0), this);
 	auto jumpStart = [&]()
 	{
 		//開始時間を少し後に設定
@@ -101,7 +101,6 @@ FbxActor::Init(const wchar_t* filePath, const string name,
 	};
 	auto jumpUpdate = [&](float animTime)
 	{
-
 		//アニメーション時間が30秒の時点で足元に当たり判定があるかどうか判別
 		AnimEnum nextAnimName;
 		if (animTime > SELECT_NEXT_ANIM_TIME)
