@@ -177,13 +177,13 @@ ImGuiManager::ImGuiDraw()
 		//float値を表示
 		for (auto& pair : _labelAndFloats)
 		{
-			ImGui::DragFloat(pair.first, &pair.second);
+			ImGui::DragFloat(pair.first.c_str(), &pair.second);
 		}
 
 		//bool値を表示
 		for (auto& pair : _labelAndBools)
 		{
-			ImGui::Checkbox(pair.first, &pair.second);
+			ImGui::Checkbox(pair.first.c_str(), &pair.second);
 		}
 
 		ImGui::Text(dynamic_pointer_cast<FbxActor>(_actor)->GetCurentAnimStr().c_str());
@@ -361,9 +361,22 @@ ImGuiManager::ResetAnimStr()
 /// <param name="idx">インデックス</param>
 /// <param name="text">文字列</param>
 void
-ImGuiManager::AddText(int idx, const char* text)
+ImGuiManager::AddText(int idx, string text)
 {
 	_texts[idx] = text;
+}
+
+/// <summary>
+/// Vector3の各要素を追加する関数
+/// </summary>
+/// <param name="label">変数名</param>
+/// <param name="value">値</param>
+void 
+ImGuiManager::AddLabelAndVector3(string label, Vector3 value)
+{
+	AddLabelAndFloat(label + "_x", value.X());
+	AddLabelAndFloat(label + "_y", value.Y());
+	AddLabelAndFloat(label + "_z", value.Z());
 }
 
 /// <summary>
@@ -372,9 +385,9 @@ ImGuiManager::AddText(int idx, const char* text)
 /// <param name="label">変数名</param>
 /// <param name="value">値</param>
 void
-ImGuiManager::AddLabelAndFloat(const char* label, float value)
+ImGuiManager::AddLabelAndFloat(string label, float value)
 {
-	_labelAndFloats[label] = value;
+	_labelAndFloats[label.c_str()] = value;
 }
 
 /// <summary>
@@ -383,7 +396,7 @@ ImGuiManager::AddLabelAndFloat(const char* label, float value)
 /// <param name="label">変数名</param>
 /// <param name="value">値</param>
 void
-ImGuiManager::AddLabelAndBool(const char* label, bool value)
+ImGuiManager::AddLabelAndBool(string label, bool value)
 {
 	_labelAndBools[label] = value;
 }

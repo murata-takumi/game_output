@@ -192,9 +192,7 @@ FbxActor::Init(const wchar_t* filePath, const string name,
 	//接地判定を行うラムダ式
 	_isOnGround = [&](const XMVECTOR& vec)
 	{
-		auto sphere = make_shared<SphereCollider>();
-		dynamic_pointer_cast<SphereCollider>(sphere)->Init(
-			5, vec);
+		ImGuiManager::Instance().AddLabelAndVector3("ColForGround", *_colForGround->Center());
 
 		//アクターの近くにあるオブジェクトを取得し当たり判定をチェック
 		auto objsNearby = OcTree::Instance().Get(_colForGround);
@@ -203,14 +201,12 @@ FbxActor::Init(const wchar_t* filePath, const string name,
 		{
 			if (CollisionDetector::Instance().CheckColAndCol(
 				obj->Collider(),
-				sphere))
+				_colForGround))
 			{
 				auto halfHeight = dynamic_pointer_cast<BoxCollider>(obj->Collider())->HalfLength()[1];
 
 				auto a = CollisionDetector::Instance().CheckColAndVec(
 					obj->Collider(), *Collider()->Center(), _fbxComp->CurrentPosition()).Y() + 85;
-
-				ImGuiManager::Instance().AddLabelAndFloat("DiffY", a);
 
 				_fbxComp->TransrateVector().Y() = 
 					obj->Collider()->Center()->Y() + halfHeight;
@@ -715,7 +711,7 @@ FbxActor::Update()
 		auto diff = GetLIntDiff(_currFrameTime, _befFrameTime);
 		_animTime += static_cast<float>(diff) * GetAnimTickPerSpeed(_currentActorAnim) * _animSpeed;
 
-		_colForGround->Update(_fbxComp->MappedMats()[0]);
+		_colForGround->Update(_fbxComp->MappedMats()[1] * _fbxComp->MappedMats()[0]);
 
 		//地面の上にいなかったら落下処理
 		if (!GetOnGround() && !IsAnimationEqual(JUMP00))
@@ -742,10 +738,7 @@ FbxActor::Update()
 			XMMatrixTranslationFromVector(_fbxComp->TransrateVector());
 	}
 
-	ImGuiManager::Instance().AddLabelAndFloat("CenterX", _fbxComp->Collider()->Center()->X());
-	ImGuiManager::Instance().AddLabelAndFloat("CenterY", _fbxComp->Collider()->Center()->Y());
-	ImGuiManager::Instance().AddLabelAndFloat("CenterZ", _fbxComp->Collider()->Center()->Z());
-
+	ImGuiManager::Instance().AddLabelAndVector3("Center", *_fbxComp->Collider()->Center());
 	//経過時間を渡し、ボーン行列を取得
 	BoneTransform(_animTime);		
 	

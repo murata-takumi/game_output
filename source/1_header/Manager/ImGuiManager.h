@@ -13,7 +13,6 @@ class Vector3;
 class ImGuiManager
 {
 public:
-	string str;
 	//初期化関数
 	void Init(HWND hwnd);
 
@@ -36,13 +35,16 @@ public:
 	void ResetAnimStr();
 
 	//文字列を追加する関数
-	void AddText(int idx, const char* text);
+	void AddText(int idx, string text);
+
+	//Vector3を追加し、それぞれの要素を表示する関数
+	void AddLabelAndVector3(string label, Vector3 value);
 
 	//float型の数値を追加する関数
-	void AddLabelAndFloat(const char* label,float value);
+	void AddLabelAndFloat(string label,float value);
 
 	//bool型の値を追加する関数
-	void AddLabelAndBool(const char* label, bool value);
+	void AddLabelAndBool(string label, bool value);
 
 	bool _isCrossed;
 private:
@@ -61,10 +63,10 @@ private:
 	map<int,string> _texts;
 
 	//表示ラベルとfloat値
-	map<const char*, float> _labelAndFloats;
+	map<string, float> _labelAndFloats;
 
 	//表示ラベルとbool値
-	map<const char*, bool> _labelAndBools;
+	map<string, bool> _labelAndBools;
 
 	ComPtr<ID3D12DescriptorHeap> _heapForImgui;		//ImGui用ヒープ
 
