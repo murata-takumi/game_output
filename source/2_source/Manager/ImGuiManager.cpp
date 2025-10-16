@@ -398,7 +398,7 @@ ImGuiManager::AddLabelAndFloat(string label, float value)
 void
 ImGuiManager::AddLabelAndBool(string label, bool value)
 {
-	_labelAndBools[label] = value;
+	_labelAndBools[label.c_str()] = value;
 }
 
 /// <summary>

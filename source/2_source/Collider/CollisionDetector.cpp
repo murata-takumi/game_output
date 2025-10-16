@@ -7,6 +7,7 @@
 #include "FBX/FbxActor.h"
 #include "FBX/IFbx.h"
 #include "FBX/FbxObject.h"
+#include "Manager/ImGuiManager.h"
 #include "Wrapper/Dx12Wrapper.h"
 
 /// <summary>
@@ -104,8 +105,9 @@ CollisionDetector::CheckColAndCol(shared_ptr<ICollider> col1, shared_ptr<ICollid
 {
 	Vector3 vecBetCenter = *col2->Center() - *col1->Center();
 
-	return CheckBoxAndBox(col1, col2, vecBetCenter) || CheckBoxAndSphere(col1, col2, vecBetCenter) ||
-		CheckBoxAndSphere(col2, col1, vecBetCenter) || CheckSphereAndSphere(col1, col2, vecBetCenter);
+	return CheckBoxAndBox(col1, col2, vecBetCenter) || 
+		CheckBoxAndSphere(col2, col1, vecBetCenter) || 
+		CheckSphereAndSphere(col1, col2, vecBetCenter);
 }
 
 /// <summary>
@@ -286,32 +288,37 @@ CollisionDetector::CheckBoxAndSphere(shared_ptr<ICollider> col1, shared_ptr<ICol
 {
 	if (!dynamic_pointer_cast<BoxCollider>(col1) || !dynamic_pointer_cast<SphereCollider>(col2))
 	{
-		return false;
+		return CheckBoxAndSphere(col2, col1, vecBetCenter);
 	}
 
 	auto tempBox = dynamic_pointer_cast<BoxCollider>(col1);
 	auto tempSphere = dynamic_pointer_cast<SphereCollider>(col2);
-	auto distance = *col1->Center() - *tempSphere->Center();
+
+	auto dis = XMVector3Length(vecBetCenter).m128_f32[0];
+	ImGuiManager::Instance().AddLabelAndFloat("Distance", dis);
+	auto radius = tempSphere->Radius();
 
 	float disInBox = 0.0f;
-	Vector3 normalizedDis = XMVector3Normalize(distance);
+	Vector3 normalizedDis = XMVector3Normalize(vecBetCenter);
 	for (int i = 0; i < 3; i++)
 	{
 		disInBox += LenOnSeparateAxis(normalizedDis,
 			tempBox->DirectionVectors()[i] * tempBox->HalfLength()[i]);
 	}
+	ImGuiManager::Instance().AddLabelAndFloat("Box", disInBox);
 
-	if (fabs(XMVector3Length(distance).m128_f32[0]) <=
+	if (fabs(XMVector3Length(vecBetCenter).m128_f32[0]) <=
 		fabs(tempSphere->Radius()) + fabs(disInBox))
 	{
+		ImGuiManager::Instance().AddLabelAndBool("BoxAndSphere", true);
 		return true;
 	}
 	else
 	{
+		ImGuiManager::Instance().AddLabelAndBool("BoxAndSphere", false);
 		return false;
 	}
 }
-
 
 /// <summary>
 /// •ª—£²‚É‘Î‚µ“Š‰e‚³‚ê‚½ƒxƒNƒgƒ‹‚Ì‘å‚«‚³‚ğ‹‚ß‚éŠÖ”

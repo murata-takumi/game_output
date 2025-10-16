@@ -90,10 +90,10 @@ private:
 	SimpleMath::Vector3 _origin = SimpleMath::Vector3::Zero;				
 
 	//コンストラクタ
-	SpriteManager();
+	SpriteManager() = default;
 	SpriteManager(const SpriteManager&) = delete;
 	//デストラクタ
-	~SpriteManager();
+	~SpriteManager() = default;
 
 	//SpriteBatch用ルートシグネチャを作成する関数
 	HRESULT CreateSpriteRS();												
@@ -104,7 +104,7 @@ private:
 	XMVECTOR RightPosToLeftPos(const Vector3& rightPos);
 
 	//スプライト・文字列表示用オブジェクトを初期化する関数
-	void InitSpriteDevices();												
+	void InitSpriteDevices();
 
 	//当たり判定を描画する関数
 	void ColliderDraw(const shared_ptr<ICollider> collider);

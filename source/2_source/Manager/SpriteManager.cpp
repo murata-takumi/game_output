@@ -15,25 +15,6 @@ const int LOADING_WIDTH = 480;		//ロード画面で表示するアイコンの幅
 const int LOADING_HEIGHT = 270;		//ロード画面で表示するアイコンの高さ
 
 /// <summary>
-/// コンストラクタ
-/// </summary>
-/// <param name="dx12">Dx12Wrapperインスタンス</param>
-/// <param name="width">画面幅</param>
-/// <param name="height">画面高さ</param>
-SpriteManager::SpriteManager()
-{
-
-}
-
-/// <summary>
-/// デストラクタ
-/// </summary>
-SpriteManager::~SpriteManager()
-{
-
-}
-
-/// <summary>
 /// シングルトンを返す
 /// </summary>
 /// <returns>シングルトン</returns>
@@ -517,6 +498,11 @@ SpriteManager::GridDraw(const map<string, shared_ptr<IFbx>> actorAndObjs)
 	{
 		if (actor.second != nullptr)
 		{
+			if (dynamic_pointer_cast<FbxActor>(actor.second))
+			{
+				ColliderDraw(dynamic_pointer_cast<FbxActor>(actor.second)->GetColForGround());
+			}
+
 			ColliderDraw(actor.second->Collider());
 			//X軸のグリッドの描画
 			v1 = VertexPositionColor(RightPosToLeftPos(actor.second->CurrentPosition()), {1.0f,0.0f,0.0f,.10f});

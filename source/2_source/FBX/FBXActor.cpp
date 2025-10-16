@@ -12,6 +12,7 @@
 #include "FBX/FbxObject.h"
 #include "FBX/AnimNodes/AnimNode.h"
 #include "Manager/ImGuiManager.h"
+#include "Manager/SpriteManager.h"
 #include "OcTree/OcTree.h"
 #include "Wrapper/Dx12Wrapper.h"
 
@@ -86,7 +87,7 @@ FbxActor::Init(const wchar_t* filePath, const string name,
 	//接地用当たり判定を作成
 	_colForGround = make_shared<SphereCollider>();
 	dynamic_pointer_cast<SphereCollider>(_colForGround)->Init(
-		10, Vector3(0, 0, 0), this);
+		30, Vector3(0, 0, 0), this);
 	auto jumpStart = [&]()
 	{
 		//開始時間を少し後に設定
@@ -738,7 +739,6 @@ FbxActor::Update()
 			XMMatrixTranslationFromVector(_fbxComp->TransrateVector());
 	}
 
-	ImGuiManager::Instance().AddLabelAndVector3("Center", *_fbxComp->Collider()->Center());
 	//経過時間を渡し、ボーン行列を取得
 	BoneTransform(_animTime);		
 	

@@ -93,8 +93,8 @@ PlayScene::SceneStart()
 			GROUND_PATH,GROUND_NAME,GROUND_COLL_SIZE, GROUND_INIT_POS, ColliderType::Box);
 		//InstantiateObject<FbxObject>(
 		//	COIN_PATH,COIN_NAME,COIN_COLL_SIZE,COIN_INIT_POS, ColliderType::Sphere);
-		InstantiateObject<FbxObject>(
-			BOX_PATH,BOX_NAME,BOX_COLL_SIZE,BOX_INIT_POS,ColliderType::Box);
+		//InstantiateObject<FbxObject>(
+		//	BOX_PATH,BOX_NAME,BOX_COLL_SIZE,BOX_INIT_POS,ColliderType::Box);
 		//InstantiateObject<FbxObject>(BOX_PATH,BOX_NAME_1,BOX_COLL_SIZE,BOX_INIT_POS_1);
 		//InstantiateObject<FbxObject>(BOX_PATH,BOX_NAME_2,BOX_COLL_SIZE,BOX_INIT_POS_2);
 		//InstantiateObject<FbxObject>(BOX_PATH,BOX_NAME_3,BOX_COLL_SIZE,BOX_INIT_POS_3);
