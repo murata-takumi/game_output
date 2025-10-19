@@ -90,9 +90,6 @@ CollisionDetector::CheckContinuousCollisionDetection(
 	//現在と1フレーム後の座標のベクトルがOBBと交わる（=1フレーム後に衝突する）なら真
 	if (XMVector3Length(diffBetColAndVec).m128_f32[0] > 0.0f)
 	{
-		//アクターの座標を調整する
-		dynamic_cast<FbxActor*>(actor)->AdjustPos(diffBetColAndVec);
-
 		return true;
 	}
 

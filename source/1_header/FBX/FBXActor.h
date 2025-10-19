@@ -21,8 +21,11 @@ class FbxActor : public IFbx
 	template<typename T>using ComPtr = ComPtr<T>;
 
 private:
-	//着地判定を行うオブジェクトを検出するための当たり判定
-	shared_ptr<ICollider> _colForGround;
+	//着地判定を行うオブジェクトを検出するための当たり判定（走りモーション中）
+	shared_ptr<ICollider> _colOnGroundForRun;
+
+	//着地判定を行うオブジェクトを検出するための当たり判定（ジャンプ、落下モーション中）
+	shared_ptr<ICollider> _colOnGroundForJump;
 
 	//アニメーション実行用ノードの配列
 	unique_ptr<AnimNode> _animNodes[Length];

@@ -81,13 +81,16 @@ FbxActor::Init(const wchar_t* filePath, const string name,
 	}
 	else if(colType == ColliderType::Sphere)
 	{
-		_fbxComp->CreateSphereCollider(10.0f, Vector3(0, 0, 0), this);
+		_fbxComp->CreateSphereCollider(30.0f, Vector3(0, 0, 0), this);
 	}
 
 	//接地用当たり判定を作成
-	_colForGround = make_shared<SphereCollider>();
-	dynamic_pointer_cast<SphereCollider>(_colForGround)->Init(
+	_colOnGroundForRun = make_shared<SphereCollider>();
+	dynamic_pointer_cast<SphereCollider>(_colOnGroundForRun)->Init(
 		30, Vector3(0, 0, 0), this);
+	_colOnGroundForJump = make_shared<SphereCollider>();
+	dynamic_pointer_cast<SphereCollider>(_colOnGroundForJump)->Init(
+		100, Vector3(0, 0, 0), this);
 	auto jumpStart = [&]()
 	{
 		//開始時間を少し後に設定
@@ -193,16 +196,16 @@ FbxActor::Init(const wchar_t* filePath, const string name,
 	//接地判定を行うラムダ式
 	_isOnGround = [&](const XMVECTOR& vec)
 	{
-		ImGuiManager::Instance().AddLabelAndVector3("ColForGround", *_colForGround->Center());
+		ImGuiManager::Instance().AddLabelAndVector3("ColForGround", *_colOnGroundForRun->Center());
 
 		//アクターの近くにあるオブジェクトを取得し当たり判定をチェック
-		auto objsNearby = OcTree::Instance().Get(_colForGround);
+		auto objsNearby = OcTree::Instance().Get(_colOnGroundForRun);
 		auto ret = false;
 		for (auto& obj : objsNearby)
 		{
 			if (CollisionDetector::Instance().CheckColAndCol(
 				obj->Collider(),
-				_colForGround))
+				_colOnGroundForRun))
 			{
 				auto halfHeight = dynamic_pointer_cast<BoxCollider>(obj->Collider())->HalfLength()[1];
 
@@ -340,7 +343,7 @@ bool
 FbxActor::GetContinuousOnGround(const Vector3& dir,	const Vector3& currentPos,
 	const float speed)
 {
-	auto objsNearby = OcTree::Instance().Get(_colForGround);
+	auto objsNearby = OcTree::Instance().Get(_colOnGroundForJump);
 	auto collision = false;
 
 	for (auto& obj : objsNearby)
@@ -709,7 +712,8 @@ FbxActor::Update()
 		auto diff = GetLIntDiff(_currFrameTime, _befFrameTime);
 		_animTime += static_cast<float>(diff) * GetAnimTickPerSpeed(_currentActorAnim) * _animSpeed;
 
-		_colForGround->Update(_fbxComp->MappedMats()[1] * _fbxComp->MappedMats()[0]);
+		_colOnGroundForRun->Update(_fbxComp->MappedMats()[1] * _fbxComp->MappedMats()[0]);
+		_colOnGroundForJump->Update(_fbxComp->MappedMats()[1] * _fbxComp->MappedMats()[0]);
 
 		//地面の上にいなかったら落下処理
 		if (!GetOnGround() && !IsAnimationEqual(JUMP00))
@@ -1049,7 +1053,7 @@ FbxActor::Collider()
 shared_ptr<ICollider>
 FbxActor::GetColForGround()const
 {
-	return _colForGround;
+	return _colOnGroundForRun;
 }
 
 /// <summary>
