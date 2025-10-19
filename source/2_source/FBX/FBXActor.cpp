@@ -206,9 +206,6 @@ FbxActor::Init(const wchar_t* filePath, const string name,
 			{
 				auto halfHeight = dynamic_pointer_cast<BoxCollider>(obj->Collider())->HalfLength()[1];
 
-				auto a = CollisionDetector::Instance().CheckColAndVec(
-					obj->Collider(), *Collider()->Center(), _fbxComp->CurrentPosition()).Y() + 85;
-
 				_fbxComp->TransrateVector().Y() = 
 					obj->Collider()->Center()->Y() + halfHeight;
 

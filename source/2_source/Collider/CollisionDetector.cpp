@@ -25,27 +25,31 @@ CollisionDetector::Instance()
 /// OBBと座標の間の距離を返す関数
 /// </summary>
 /// <param name="col">OBB</param>
-/// <param name="dir">投影するベクトル</param>
 /// <param name="pos">座標</param>
 /// <returns>距離</returns>
 float 
-CollisionDetector::GetLengthBetweenColAndPos(shared_ptr<ICollider> col, const Vector3& dir, const Vector3& pos)
+CollisionDetector::GetLengthBetweenColAndPos(shared_ptr<ICollider> col, const Vector3& pos)
 {
+	//座標とOBBの中心の差分
+	Vector3 diff = pos - *col->Center();
+
+	//差分の距離
+	float lenOnDiff = XMVector3Length(diff).m128_f32[0];
+
 	if(col == dynamic_pointer_cast<BoxCollider>(col))
 	{
 		auto tempBox = dynamic_pointer_cast<BoxCollider>(col);
-
-		//座標とOBBの中心の差分
-		Vector3 diff = pos - *col->Center();
-		//差分のベクトルへの投影
-		float lenOnDiff = abs(XMVector3Dot(diff, dir).m128_f32[0]);
 
 		//OBBの方向ベクトルのベクトルへの投影の和を取得
 		float sumOfLenOnDir = 0.0f;
 		for (int i = 0; i < 3; i++)
 		{
-			sumOfLenOnDir += tempBox->HalfLength()[i] * abs(XMVector3Dot(
-				dir, tempBox->DirectionVectors()[i]).m128_f32[0]);
+			float s = fabs(XMVector3Dot(diff, tempBox->DirectionVectors()[i]).m128_f32[0]) / tempBox->HalfLength()[i];
+
+			if (s > 1)
+			{
+				sumOfLenOnDir += (1 - s) * tempBox->HalfLength()[i];
+			}
 		}
 
 		//OBB内の距離と差分の差
@@ -55,8 +59,9 @@ CollisionDetector::GetLengthBetweenColAndPos(shared_ptr<ICollider> col, const Ve
 	}
 	else
 	{
-		//OBBでなかったら0を返す
-		return 0.0f;
+		auto tempSphere = dynamic_pointer_cast<SphereCollider>(col);
+
+		return lenOnDiff - tempSphere->Radius();
 	}
 }
 
@@ -166,50 +171,6 @@ CollisionDetector::CheckColAndVec(shared_ptr<ICollider> col, const Vector3& star
 }
 
 /// <summary>
-/// OBBに座標が入り込んでいるか確認する関数
-/// </summary>
-/// <param name="col">対象のOBB</param>
-/// <param name="point">座標</param>
-/// <returns>入り込んでいるかどうか</returns>
-bool
-CollisionDetector::CheckColAndPoint(shared_ptr<ICollider> col, const Vector3& point)
-{
-	//座標とOBBの中心を結ぶベクトルを取得
-	auto vecBetcolAndPoint = *col->Center() - point;
-
-	//方向ベクトルからはみ出ているベクトル
-	Vector3 vec = XMVectorSet(0, 0, 0, 0);
-
-	if (col == dynamic_pointer_cast<BoxCollider>(col))
-	{
-		auto tempBox = dynamic_pointer_cast<BoxCollider>(col);
-
-		for (int i = 0; i < 3; i++)
-		{
-			//方向ベクトルに対する比率を取得し、絶対値が1より大きければ距離に加算
-			float s = XMVector3Dot(
-				vecBetcolAndPoint, 
-				tempBox->DirectionVectors()[i]).m128_f32[0] / tempBox->HalfLength()[i];
-			if (fabs(s) > 1)
-			{
-				vec += (1 - fabs(s)) * tempBox->HalfLength()[i] * 
-					tempBox->DirectionVectors()[i];
-			}
-		}
-
-		//距離が0以下だったらOBBの中に座標が入り込んでいる
-		if (XMVector3Length(vec).m128_f32[0] <= 0)
-		{
-			return true;
-		}
-
-		return false;
-	}
-
-	return false;
-}
-
-/// <summary>
 /// 矩形同士の当たり判定を確認する関数
 /// </summary>
 /// <param name="col1">当たり判定その1</param>
@@ -295,27 +256,16 @@ CollisionDetector::CheckBoxAndSphere(shared_ptr<ICollider> col1, shared_ptr<ICol
 	auto tempSphere = dynamic_pointer_cast<SphereCollider>(col2);
 
 	auto dis = XMVector3Length(vecBetCenter).m128_f32[0];
-	ImGuiManager::Instance().AddLabelAndFloat("Distance", dis);
 	auto radius = tempSphere->Radius();
 
-	float disInBox = 0.0f;
-	Vector3 normalizedDis = XMVector3Normalize(vecBetCenter);
-	for (int i = 0; i < 3; i++)
-	{
-		disInBox += LenOnSeparateAxis(normalizedDis,
-			tempBox->DirectionVectors()[i] * tempBox->HalfLength()[i]);
-	}
-	ImGuiManager::Instance().AddLabelAndFloat("Box", disInBox);
+	float disInBox = GetLengthBetweenColAndPos(tempBox, *tempSphere->Center());
 
-	if (fabs(XMVector3Length(vecBetCenter).m128_f32[0]) <=
-		fabs(tempSphere->Radius()) + fabs(disInBox))
+	if (fabs(disInBox) - fabs(dis) <= fabs(tempSphere->Radius()))
 	{
-		ImGuiManager::Instance().AddLabelAndBool("BoxAndSphere", true);
 		return true;
 	}
 	else
 	{
-		ImGuiManager::Instance().AddLabelAndBool("BoxAndSphere", false);
 		return false;
 	}
 }

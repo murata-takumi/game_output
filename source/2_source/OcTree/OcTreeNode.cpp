@@ -36,7 +36,7 @@ bool
 OcTreeNode::AddObject(const shared_ptr<IFbx> obj)
 {
 	//‹óŠÔ“à‚É“ü‚Á‚Ä‚È‚©‚Á‚½‚çˆ—’†’f
-	if (!CollisionDetector::Instance().CheckColAndPoint(_col, obj.get()->CurrentPosition()))
+	if (!CollisionDetector::Instance().GetLengthBetweenColAndPos(_col, obj.get()->CurrentPosition()) <= 0.0f)
 	{
 		return false;
 	}

@@ -240,7 +240,7 @@ SpriteManager::ColliderDraw(const shared_ptr<ICollider> collider)
 	else if (dynamic_pointer_cast<SphereCollider>(collider))
 	{
 		auto radius = dynamic_pointer_cast<SphereCollider>(collider)->Radius();
-		auto primitive = GeometricPrimitive::CreateSphere(radius, 8);
+		auto primitive = GeometricPrimitive::CreateSphere(radius * 2, 8);
 		primitive->Draw(Dx12Wrapper::Instance().CommandList());
 	}
 
