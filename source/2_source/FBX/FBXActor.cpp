@@ -196,7 +196,11 @@ FbxActor::Init(const wchar_t* filePath, const string name,
 	//接地判定を行うラムダ式
 	_isOnGround = [&](const XMVECTOR& vec)
 	{
-		ImGuiManager::Instance().AddLabelAndVector3("ColForGround", *_colOnGroundForRun->Center());
+		float heightDiff = 0.0f;
+		if (!IsAnimationEqual(JUMP00))
+		{
+			heightDiff = _fbxComp->MappedMats()[1].r[3].m128_f32[1];
+		}
 
 		//アクターの近くにあるオブジェクトを取得し当たり判定をチェック
 		auto objsNearby = OcTree::Instance().Get(_colOnGroundForRun);
@@ -210,7 +214,7 @@ FbxActor::Init(const wchar_t* filePath, const string name,
 				auto halfHeight = dynamic_pointer_cast<BoxCollider>(obj->Collider())->HalfLength()[1];
 
 				_fbxComp->TransrateVector().Y() = 
-					obj->Collider()->Center()->Y() + halfHeight;
+					obj->Collider()->Center()->Y() + halfHeight - heightDiff;
 
 				ret = true;
 				break;
