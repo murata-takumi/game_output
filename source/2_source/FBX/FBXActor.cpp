@@ -207,13 +207,13 @@ FbxActor::Init(const wchar_t* filePath, const string name,
 		auto ret = false;
 		for (auto& obj : objsNearby)
 		{
-			if (CollisionDetector::Instance().CheckColAndCol(
+			if (CollisionDetector::Instance().CheckColAndVec(
 				obj->Collider(),
-				_colOnGroundForRun))
+				*_fbxComp->Collider()->Center(), _fbxComp->CurrentPosition() - Vector3(0, 75.0f, 0)))
 			{
 				auto halfHeight = dynamic_pointer_cast<BoxCollider>(obj->Collider())->HalfLength()[1];
 
-				_fbxComp->TransrateVector().Y() = 
+				_fbxComp->TransrateVector().Y() =
 					obj->Collider()->Center()->Y() + halfHeight - heightDiff;
 
 				ret = true;
@@ -777,32 +777,35 @@ FbxActor::OnKeyPressed(const Vector3& input)
 	//入力ベクトルを更新
 	_inputVec = input;
 
-	//座標に入力に応じたベクトルを加算
-	_fbxComp->TransrateVector() +=
-		input * Dx12Wrapper::Instance().GetDeltaTime() * MOVE_SPEED;
-
 	_fbxComp->Speed().X() = input.X() * MOVE_SPEED;
 	_fbxComp->Speed().Z() = input.Z() * MOVE_SPEED;
 
 	float speed = std::sqrt(
-		std::pow(_fbxComp->Speed().X(),2) + 
+		std::pow(_fbxComp->Speed().X(), 2) +
 		std::pow(_fbxComp->Speed().Y(), 2) +
 		std::pow(_fbxComp->Speed().Z(), 2));
 
+	ImGuiManager::Instance().AddLabelAndVector3("FrontVec", _currentFrontVec);
+
 	//当たり判定をチェックし、正面にオブジェクトが存在しなかったら移動処理
-	//auto collision = false;
-	//auto objsNearby = OcTree::Instance().Get(_fbxComp->Collider());
-	//for (auto& obj : objsNearby)
-	//{
-	//	//if (CollisionDetector::Instance().CheckColAndPoint(
-	//	//	obj->Collider(), _fbxComp->FrontVec()))
-	//	if(CollisionDetector::Instance().CheckContinuousCollisionDetection(
-	//		this, obj->Collider(), _currentFrontVec, _fbxComp->FrontVec(), speed))
-	//	{
-	//		collision = true;
-	//		break;
-	//	}
-	//}
+	auto collision = GetContinuousOnGround(_currentFrontVec, _fbxComp->FrontVec(), speed);
+	auto objsNearby = OcTree::Instance().Get(_fbxComp->Collider());
+	for (auto& obj : objsNearby)
+	{
+		if(CollisionDetector::Instance().CheckContinuousCollisionDetection(
+			this, obj->Collider(), _currentFrontVec, _fbxComp->FrontVec(), speed))
+		{
+			collision = true;
+			break;
+		}
+	}
+
+	if (!collision)
+	{
+		//座標に入力に応じたベクトルを加算
+		_fbxComp->TransrateVector() +=
+			input * Dx12Wrapper::Instance().GetDeltaTime() * MOVE_SPEED;
+	}
 
 	//入力ベクトルと正面ベクトルの角度差を取得
 	auto diff = XMVector3AngleBetweenVectors(input, _currentFrontVec).m128_f32[0];

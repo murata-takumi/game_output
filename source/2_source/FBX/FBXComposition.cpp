@@ -400,8 +400,6 @@ FbxComposition::CreateTransformView(int buffLength)
 	_mappedMats[0] = XMMatrixIdentity();
 	_mappedMats[0] *= XMMatrixTranslationFromVector(_translateVector);
 
-	// copy(_boneMats.begin(), _boneMats.end(), _mappedMats + 1);
-
 	//ディスクリプタヒープの作成
 	D3D12_DESCRIPTOR_HEAP_DESC transformDescHeapDesc = {};
 	transformDescHeapDesc.NumDescriptors = 1;

@@ -50,7 +50,7 @@ const Vector3 COIN_INIT_POS = Vector3(0.0f, 0.0f, 100.0f);
 //箱の初期座標
 //const Vector3 BOX_INIT_POS = Vector3(200.0f, 00.0f, 0.0f);
 const Vector3 BOX_INIT_POS = Vector3(500.0f, -500.0f, 0.0f);
-const Vector3 BOX_INIT_POS_1 = Vector3(-600.0f, 200.0f, -600.0f);
+const Vector3 BOX_INIT_POS_1 = Vector3(-200.0f, 00.0f, 0.0f);
 const Vector3 BOX_INIT_POS_2 = Vector3(0.0f, -200.0f, 600.0f);
 const Vector3 BOX_INIT_POS_3 = Vector3(0.0f, -200.0f, -600.0f);
 
@@ -93,9 +93,9 @@ PlayScene::SceneStart()
 			GROUND_PATH,GROUND_NAME,GROUND_COLL_SIZE, GROUND_INIT_POS, ColliderType::Box);
 		//InstantiateObject<FbxObject>(
 		//	COIN_PATH,COIN_NAME,COIN_COLL_SIZE,COIN_INIT_POS, ColliderType::Sphere);
-		//InstantiateObject<FbxObject>(
-		//	BOX_PATH,BOX_NAME,BOX_COLL_SIZE,BOX_INIT_POS,ColliderType::Box);
-		//InstantiateObject<FbxObject>(BOX_PATH,BOX_NAME_1,BOX_COLL_SIZE,BOX_INIT_POS_1);
+		InstantiateObject<FbxObject>(
+			BOX_PATH,BOX_NAME,BOX_COLL_SIZE,BOX_INIT_POS,ColliderType::Box);
+		InstantiateObject<FbxObject>(BOX_PATH,BOX_NAME_1,BOX_COLL_SIZE,BOX_INIT_POS_1);
 		//InstantiateObject<FbxObject>(BOX_PATH,BOX_NAME_2,BOX_COLL_SIZE,BOX_INIT_POS_2);
 		//InstantiateObject<FbxObject>(BOX_PATH,BOX_NAME_3,BOX_COLL_SIZE,BOX_INIT_POS_3);
 
@@ -165,14 +165,6 @@ PlayScene::Update()
 	//操作可能な場合入力を反映する
 	if (SceneComposition::Instance().GetCanInput())
 	{
-		//コインとアクターが接触したらコインを削除
-		//if (_actorAndObjs[COIN_NAME] && CheckColAndCol(*_actorAndObjs[COIN_NAME]->Collider(), *_actor->Collider()))
-		//{
-		//	_actorAndObjs.erase(COIN_NAME);
-
-		//	SoundManager::Instance().CallSound(Sounds::COIN);
-		//}
-
 		//WASDキーの入力に応じて視点を移動させる
 		//注視点を中心に視点を回転
 		if (InputManager::Instance().KeyState().A)

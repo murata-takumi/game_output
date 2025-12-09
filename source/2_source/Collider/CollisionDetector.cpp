@@ -85,7 +85,7 @@ CollisionDetector::CheckContinuousCollisionDetection(
 	//1フレーム後の座標を取得
 	Vector3 nextPos = currentPos + (dir * speed * Dx12Wrapper::Instance().GetDeltaTime());
 	//OBBと座標の差
-	Vector3 diffBetColAndVec = CheckColAndVec(col, currentPos, nextPos);
+	Vector3 diffBetColAndVec = GetDiffBetweenColAndVec(col, currentPos, nextPos);
 
 	//現在と1フレーム後の座標のベクトルがOBBと交わる（=1フレーム後に衝突する）なら真
 	if (XMVector3Length(diffBetColAndVec).m128_f32[0] > 0.0f)
@@ -119,8 +119,56 @@ CollisionDetector::CheckColAndCol(shared_ptr<ICollider> col1, shared_ptr<ICollid
 /// <param name="startPos">線分の始点</param>
 /// <param name="endPos">線分の終点</param>
 /// <returns>入っているかどうか</returns>
+bool 
+CollisionDetector::CheckColAndVec(
+	shared_ptr<ICollider> col,
+	const Vector3& startPos,
+	const Vector3& endPos)
+{
+	//線分
+	Vector3 line = endPos - startPos;
+	//OBBの中心と線分の終端の差分
+	Vector3 diffBetCenterAndEnd = endPos - *col->Center();
+
+	if (col == dynamic_pointer_cast<BoxCollider>(col))
+	{
+		auto tempBox = dynamic_pointer_cast<BoxCollider>(col);
+
+		float diffBetCenterAndEndLenOnDir, halfLen, lineLenOnDir;
+
+		//OBBの方向ベクトルに対し差分を投影し、半分長と線分の投影の和を比較して衝突判定
+		for (int i = 0; i < 3; i++)
+		{
+			//中心差分の投影
+			diffBetCenterAndEndLenOnDir = abs(XMVector3Dot(diffBetCenterAndEnd, tempBox->DirectionVectors()[i]).m128_f32[0]);
+			//線分の方向ベクトルへの投影
+			lineLenOnDir = abs(XMVector3Dot(line, tempBox->DirectionVectors()[i]).m128_f32[0]);
+			//方向ベクトルの半分長
+			halfLen = tempBox->HalfLength()[i];
+
+			if (diffBetCenterAndEndLenOnDir > halfLen + lineLenOnDir)
+			{
+				return false;
+			}
+		}
+	}
+	else if (col == dynamic_pointer_cast<SphereCollider>(col))
+	{
+		return false;
+	}
+
+	return true;
+}
+
+/// <summary>
+/// 当たり判定に線分が入っているか確認する関数
+/// </summary>
+/// <param name="col">当たり判定</param>
+/// <param name="startPos">線分の始点</param>
+/// <param name="endPos">線分の終点</param>
+/// <returns>入っているかどうか</returns>
 Vector3
-CollisionDetector::CheckColAndVec(shared_ptr<ICollider> col, const Vector3& startPos, const Vector3& endPos)
+CollisionDetector::GetDiffBetweenColAndVec(shared_ptr<ICollider> col, const Vector3& startPos, const Vector3& endPos)
 {
 	//線分
 	Vector3 line = endPos - startPos;
@@ -244,8 +292,13 @@ CollisionDetector::CheckSphereAndSphere(shared_ptr<ICollider> col1, shared_ptr<I
 bool
 CollisionDetector::CheckBoxAndSphere(shared_ptr<ICollider> col1, shared_ptr<ICollider> col2, Vector3 vecBetCenter)
 {
-	if (!dynamic_pointer_cast<BoxCollider>(col1) || !dynamic_pointer_cast<SphereCollider>(col2))
+	if(!dynamic_pointer_cast<BoxCollider>(col1) || !dynamic_pointer_cast<SphereCollider>(col2))
 	{
+		if (!dynamic_pointer_cast<SphereCollider>(col1) && !dynamic_pointer_cast<SphereCollider>(col2))
+		{
+			return false;
+		}
+
 		return CheckBoxAndSphere(col2, col1, vecBetCenter);
 	}
 

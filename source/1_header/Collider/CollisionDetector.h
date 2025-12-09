@@ -32,6 +32,12 @@ public:
 	//Collider同士の当たり判定を確認する関数
 	bool CheckColAndCol(shared_ptr<ICollider> col1, shared_ptr<ICollider> col2);
 
+	//ベクトルがColliderに入り込んでいるか確認する関数
+	bool CheckColAndVec(
+		shared_ptr<ICollider> col,
+		const Vector3& startPos,
+		const Vector3& endPos);
+
 private:
 	//矩形同士の当たり判定を確認する関数
 	bool CheckBoxAndBox(shared_ptr<ICollider> col1, shared_ptr<ICollider> col2, Vector3 vecBetCenter);
@@ -43,7 +49,7 @@ private:
 	bool CheckBoxAndSphere(shared_ptr<ICollider> col1, shared_ptr<ICollider> col2, Vector3 vecBetCenter);
 	
 	//OBBにベクトルが入っているか確認する関数
-	Vector3 CheckColAndVec(
+	Vector3 GetDiffBetweenColAndVec(
 		shared_ptr<ICollider> col,
 		const Vector3& startPos,
 		const Vector3& endPos
