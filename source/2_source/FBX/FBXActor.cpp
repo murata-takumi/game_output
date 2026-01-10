@@ -75,13 +75,18 @@ FbxActor::Init(const wchar_t* filePath, const string name,
 	_fbxComp->CreateShaderResourceView();
 
 	//当たり判定を作成
-	if (colType == ColliderType::Box)
+	switch (colType)
 	{
-		_fbxComp->CreateBoxCollider(size, Vector3(0, 0, 0), this);
-	}
-	else if(colType == ColliderType::Sphere)
-	{
-		_fbxComp->CreateSphereCollider(30.0f, Vector3(0, 0, 0), this);
+		case ColliderType::Box:
+			_fbxComp->CreateBoxCollider(size, Vector3(0, 0, 0), this);
+			break;
+
+		case ColliderType::Sphere:
+			_fbxComp->CreateSphereCollider(30.0f, Vector3(0, 0, 0), this);
+			break;
+		case ColliderType::Capsule:
+			_fbxComp->CreateCapsuleCollider(170.0f, 30.0f, Vector3(0, 0, 0), this);
+			break;
 	}
 
 	//接地用当たり判定を作成
@@ -738,6 +743,9 @@ FbxActor::Update()
 		//アニメーションノードの更新
 		_crntNode->Update(_animTime);
 
+		auto a = _fbxComp->MappedMats()[0];
+		auto b = _fbxComp->TransrateVector();
+
 		//回転、平行移動
 		_fbxComp->MappedMats()[0] = XMMatrixRotationY(_rotY);
 		_fbxComp->MappedMats()[0] *= 
@@ -785,21 +793,19 @@ FbxActor::OnKeyPressed(const Vector3& input)
 		std::pow(_fbxComp->Speed().Y(), 2) +
 		std::pow(_fbxComp->Speed().Z(), 2));
 
-	ImGuiManager::Instance().AddLabelAndVector3("FrontVec", _currentFrontVec);
-
 	//当たり判定をチェックし、正面にオブジェクトが存在しなかったら移動処理
-	auto collision = GetContinuousOnGround(_currentFrontVec, _fbxComp->FrontVec(), speed);
-	auto objsNearby = OcTree::Instance().Get(_fbxComp->Collider());
+	auto objsNearby = OcTree::Instance().Get(_colOnGroundForRun);
+	auto collision = false;
+
 	for (auto& obj : objsNearby)
 	{
-		if(CollisionDetector::Instance().CheckContinuousCollisionDetection(
-			this, obj->Collider(), _currentFrontVec, _fbxComp->FrontVec(), speed))
+		if (CollisionDetector::Instance().CheckCapsuleAndBox(
+			obj->Collider(), _fbxComp->Collider()))
 		{
 			collision = true;
-			break;
 		}
-	}
-
+	}	
+	
 	if (!collision)
 	{
 		//座標に入力に応じたベクトルを加算
@@ -938,16 +944,6 @@ vector<string>
 FbxActor::GetAnimstr()const
 {
 	return _animStr;
-}
-
-/// <summary>
-/// 現在実行しているアニメーション名を返す関数
-/// </summary>
-/// <returns>アニメーション名</returns>
-string
-FbxActor::GetCurentAnimStr()const
-{
-	return _currentActorAnim;
 }
 
 /// <summary>

@@ -70,5 +70,6 @@ struct FBXVertex
 enum ColliderType
 {
 	Box,
+	Capsule,
 	Sphere,
 };

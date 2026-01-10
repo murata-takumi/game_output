@@ -18,6 +18,7 @@
 /// </summary>
 class BoxCollider;
 class BoxCollider2D;
+class CapsuleCollider;
 class Dx12Wrapper;
 class ICollider;
 class IFbx;

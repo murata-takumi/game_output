@@ -129,8 +129,6 @@ public:
 
 	//アニメーション名のベクトルを返す関数
 	vector<string> GetAnimstr()const;
-	//現在実行しているアニメーション名を返す関数
-	string GetCurentAnimStr()const;
 
 	//アニメーションの総時間を返す関数
 	float GetAnimDuration(string animation);	

@@ -2,6 +2,7 @@
 #include "Vector3.h"
 
 #include "Collider/BoxCollider.h"
+#include "Collider/CapsuleCollider.h"
 #include "Collider/ICollider.h"
 #include "Collider/SphereCollider.h"
 #include "FBX/AssimpLoader.h"
@@ -363,6 +364,25 @@ FbxComposition::CreateSphereCollider(float radius, const Vector3& pos, IFbx* obj
 }
 
 /// <summary>
+/// カプセルの当たり判定を作成する関数
+/// </summary>
+/// <param name="height">高さ</param>
+/// <param name="radius">半径</param>
+/// <param name="pos">初期座標</param>
+/// <param name="obj">紐づけるオブジェクト</param>
+void 
+FbxComposition::CreateCapsuleCollider(float height, float radius, const Vector3& pos, IFbx* obj)
+{
+	_collider = make_shared<CapsuleCollider>();
+	dynamic_pointer_cast<CapsuleCollider>(_collider)->Init(height, radius, pos, obj);
+
+	_shiftColMatrix = XMMatrixTranslation(
+		0,
+		height / 2,
+		0);
+}
+
+/// <summary>
 /// オブジェクトの座標変換に用いられるヒープ・ビューを作成する関数
 /// </summary>
 /// <param name="buffLength">ワールド行列用バッファーの個数</param>
@@ -541,6 +561,11 @@ FbxComposition::Update()
 	{
 		auto radius = dynamic_pointer_cast<SphereCollider>(_collider)->Radius();
 		_currentPosition = *_collider->Center() - Vector3(0,radius / 2,0);
+	}
+	else if (dynamic_pointer_cast<CapsuleCollider>(_collider))
+	{
+		auto height = dynamic_pointer_cast<CapsuleCollider>(_collider)->Height();
+		_currentPosition = *_collider->Center() - Vector3(0, height / 2, 0);
 	}
 }
 

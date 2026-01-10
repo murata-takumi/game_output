@@ -7,6 +7,7 @@ class aiScene;
 class BoneData;
 class BoneInfo;
 class BoxCollider;
+class CapsuleCollider;
 class ICollider;
 class IFbx;
 class SphereCollider;
@@ -27,6 +28,9 @@ public:
 
 	//当たり判定（球）作成関数
 	void CreateSphereCollider(float radius, const Vector3& pos, IFbx* obj);
+
+	//当たり判定（カプセル）作成関数
+	void CreateCapsuleCollider(float height, float radius, const Vector3& pos, IFbx* obj);
 
 	//毎フレームの描画処理
 	void Draw();

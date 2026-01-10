@@ -22,6 +22,7 @@
     <ClInclude Include="1_header\Application.h" />
     <ClInclude Include="1_header\Collider\BoxCollider.h" />
     <ClInclude Include="1_header\Collider\BoxCollider2D.h" />
+    <ClInclude Include="1_header\Collider\CapsuleCollider.h" />
     <ClInclude Include="1_header\Collider\ColliderComposition.h" />
     <ClInclude Include="1_header\Collider\CollisionDetector.h" />
     <ClInclude Include="1_header\Collider\ICollider.h" />
@@ -58,6 +59,7 @@
     <ClCompile Include="2_source\Application.cpp" />
     <ClCompile Include="2_source\Collider\BoxCollider.cpp" />
     <ClCompile Include="2_source\Collider\BoxCollider2D.cpp" />
+    <ClCompile Include="2_source\Collider\CapsuleCollider.cpp" />
     <ClCompile Include="2_source\Collider\ColliderComposition.cpp" />
     <ClCompile Include="2_source\Collider\CollisionDetector.cpp" />
     <ClCompile Include="2_source\Collider\SphereCollider.cpp" />

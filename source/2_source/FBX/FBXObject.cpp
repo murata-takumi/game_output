@@ -36,13 +36,17 @@ FbxObject::Init(const wchar_t* filePath, const string name,
 	_fbxComp->CreateShaderResourceView();
 
 	//“–‚½‚è”»’è‚ğì¬
-	if (colType == ColliderType::Box)
+	switch (colType)
 	{
+	case ColliderType::Box:
 		_fbxComp->CreateBoxCollider(size, Vector3(0, 0, 0), this);
-	}
-	else if (colType == ColliderType::Sphere)
-	{
+		break;
+
+	case ColliderType::Sphere:
 		_fbxComp->CreateSphereCollider(25.0f, Vector3(0, 0, 0), this);
+		break;
+	case ColliderType::Capsule:
+		break;
 	}
 
 	//À•W‚à‰Šú‰»

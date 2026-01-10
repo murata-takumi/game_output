@@ -5,6 +5,7 @@
 /// 当たり判定の計算を管理するクラス
 /// </summary>
 class BoxCollider;
+class CapsuleCollider;
 class Dx12Wrapper;
 class FbxActor;
 class ICollider;
@@ -38,6 +39,12 @@ public:
 		const Vector3& startPos,
 		const Vector3& endPos);
 
+	//カプセルと箱の当たり判定を確認する関数
+	bool CheckCapsuleAndBox(shared_ptr<ICollider> box, shared_ptr<ICollider> capsule);
+
+	//Colliderとベクトルの当たり判定を確認する関数
+	bool CheckColAndVector(shared_ptr<ICollider> col, const Vector3 startPos, const Vector3 direction, float length);
+
 private:
 	//矩形同士の当たり判定を確認する関数
 	bool CheckBoxAndBox(shared_ptr<ICollider> col1, shared_ptr<ICollider> col2, Vector3 vecBetCenter);
@@ -55,6 +62,6 @@ private:
 		const Vector3& endPos
 	);
 
-	//分離軸に投影された線分の長さを取得する
-	float LenOnSeparateAxis(const Vector3& sep, const Vector3& dirVec);
+	//別ベクトルに投影されたベクトルの長さを取得する
+	float LenOnOtherVec(const Vector3& sep, const Vector3& dirVec);
 };

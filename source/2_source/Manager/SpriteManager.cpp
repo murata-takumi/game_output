@@ -3,6 +3,7 @@
 
 #include "Collider/BoxCollider.h"
 #include "Collider/BoxCollider2D.h"
+#include "Collider/CapsuleCollider.h"
 #include "Collider/ICollider.h"
 #include "Collider/SphereCollider.h"
 #include "FBX/FbxActor.h"
@@ -242,6 +243,29 @@ SpriteManager::ColliderDraw(const shared_ptr<ICollider> collider)
 		auto radius = dynamic_pointer_cast<SphereCollider>(collider)->Radius();
 		auto primitive = GeometricPrimitive::CreateSphere(radius * 2, 8);
 		primitive->Draw(Dx12Wrapper::Instance().CommandList());
+	}
+	else if (dynamic_pointer_cast<CapsuleCollider>(collider))
+	{
+		auto diameter = dynamic_pointer_cast<CapsuleCollider>(collider)->Radius() * 2;
+		auto height = dynamic_pointer_cast<CapsuleCollider>(collider)->Height() - diameter;
+
+		auto cylinder = GeometricPrimitive::CreateCylinder(height, diameter, 8);
+		auto sphere = GeometricPrimitive::CreateSphere(diameter, 8);
+
+		XMMATRIX topSphere = XMMatrixTranslation(0, height / 2, 0) * transMat;
+		XMMATRIX bottomSphere = XMMatrixTranslation(0, -height / 2, 0) * transMat;
+
+		cylinder->Draw(Dx12Wrapper::Instance().CommandList());
+
+		_effect->SetWorld(topSphere);
+		_effect->Apply(Dx12Wrapper::Instance().CommandList());
+
+		sphere->Draw(Dx12Wrapper::Instance().CommandList());
+
+		_effect->SetWorld(bottomSphere);
+		_effect->Apply(Dx12Wrapper::Instance().CommandList());
+
+		sphere->Draw(Dx12Wrapper::Instance().CommandList());
 	}
 
 	//Œ³‚É–ß‚·

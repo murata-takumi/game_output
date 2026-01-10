@@ -1,6 +1,7 @@
 #include "Vector3.h"
 
 #include "Collider/BoxCollider.h"
+#include "Collider/CapsuleCollider.h"
 #include "Collider/CollisionDetector.h"
 #include "Collider/ICollider.h"
 #include "Collider/SphereCollider.h"
@@ -44,7 +45,7 @@ CollisionDetector::GetLengthBetweenColAndPos(shared_ptr<ICollider> col, const Ve
 		float sumOfLenOnDir = 0.0f;
 		for (int i = 0; i < 3; i++)
 		{
-			float s = fabs(XMVector3Dot(diff, tempBox->DirectionVectors()[i]).m128_f32[0]) / tempBox->HalfLength()[i];
+			float s = LenOnOtherVec(diff,tempBox->DirectionVectors()[i]) / tempBox->HalfLength()[i];
 
 			if (s > 1)
 			{
@@ -97,7 +98,7 @@ CollisionDetector::CheckContinuousCollisionDetection(
 }
 
 /// <summary>
-/// 分離軸定理二つのOBBが衝突しているか確認する関数
+/// 二つのOBBが衝突しているか確認する関数
 /// </summary>
 /// <param name="col1">当たり判定その1</param>
 /// <param name="col2">当たり判定その2</param>
@@ -140,9 +141,9 @@ CollisionDetector::CheckColAndVec(
 		for (int i = 0; i < 3; i++)
 		{
 			//中心差分の投影
-			diffBetCenterAndEndLenOnDir = abs(XMVector3Dot(diffBetCenterAndEnd, tempBox->DirectionVectors()[i]).m128_f32[0]);
+			diffBetCenterAndEndLenOnDir = LenOnOtherVec(diffBetCenterAndEnd, tempBox->DirectionVectors()[i]);
 			//線分の方向ベクトルへの投影
-			lineLenOnDir = abs(XMVector3Dot(line, tempBox->DirectionVectors()[i]).m128_f32[0]);
+			lineLenOnDir = LenOnOtherVec(line, tempBox->DirectionVectors()[i]);
 			//方向ベクトルの半分長
 			halfLen = tempBox->HalfLength()[i];
 
@@ -158,6 +159,106 @@ CollisionDetector::CheckColAndVec(
 	}
 
 	return true;
+}
+
+/// <summary>
+/// カプセルと箱の当たり判定を確認する関数
+/// </summary>
+/// <param name="box">箱の当たり判定</param>
+/// <param name="capsule">箱の当たり判定</param>
+/// <returns>衝突しているかどうか</returns>
+bool
+CollisionDetector::CheckCapsuleAndBox(shared_ptr<ICollider> box, shared_ptr<ICollider> capsule)
+{
+	auto boxColl = dynamic_pointer_cast<BoxCollider>(box);
+	auto capsuleColl = dynamic_pointer_cast<CapsuleCollider>(capsule);
+
+	auto vecBetCenter = *boxColl->Center() - *capsuleColl->Center();
+	
+	if (fabs(XMVector3Dot(XMVector3Normalize(vecBetCenter), Vector3(0, 1, 0)).m128_f32[0]) > .9f)
+	{
+		return false;
+	}
+
+	auto lenBetCenter = XMVector3Length(vecBetCenter).m128_f32[0];
+	ImGuiManager::Instance().AddLabelAndFloat("LenBetCenter", lenBetCenter);
+
+	////①カプセルの上端、下端ベクトルをOBBのローカル空間に変換
+	//Vector3 upToLocal = Vector3(
+	//	LenOnOtherVec(*capsuleColl->UpEdge(), boxColl->DirectionVectors()[0]),
+	//	LenOnOtherVec(*capsuleColl->UpEdge(),boxColl->DirectionVectors()[1]),
+	//	LenOnOtherVec(*capsuleColl->UpEdge(),boxColl->DirectionVectors()[2])
+	//) - *boxColl->Center();
+	//Vector3 downToLocal = Vector3(
+	//	LenOnOtherVec(*capsuleColl->DownEdge(), boxColl->DirectionVectors()[0]),
+	//	LenOnOtherVec(*capsuleColl->DownEdge(), boxColl->DirectionVectors()[1]),
+	//	LenOnOtherVec(*capsuleColl->DownEdge(), boxColl->DirectionVectors()[2])
+	//) - *boxColl->Center();
+
+	//ImGuiManager::Instance().AddLabelAndVector3("Up", upToLocal);
+	//ImGuiManager::Instance().AddLabelAndVector3("Center", *capsuleColl->Center());
+	//ImGuiManager::Instance().AddLabelAndVector3("Down", downToLocal);
+
+	////②2つの当たり判定の中心を結ぶベクトル
+	//Vector3 vecBetCenter = downToLocal - upToLocal;
+
+	////③
+	//float min = 0.0f;
+	//float max = 1.0f;
+
+	//int count = 0;
+	//float candidates[8];
+	//candidates[count++] = 0.0f;
+	//candidates[count++] = 1.0f;
+
+	//for (int i = 0; i < 3; ++i)
+	//{
+	//	//中心線と始点の要素をそれぞれ取得
+	//	float directionComponent = vecBetCenter[i];
+	//	float originComponent = upToLocal[i];
+
+	//	//中心線の要素がある程度大きければ
+	//	if (fabs(directionComponent) > 1e-6f)
+	//	{
+	//		float t1 = (-boxColl->HalfLength()[i] - originComponent) / directionComponent;
+	//		float t2 = (boxColl->HalfLength()[i] - originComponent) / directionComponent;
+
+	//		if (t1 > 0.0f && t1 < 1.0f)
+	//		{
+	//			candidates[count++] = t1;
+	//		}
+	//		if (t2 > 0.0f && t2 < 1.0f)
+	//		{
+	//			candidates[count++] = t2;
+	//		}
+	//	}
+	//}
+
+	//auto SqDistPointAABB = [&](Vector3 p)
+	//{
+	//	float ret = 0.0f;
+	//	if (p.X() < -boxColl->HalfLength()[0]) ret += (-boxColl->HalfLength()[0] - p.X()) * (-boxColl->HalfLength()[0] - p.X());
+	//	if (p.X() > boxColl->HalfLength()[0]) ret += (p.X() - boxColl->HalfLength()[0]) * (p.X() - boxColl->HalfLength()[0]);
+	//	if (p.Y() < -boxColl->HalfLength()[1]) ret += (-boxColl->HalfLength()[1] - p.Y()) * (-boxColl->HalfLength()[1] - p.Y());
+	//	if (p.Y() > boxColl->HalfLength()[1]) ret += (p.Y() - boxColl->HalfLength()[1]) * (p.Y() - boxColl->HalfLength()[1]);
+	//	if (p.Z() < -boxColl->HalfLength()[2]) ret += (-boxColl->HalfLength()[2] - p.Z()) * (-boxColl->HalfLength()[2] - p.Z());
+	//	if (p.Z() > boxColl->HalfLength()[2]) ret += (p.Z() - boxColl->HalfLength()[2]) * (p.Z() - boxColl->HalfLength()[2]);
+	//	return ret;
+	//};
+
+	//float minSqDist = 1e30f;
+	//for (int i = 0; i < count; i++)
+	//{
+	//	Vector3 p = upToLocal + vecBetCenter * candidates[i];
+	//	float sqDistPointAABB = SqDistPointAABB(p);
+
+	//	minSqDist = min(minSqDist, sqDistPointAABB);
+	//}
+
+	//ImGuiManager::Instance().AddLabelAndFloat("MinSqDist", sqrt(minSqDist));
+
+	//return sqrt(minSqDist) >= capsuleColl->Radius();
+	return false;
 }
 
 /// <summary>
@@ -186,23 +287,19 @@ CollisionDetector::GetDiffBetweenColAndVec(shared_ptr<ICollider> col, const Vect
 		for (int i = 0; i < 3; i++)
 		{
 			//中心差分の投影
-			lenOnDiffBetCenter = XMVector3Dot(diffBetCenter, tempBox->DirectionVectors()[i]).m128_f32[0];
+			lenOnDiffBetCenter = LenOnOtherVec(diffBetCenter, tempBox->DirectionVectors()[i]);
 			//方向ベクトルの半分長
 			halfLen = tempBox->HalfLength()[i];
 			//線分の方向ベクトルへの投影
-			lineLenOnDir = abs(XMVector3Dot(line, tempBox->DirectionVectors()[i]).m128_f32[0]);
+			lineLenOnDir = LenOnOtherVec(line, tempBox->DirectionVectors()[i]);
 
-			if (abs(lenOnDiffBetCenter) > halfLen + lineLenOnDir)
+			if (lenOnDiffBetCenter > halfLen + lineLenOnDir)
 			{
 				return XMVectorZero();
 			}
 			else
 			{
 				colPoint[i] = lenOnDiffBetCenter - lineLenOnDir;
-				//if (i == 1)
-				//{
-				//	colPoint[i] = halfLen;
-				//}
 			}
 
 		}
@@ -216,7 +313,84 @@ CollisionDetector::GetDiffBetweenColAndVec(shared_ptr<ICollider> col, const Vect
 }
 
 /// <summary>
+/// ベクトルとColliderの衝突判定を行う
+/// スラブ法の使用例
+/// </summary>
+/// <param name="col">Collider</param>
+/// <param name="startPos">ベクトルの始点</param>
+/// <param name="direction">ベクトルの向き</param>
+/// <param name="length">ベクトルの長さ</param>
+/// <returns>衝突判定</returns>
+bool 
+CollisionDetector::CheckColAndVector(shared_ptr<ICollider> col, const Vector3 startPos, const Vector3 direction, float length)
+{
+	//カプセル・球の当たり判定は除外
+	if (dynamic_pointer_cast<CapsuleCollider>(col) || dynamic_pointer_cast<SphereCollider>(col))
+	{
+		return false;
+	}
+
+	auto boxCol = dynamic_pointer_cast<BoxCollider>(col);
+
+	//当たり判定の中心とベクトルの始点を結ぶベクトル
+	Vector3 vecBetCenterAndStart = *boxCol->Center() - startPos;
+
+	float min = 0.0f;
+	float max = FLT_MAX;
+
+	for (int i = 0; i < 3; i++)
+	{
+		//中心ベクトル、ベクトルの向きの各軸への投影
+		float e = XMVector3Dot(boxCol->DirectionVectors()[i],vecBetCenterAndStart).m128_f32[0];
+		float f = XMVector3Dot(boxCol->DirectionVectors()[i], direction).m128_f32[0];
+
+		//ベクトルが軸に対し並行でない場合
+		if (abs(f) > 1e-6f)
+		{
+			//軸でのベクトルに対する中心ベクトルと半分長の和の比
+			float val_min = (e - boxCol->HalfLength()[i]) / f;
+			//差の比
+			float val_max = (e - boxCol->HalfLength()[i]) / f;
+
+			//和の比が差の比より大きかったら入れ替え
+			if (val_min > val_max)
+			{
+				swap(val_min, val_max);
+			}
+
+			//最小値、最大値の幅を狭めていく
+			if (val_min > min)
+			{
+				min = val_min;
+			}
+			if (val_max < max)
+			{
+				max = val_max;
+			}
+
+			//最小値が最大値を上回るか、最大値が0未満になったら衝突していない
+			if (min > max || max < 0.0f)
+			{
+				return false;
+			}
+		}
+		//軸に対し平行な場合
+		else
+		{
+			float s = boxCol->HalfLength()[i];
+			if (-e - s > 0.0f || -e + s < 0.0f)
+			{
+				return false;
+			}
+		}
+
+		return true;
+	}
+}
+
+/// <summary>
 /// 矩形同士の当たり判定を確認する関数
+/// 分離軸定理の使用例
 /// </summary>
 /// <param name="col1">当たり判定その1</param>
 /// <param name="col2">当たり判定その2</param>
@@ -238,15 +412,15 @@ CollisionDetector::CheckBoxAndBox(shared_ptr<ICollider> col1, shared_ptr<ICollid
 		float r = 0;
 		for (int j = 0; j < 3; j++)
 		{
-			r += LenOnSeparateAxis(tempBox1->DirectionVectors()[i],
+			r += LenOnOtherVec(tempBox1->DirectionVectors()[i],
 				tempBox2->DirectionVectors()[j] * tempBox2->HalfLength()[j]);
 		}
 
 		//中心間ベクトルの分離軸への投影
-		float s = XMVector3Dot(vecBetCenter, tempBox1->DirectionVectors()[i]).m128_f32[0];
+		float s = LenOnOtherVec(vecBetCenter, tempBox1->DirectionVectors()[i]);
 
 		//比較して、中心間ベクトルの投影の方が大きければ衝突していない
-		if (fabs(s) > r + tempBox1->HalfLength()[i])
+		if (s > r + tempBox1->HalfLength()[i])
 		{
 			return false;
 		}
@@ -283,6 +457,7 @@ CollisionDetector::CheckSphereAndSphere(shared_ptr<ICollider> col1, shared_ptr<I
 		return false;
 	}
 }
+
 /// <summary>
 /// 矩形と球形の当たり判定を確認する関数
 /// </summary>
@@ -298,8 +473,6 @@ CollisionDetector::CheckBoxAndSphere(shared_ptr<ICollider> col1, shared_ptr<ICol
 		{
 			return false;
 		}
-
-		return CheckBoxAndSphere(col2, col1, vecBetCenter);
 	}
 
 	auto tempBox = dynamic_pointer_cast<BoxCollider>(col1);
@@ -321,13 +494,13 @@ CollisionDetector::CheckBoxAndSphere(shared_ptr<ICollider> col1, shared_ptr<ICol
 }
 
 /// <summary>
-/// 分離軸に対し投影されたベクトルの大きさを求める関数
+/// 別ベクトルに投影されたベクトルの長さを取得する関数
 /// </summary>
-/// <param name="sep">分離軸</param>
-/// <param name="dirVec">方向ベクトル</param>
-/// <returns>分離軸上の方向ベクトルの大きさ</returns>
+/// <param name="sep">長さを求めたいベクトル</param>
+/// <param name="dirVec">投影先のベクトル</param>
+/// <returns>投影ベクトル上のベクトルの大きさ</returns>
 float
-CollisionDetector::LenOnSeparateAxis(const Vector3& sep, const Vector3& dirVec)
+CollisionDetector::LenOnOtherVec(const Vector3& sep, const Vector3& dirVec)
 {
 	//分離軸と各ベクトルの内積を取り、その絶対値が投影された大きさとなる
 	float ret = fabs(XMVector3Dot(sep, dirVec).m128_f32[0]);
