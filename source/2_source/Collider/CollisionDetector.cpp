@@ -335,6 +335,7 @@ CollisionDetector::CheckColAndVector(shared_ptr<ICollider> col, const Vector3 st
 	//当たり判定の中心とベクトルの始点を結ぶベクトル
 	Vector3 vecBetCenterAndStart = *boxCol->Center() - startPos;
 
+	//ベクトルをf=始点+t*方向として、OBBに入った時、出た時のtの値
 	float min = 0.0f;
 	float max = FLT_MAX;
 
@@ -342,15 +343,14 @@ CollisionDetector::CheckColAndVector(shared_ptr<ICollider> col, const Vector3 st
 	{
 		//中心ベクトル、ベクトルの向きの各軸への投影
 		float e = XMVector3Dot(boxCol->DirectionVectors()[i],vecBetCenterAndStart).m128_f32[0];
-		float f = XMVector3Dot(boxCol->DirectionVectors()[i], direction).m128_f32[0];
+		float f = XMVector3Dot(boxCol->DirectionVectors()[i], direction * length).m128_f32[0];
 
 		//ベクトルが軸に対し並行でない場合
 		if (abs(f) > 1e-6f)
 		{
-			//軸でのベクトルに対する中心ベクトルと半分長の和の比
+			//特定の軸に注目した時のOBBの入口、出口のtの値
 			float val_min = (e - boxCol->HalfLength()[i]) / f;
-			//差の比
-			float val_max = (e - boxCol->HalfLength()[i]) / f;
+			float val_max = (e + boxCol->HalfLength()[i]) / f;
 
 			//和の比が差の比より大きかったら入れ替え
 			if (val_min > val_max)
@@ -368,7 +368,8 @@ CollisionDetector::CheckColAndVector(shared_ptr<ICollider> col, const Vector3 st
 				max = val_max;
 			}
 
-			//最小値が最大値を上回るか、最大値が0未満になったら衝突していない
+			//出口より入り口が後にきている場合OBBを突き抜けている…らしい
+			//出口が0より前にある場合OBBはベクトルとは逆方向…らしい
 			if (min > max || max < 0.0f)
 			{
 				return false;
@@ -383,9 +384,9 @@ CollisionDetector::CheckColAndVector(shared_ptr<ICollider> col, const Vector3 st
 				return false;
 			}
 		}
-
-		return true;
 	}
+
+	return true;
 }
 
 /// <summary>
