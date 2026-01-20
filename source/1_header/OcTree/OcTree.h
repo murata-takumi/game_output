@@ -20,8 +20,10 @@ public:
 	bool AddObject(const shared_ptr<IFbx> obj);
 
 	//クエリ範囲にあるオブジェクトを取得する関数
-	vector<shared_ptr<IFbx>> Get(const shared_ptr<ICollider> col)noexcept;
+	vector<shared_ptr<IFbx>> GetByCollider(const shared_ptr<ICollider> col)noexcept;
 
+	//ベクトルに接しているオブジェクトを取得する関数
+	vector<shared_ptr<IFbx>> GetByVector(const Vector3 startPos, const Vector3 direction, float length)noexcept;
 private:
 	//ノード
 	shared_ptr<OcTreeNode> _rootNode;

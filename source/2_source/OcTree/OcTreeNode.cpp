@@ -113,7 +113,7 @@ OcTreeNode::AddToChild(const vector<shared_ptr<IFbx>> objs)
 /// <param name="bounds">クエリ範囲</param>
 /// <returns>オブジェクト</returns>
 vector<shared_ptr<IFbx>>
-OcTreeNode::Get(const shared_ptr<ICollider> col)noexcept
+OcTreeNode::GetByCollider(const shared_ptr<ICollider> col)noexcept
 {
 	vector<shared_ptr<IFbx>> ret;
 
@@ -129,7 +129,38 @@ OcTreeNode::Get(const shared_ptr<ICollider> col)noexcept
 	//子ノードに対し再帰的に取得処理を行う
 	for (shared_ptr<OcTreeNode> node : _children)
 	{
-		const auto& child = node->Get(col);
+		const auto& child = node->GetByCollider(col);
+		ret.insert(ret.end(), child.begin(), child.end());
+	}
+
+	return ret;
+}
+
+/// <summary>
+/// ベクトルに接しているオブジェクトを取得する関数
+/// </summary>
+/// <param name="startPos">ベクトルの始点</param>
+/// <param name="direction">ベクトルの向き</param>
+/// <param name="length">ベクトルの長さ</param>
+/// <returns>衝突しているオブジェクト</returns>
+vector<shared_ptr<IFbx>> 
+OcTreeNode::GetByVector(const Vector3 startPos, const Vector3 direction, float length)noexcept
+{
+	vector<shared_ptr<IFbx>> ret;
+
+	//全オブジェクトに対しベクトルと衝突しているかチェックを行う
+	for (auto& obj : _objs)
+	{
+		if (CollisionDetector::Instance().CheckColAndVector(obj->Collider(), startPos, direction, length))
+		{
+			ret.push_back(obj);
+		}
+	}
+
+	//子ノードに対し再帰的に取得処理を行う
+	for (shared_ptr<OcTreeNode> node : _children)
+	{
+		const auto& child = node->GetByVector(startPos, direction, length);
 		ret.insert(ret.end(), child.begin(), child.end());
 	}
 

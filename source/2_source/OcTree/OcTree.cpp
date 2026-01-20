@@ -60,7 +60,20 @@ OcTree::AddObject(const shared_ptr<IFbx> obj)
 /// <param name="bounds">クエリ範囲</param>
 /// <returns>取得したオブジェクト</returns>
 vector<shared_ptr<IFbx>>
-OcTree::Get(const shared_ptr<ICollider> col)noexcept
+OcTree::GetByCollider(const shared_ptr<ICollider> col)noexcept
 {
-	return _rootNode->Get(col);
+	return _rootNode->GetByCollider(col);
+}
+
+/// <summary>
+/// ベクトルに接しているオブジェクトを取得する関数
+/// </summary>
+/// <param name="startPos">ベクトルの始点</param>
+/// <param name="direction">ベクトルの向き</param>
+/// <param name="length">ベクトルの長さ</param>
+/// <returns>衝突しているオブジェクト</returns>
+vector<shared_ptr<IFbx>> 
+OcTree::GetByVector(const Vector3 startPos, const Vector3 direction, float length)noexcept
+{
+	return _rootNode->GetByVector(startPos, direction, length);
 }
