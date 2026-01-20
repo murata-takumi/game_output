@@ -43,6 +43,9 @@ public:
 	//float型の数値を追加する関数
 	void AddLabelAndFloat(string label,float value);
 
+	//int型の数値を追加する関数
+	void AddLabelAndInt(string label, int value);
+
 	//bool型の値を追加する関数
 	void AddLabelAndBool(string label, bool value);
 
@@ -64,6 +67,9 @@ private:
 
 	//表示ラベルとfloat値
 	map<string, float> _labelAndFloats;
+
+	//表示ラベルとint値
+	map<string, int> _labelAndInts;
 
 	//表示ラベルとbool値
 	map<string, bool> _labelAndBools;

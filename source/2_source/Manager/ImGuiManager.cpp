@@ -180,13 +180,16 @@ ImGuiManager::ImGuiDraw()
 			ImGui::DragFloat(pair.first.c_str(), &pair.second);
 		}
 
+		for (auto& pair : _labelAndInts)
+		{
+			ImGui::DragInt(pair.first.c_str(), &pair.second);
+		}
+
 		//bool値を表示
 		for (auto& pair : _labelAndBools)
 		{
 			ImGui::Checkbox(pair.first.c_str(), &pair.second);
 		}
-
-		ImGui::Text(dynamic_pointer_cast<FbxActor>(_actor)->GetCurentAnimStr().c_str());
 		
 		ImGui::End();
 	}
@@ -388,6 +391,17 @@ void
 ImGuiManager::AddLabelAndFloat(string label, float value)
 {
 	_labelAndFloats[label.c_str()] = value;
+}
+
+/// <summary>
+/// int値を追加する関数
+/// </summary>
+/// <param name="label">変数名</param>
+/// <param name="value">値</param>
+void
+ImGuiManager::AddLabelAndInt(string label, int value)
+{
+	_labelAndInts[label.c_str()] = value;
 }
 
 /// <summary>
