@@ -93,9 +93,7 @@ FbxActor::Init(const wchar_t* filePath, const string name,
 	_colOnGroundForRun = make_shared<SphereCollider>();
 	dynamic_pointer_cast<SphereCollider>(_colOnGroundForRun)->Init(
 		30, Vector3(0, 0, 0), this);
-	_colOnGroundForJump = make_shared<SphereCollider>();
-	dynamic_pointer_cast<SphereCollider>(_colOnGroundForJump)->Init(
-		10000, Vector3(0, 0, 0), this);
+
 	auto jumpStart = [&]()
 	{
 		//開始時間を少し後に設定
@@ -209,6 +207,8 @@ FbxActor::Init(const wchar_t* filePath, const string name,
 
 		//アクターの近くにあるオブジェクトを取得し当たり判定をチェック
 		auto objsNearby = OcTree::Instance().GetByCollider(_colOnGroundForRun);
+		ImGuiManager::Instance().AddLabelAndInt("Count", objsNearby.size());
+
 		auto ret = false;
 		for (auto& obj : objsNearby)
 		{
@@ -352,7 +352,7 @@ bool
 FbxActor::GetContinuousOnGround(const Vector3& dir,	const Vector3& currentPos,
 	const float speed)
 {
-	auto objsNearby = OcTree::Instance().GetByCollider(_colOnGroundForJump);
+	auto objsNearby = OcTree::Instance().GetByVector(currentPos, -dir, 1000);
 	auto collision = false;
 
 	for (auto& obj : objsNearby)
@@ -722,7 +722,6 @@ FbxActor::Update()
 		_animTime += static_cast<float>(diff) * GetAnimTickPerSpeed(_currentActorAnim) * _animSpeed;
 
 		_colOnGroundForRun->Update(_fbxComp->MappedMats()[1] * _fbxComp->MappedMats()[0]);
-		_colOnGroundForJump->Update(_fbxComp->MappedMats()[1] * _fbxComp->MappedMats()[0]);
 
 		//地面の上にいなかったら落下処理
 		if (!GetOnGround() && !IsAnimationEqual(JUMP00))
@@ -794,9 +793,6 @@ FbxActor::OnKeyPressed(const Vector3& input)
 		std::pow(_fbxComp->Speed().X(), 2) +
 		std::pow(_fbxComp->Speed().Y(), 2) +
 		std::pow(_fbxComp->Speed().Z(), 2));
-
-	auto a = OcTree::Instance().GetByVector(*_fbxComp->Collider()->Center(), _currentFrontVec, 1000);
-	ImGuiManager::Instance().AddLabelAndInt("Count", a.size());
 
 	//当たり判定をチェックし、正面にオブジェクトが存在しなかったら移動処理
 	auto objsNearby = OcTree::Instance().GetByCollider(_colOnGroundForRun);
