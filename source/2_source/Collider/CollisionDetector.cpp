@@ -1,4 +1,7 @@
+ï»¿#define NOMINMAX
 #include "Vector3.h"
+
+#include <algorithm>
 
 #include "Collider/BoxCollider.h"
 #include "Collider/CapsuleCollider.h"
@@ -12,9 +15,9 @@
 #include "Wrapper/Dx12Wrapper.h"
 
 /// <summary>
-/// ƒVƒ“ƒOƒ‹ƒgƒ“‚ğ•Ô‚·
+/// ã‚·ãƒ³ã‚°ãƒ«ãƒˆãƒ³ã‚’è¿”ã™
 /// </summary>
-/// <returns>ƒVƒ“ƒOƒ‹ƒgƒ“</returns>
+/// <returns>ã‚·ãƒ³ã‚°ãƒ«ãƒˆãƒ³</returns>
 CollisionDetector&
 CollisionDetector::Instance()
 {
@@ -23,25 +26,25 @@ CollisionDetector::Instance()
 }
 
 /// <summary>
-/// OBB‚ÆÀ•W‚ÌŠÔ‚Ì‹——£‚ğ•Ô‚·ŠÖ”
+/// OBBã¨åº§æ¨™ã®é–“ã®è·é›¢ã‚’è¿”ã™é–¢æ•°
 /// </summary>
 /// <param name="col">OBB</param>
-/// <param name="pos">À•W</param>
-/// <returns>‹——£</returns>
+/// <param name="pos">åº§æ¨™</param>
+/// <returns>è·é›¢</returns>
 float 
 CollisionDetector::GetLengthBetweenColAndPos(shared_ptr<ICollider> col, const Vector3& pos)
 {
-	//À•W‚ÆOBB‚Ì’†S‚Ì·•ª
+	//åº§æ¨™ã¨OBBã®ä¸­å¿ƒã®å·®åˆ†
 	Vector3 diff = pos - *col->Center();
 
-	//·•ª‚Ì‹——£
+	//å·®åˆ†ã®è·é›¢
 	float lenOnDiff = XMVector3Length(diff).m128_f32[0];
 
 	if(col == dynamic_pointer_cast<BoxCollider>(col))
 	{
 		auto tempBox = dynamic_pointer_cast<BoxCollider>(col);
 
-		//OBB‚Ì•ûŒüƒxƒNƒgƒ‹‚ÌƒxƒNƒgƒ‹‚Ö‚Ì“Š‰e‚Ì˜a‚ğæ“¾
+		//OBBã®æ–¹å‘ãƒ™ã‚¯ãƒˆãƒ«ã®ãƒ™ã‚¯ãƒˆãƒ«ã¸ã®æŠ•å½±ã®å’Œã‚’å–å¾—
 		float sumOfLenOnDir = 0.0f;
 		for (int i = 0; i < 3; i++)
 		{
@@ -53,7 +56,7 @@ CollisionDetector::GetLengthBetweenColAndPos(shared_ptr<ICollider> col, const Ve
 			}
 		}
 
-		//OBB“à‚Ì‹——£‚Æ·•ª‚Ì·
+		//OBBå†…ã®è·é›¢ã¨å·®åˆ†ã®å·®
 		float lenBetColAndPos = lenOnDiff - sumOfLenOnDir;
 
 		return lenBetColAndPos;
@@ -67,14 +70,14 @@ CollisionDetector::GetLengthBetweenColAndPos(shared_ptr<ICollider> col, const Ve
 }
 
 /// <summary>
-/// ˜A‘±“I‚ÈÕ“Ë”»’èˆ—
+/// é€£ç¶šçš„ãªè¡çªåˆ¤å®šå‡¦ç†
 /// </summary>
-/// <param name="actor">À•W‚ğƒYƒ‰‚·‘ÎÛ‚ÌƒAƒNƒ^[</param>
-/// <param name="col">Õ“Ë‘ÎÛ‚ÌOBB</param>
-/// <param name="dir">ˆÚ“®•ûŒü</param>
-/// <param name="pos">Œ»İ‚ÌÀ•W</param>
-/// <param name="speed">ˆÚ“®‘¬“x</param>
-/// <returns>Õ“Ë‚·‚é‚©‚Ç‚¤‚©</returns>
+/// <param name="actor">åº§æ¨™ã‚’ã‚ºãƒ©ã™å¯¾è±¡ã®ã‚¢ã‚¯ã‚¿ãƒ¼</param>
+/// <param name="col">è¡çªå¯¾è±¡ã®OBB</param>
+/// <param name="dir">ç§»å‹•æ–¹å‘</param>
+/// <param name="pos">ç¾åœ¨ã®åº§æ¨™</param>
+/// <param name="speed">ç§»å‹•é€Ÿåº¦</param>
+/// <returns>è¡çªã™ã‚‹ã‹ã©ã†ã‹</returns>
 bool 
 CollisionDetector::CheckContinuousCollisionDetection(
 	IFbx* actor,
@@ -83,12 +86,12 @@ CollisionDetector::CheckContinuousCollisionDetection(
 	const Vector3& currentPos, 
 	const float speed)
 {
-	//1ƒtƒŒ[ƒ€Œã‚ÌÀ•W‚ğæ“¾
+	//1ãƒ•ãƒ¬ãƒ¼ãƒ å¾Œã®åº§æ¨™ã‚’å–å¾—
 	Vector3 nextPos = currentPos + (dir * speed * Dx12Wrapper::Instance().GetDeltaTime());
-	//OBB‚ÆÀ•W‚Ì·
+	//OBBã¨åº§æ¨™ã®å·®
 	Vector3 diffBetColAndVec = GetDiffBetweenColAndVec(col, currentPos, nextPos);
 
-	//Œ»İ‚Æ1ƒtƒŒ[ƒ€Œã‚ÌÀ•W‚ÌƒxƒNƒgƒ‹‚ªOBB‚ÆŒğ‚í‚éi=1ƒtƒŒ[ƒ€Œã‚ÉÕ“Ë‚·‚éj‚È‚ç^
+	//ç¾åœ¨ã¨1ãƒ•ãƒ¬ãƒ¼ãƒ å¾Œã®åº§æ¨™ã®ãƒ™ã‚¯ãƒˆãƒ«ãŒOBBã¨äº¤ã‚ã‚‹ï¼ˆ=1ãƒ•ãƒ¬ãƒ¼ãƒ å¾Œã«è¡çªã™ã‚‹ï¼‰ãªã‚‰çœŸ
 	if (XMVector3Length(diffBetColAndVec).m128_f32[0] > 0.0f)
 	{
 		return true;
@@ -98,11 +101,11 @@ CollisionDetector::CheckContinuousCollisionDetection(
 }
 
 /// <summary>
-/// “ñ‚Â‚ÌOBB‚ªÕ“Ë‚µ‚Ä‚¢‚é‚©Šm”F‚·‚éŠÖ”
+/// äºŒã¤ã®OBBãŒè¡çªã—ã¦ã„ã‚‹ã‹ç¢ºèªã™ã‚‹é–¢æ•°
 /// </summary>
-/// <param name="col1">“–‚½‚è”»’è‚»‚Ì1</param>
-/// <param name="col2">“–‚½‚è”»’è‚»‚Ì2</param>
-/// <returns>Õ“Ë‚µ‚Ä‚¢‚é‚©‚Ç‚¤‚©</returns>
+/// <param name="col1">å½“ãŸã‚Šåˆ¤å®šãã®1</param>
+/// <param name="col2">å½“ãŸã‚Šåˆ¤å®šãã®2</param>
+/// <returns>è¡çªã—ã¦ã„ã‚‹ã‹ã©ã†ã‹</returns>
 bool
 CollisionDetector::CheckColAndCol(shared_ptr<ICollider> col1, shared_ptr<ICollider> col2)
 {
@@ -114,21 +117,21 @@ CollisionDetector::CheckColAndCol(shared_ptr<ICollider> col1, shared_ptr<ICollid
 }
 
 /// <summary>
-/// “–‚½‚è”»’è‚Éü•ª‚ª“ü‚Á‚Ä‚¢‚é‚©Šm”F‚·‚éŠÖ”
+/// å½“ãŸã‚Šåˆ¤å®šã«ç·šåˆ†ãŒå…¥ã£ã¦ã„ã‚‹ã‹ç¢ºèªã™ã‚‹é–¢æ•°
 /// </summary>
-/// <param name="col">“–‚½‚è”»’è</param>
-/// <param name="startPos">ü•ª‚Ìn“_</param>
-/// <param name="endPos">ü•ª‚ÌI“_</param>
-/// <returns>“ü‚Á‚Ä‚¢‚é‚©‚Ç‚¤‚©</returns>
+/// <param name="col">å½“ãŸã‚Šåˆ¤å®š</param>
+/// <param name="startPos">ç·šåˆ†ã®å§‹ç‚¹</param>
+/// <param name="endPos">ç·šåˆ†ã®çµ‚ç‚¹</param>
+/// <returns>å…¥ã£ã¦ã„ã‚‹ã‹ã©ã†ã‹</returns>
 bool 
 CollisionDetector::CheckColAndVec(
 	shared_ptr<ICollider> col,
 	const Vector3& startPos,
 	const Vector3& endPos)
 {
-	//ü•ª
+	//ç·šåˆ†
 	Vector3 line = endPos - startPos;
-	//OBB‚Ì’†S‚Æü•ª‚ÌI’[‚Ì·•ª
+	//OBBã®ä¸­å¿ƒã¨ç·šåˆ†ã®çµ‚ç«¯ã®å·®åˆ†
 	Vector3 diffBetCenterAndEnd = endPos - *col->Center();
 
 	if (col == dynamic_pointer_cast<BoxCollider>(col))
@@ -137,14 +140,14 @@ CollisionDetector::CheckColAndVec(
 
 		float diffBetCenterAndEndLenOnDir, halfLen, lineLenOnDir;
 
-		//OBB‚Ì•ûŒüƒxƒNƒgƒ‹‚É‘Î‚µ·•ª‚ğ“Š‰e‚µA”¼•ª’·‚Æü•ª‚Ì“Š‰e‚Ì˜a‚ğ”äŠr‚µ‚ÄÕ“Ë”»’è
+		//OBBã®æ–¹å‘ãƒ™ã‚¯ãƒˆãƒ«ã«å¯¾ã—å·®åˆ†ã‚’æŠ•å½±ã—ã€åŠåˆ†é•·ã¨ç·šåˆ†ã®æŠ•å½±ã®å’Œã‚’æ¯”è¼ƒã—ã¦è¡çªåˆ¤å®š
 		for (int i = 0; i < 3; i++)
 		{
-			//’†S·•ª‚Ì“Š‰e
+			//ä¸­å¿ƒå·®åˆ†ã®æŠ•å½±
 			diffBetCenterAndEndLenOnDir = LenOnOtherVec(diffBetCenterAndEnd, tempBox->DirectionVectors()[i]);
-			//ü•ª‚Ì•ûŒüƒxƒNƒgƒ‹‚Ö‚Ì“Š‰e
+			//ç·šåˆ†ã®æ–¹å‘ãƒ™ã‚¯ãƒˆãƒ«ã¸ã®æŠ•å½±
 			lineLenOnDir = LenOnOtherVec(line, tempBox->DirectionVectors()[i]);
-			//•ûŒüƒxƒNƒgƒ‹‚Ì”¼•ª’·
+			//æ–¹å‘ãƒ™ã‚¯ãƒˆãƒ«ã®åŠåˆ†é•·
 			halfLen = tempBox->HalfLength()[i];
 
 			if (diffBetCenterAndEndLenOnDir > halfLen + lineLenOnDir)
@@ -162,120 +165,115 @@ CollisionDetector::CheckColAndVec(
 }
 
 /// <summary>
-/// ƒJƒvƒZƒ‹‚Æ” ‚Ì“–‚½‚è”»’è‚ğŠm”F‚·‚éŠÖ”
+/// ã‚«ãƒ—ã‚»ãƒ«ã¨ç®±ã®å½“ãŸã‚Šåˆ¤å®šã‚’ç¢ºèªã™ã‚‹é–¢æ•°
 /// </summary>
-/// <param name="box">” ‚Ì“–‚½‚è”»’è</param>
-/// <param name="capsule">” ‚Ì“–‚½‚è”»’è</param>
-/// <returns>Õ“Ë‚µ‚Ä‚¢‚é‚©‚Ç‚¤‚©</returns>
+/// <param name="box">ç®±ã®å½“ãŸã‚Šåˆ¤å®š</param>
+/// <param name="capsule">ç®±ã®å½“ãŸã‚Šåˆ¤å®š</param>
+/// <returns>è¡çªã—ã¦ã„ã‚‹ã‹ã©ã†ã‹</returns>
 bool
 CollisionDetector::CheckCapsuleAndBox(shared_ptr<ICollider> box, shared_ptr<ICollider> capsule)
 {
 	auto boxColl = dynamic_pointer_cast<BoxCollider>(box);
 	auto capsuleColl = dynamic_pointer_cast<CapsuleCollider>(capsule);
 
-	auto vecBetCenter = *boxColl->Center() - *capsuleColl->Center();
-	
-	if (fabs(XMVector3Dot(XMVector3Normalize(vecBetCenter), Vector3(0, 1, 0)).m128_f32[0]) > .9f)
+	//OBBãŒå±ã™ã‚‹ãƒ­ãƒ¼ã‚«ãƒ«ç©ºé–“ã¸ã®å¤‰æ›é–¢æ•°
+	auto WorldToLocal = [&](Vector3 worldPos) {
+		Vector3 rel = worldPos - *boxColl->Center();
+		return Vector3{
+			rel.X() * boxColl->DirectionVectors()[0].X() + rel.Y() * boxColl->DirectionVectors()[0].Y() + rel.Z() * boxColl->DirectionVectors()[0].Z(),
+			rel.X() * boxColl->DirectionVectors()[1].X() + rel.Y() * boxColl->DirectionVectors()[1].Y() + rel.Z() * boxColl->DirectionVectors()[1].Z(),
+			rel.X() * boxColl->DirectionVectors()[2].X() + rel.Y() * boxColl->DirectionVectors()[2].Y() + rel.Z() * boxColl->DirectionVectors()[2].Z()
+		};
+	};
+
+	//ç‚¹ã¨AABBã®æœ€çŸ­è·é›¢ã®äºŒä¹—ã‚’æ±‚ã‚ã‚‹ãƒ˜ãƒ«ãƒ‘ãƒ¼
+	auto SqDistPointAABB = [&](Vector3 p, Vector3 extents) {
+		float sqDist = 0.0f;
+		// Xè»¸
+		if (p.X() < -extents.X()) sqDist += (p.X() + extents.X()) * (p.X() + extents.X());
+		else if (p.X() > extents.X()) sqDist += (p.X() - extents.X()) * (p.X() - extents.X());
+		// Yè»¸
+		if (p.Y() < -extents.Y()) sqDist += (p.Y() + extents.Y()) * (p.Y() + extents.Y());
+		else if (p.Y() > extents.Y()) sqDist += (p.Y() - extents.Y()) * (p.Y() - extents.Y());
+		// Zè»¸
+		if (p.Z() < -extents.Z()) sqDist += (p.Z() + extents.Z()) * (p.Z() + extents.Z());
+		else if (p.Z() > extents.Z()) sqDist += (p.Z() - extents.Z()) * (p.Z() - extents.Z());
+
+		return sqDist;
+	};
+
+	//ç·šåˆ†ã¨AABBã®è·é›¢ã®äºŒä¹—ã‚’æ±‚ã‚ã‚‹
+	auto SegmentAABBSqDistance = [&](Vector3 p0, Vector3 p1, Vector3 extents)
 	{
-		return false;
-	}
+		Vector3 d = p1 - p0;
+		float tMin = 0.0f;
+		float tMax = 1.0f;
 
-	auto lenBetCenter = XMVector3Length(vecBetCenter).m128_f32[0];
-	ImGuiManager::Instance().AddLabelAndFloat("LenBetCenter", lenBetCenter);
+		// å„è»¸(X, Y, Z)ã«ã¤ã„ã¦ã€ç·šåˆ†ãŒAABBã®ã€Œå¤–å´ã€ã«ã‚ã‚‹ç¯„å›²ã‚’çµã‚Šè¾¼ã‚€
+		// ã“ã®å‡¦ç†ã¯ã€ç·šåˆ†ã‚’AABBã®å„é¢ã§ä½œã‚‰ã‚Œã‚‹ã‚¹ãƒ©ãƒ–ã§ã‚¯ãƒªãƒƒãƒ”ãƒ³ã‚°ã™ã‚‹ã®ã¨åŒç¾©ã§ã™ã€‚
+		auto clip = [&](float p, float delta, float extent) {
+			if (std::abs(delta) < 1e-7f) {
+				// ç·šåˆ†ãŒè»¸ã«å¹³è¡Œãªå ´åˆã€ãã®è»¸ã§å¤–ã‚Œã¦ã„ã‚Œã°äº¤å·®ã—ãªã„
+				return p < -extent || p > extent;
+			}
+			float t0 = (-extent - p) / delta;
+			float t1 = (extent - p) / delta;
+			if (t0 > t1) std::swap(t0, t1);
 
-	////‡@ƒJƒvƒZƒ‹‚Ìã’[A‰º’[ƒxƒNƒgƒ‹‚ğOBB‚Ìƒ[ƒJƒ‹‹óŠÔ‚É•ÏŠ·
-	//Vector3 upToLocal = Vector3(
-	//	LenOnOtherVec(*capsuleColl->UpEdge(), boxColl->DirectionVectors()[0]),
-	//	LenOnOtherVec(*capsuleColl->UpEdge(),boxColl->DirectionVectors()[1]),
-	//	LenOnOtherVec(*capsuleColl->UpEdge(),boxColl->DirectionVectors()[2])
-	//) - *boxColl->Center();
-	//Vector3 downToLocal = Vector3(
-	//	LenOnOtherVec(*capsuleColl->DownEdge(), boxColl->DirectionVectors()[0]),
-	//	LenOnOtherVec(*capsuleColl->DownEdge(), boxColl->DirectionVectors()[1]),
-	//	LenOnOtherVec(*capsuleColl->DownEdge(), boxColl->DirectionVectors()[2])
-	//) - *boxColl->Center();
+			tMin = max(tMin, t0);
+			tMax = min(tMax, t1);
+			return tMin > tMax; // çŸ›ç›¾ãŒç”Ÿã˜ãŸã‚‰ï¼ˆã“ã®è»¸ã§ã¯å¤–ã‚Œã¦ã„ã‚‹ï¼‰
+		};
 
-	//ImGuiManager::Instance().AddLabelAndVector3("Up", upToLocal);
-	//ImGuiManager::Instance().AddLabelAndVector3("Center", *capsuleColl->Center());
-	//ImGuiManager::Instance().AddLabelAndVector3("Down", downToLocal);
+		// 3è»¸ã™ã¹ã¦ã§ã‚¯ãƒªãƒƒãƒ”ãƒ³ã‚°ã‚’è©¦ã¿ã‚‹
+		bool separated = clip(p0.X(), d.X(), extents.X()) ||
+			clip(p0.Y(), d.Y(), extents.Y()) ||
+			clip(p0.Z(), d.Z(), extents.Z());
 
-	////‡A2‚Â‚Ì“–‚½‚è”»’è‚Ì’†S‚ğŒ‹‚ÔƒxƒNƒgƒ‹
-	//Vector3 vecBetCenter = downToLocal - upToLocal;
+		if (!separated) {
+			// ç·šåˆ†ã®ä¸€éƒ¨ã¾ãŸã¯å…¨éƒ¨ãŒAABBã®å†…éƒ¨ã«ã‚ã‚‹å ´åˆã€æœ€çŸ­è·é›¢ã¯0
+			// (å³å¯†ã«ã¯tMinã€œtMaxã®ç¯„å›²ã§äº¤å·®ã—ã¦ã„ã‚‹)
+			return 0.0f;
+		}
 
-	////‡B
-	//float min = 0.0f;
-	//float max = 1.0f;
+		// ç·šåˆ†ãŒå¤–å´ã«ã‚ã‚‹å ´åˆã€p0(t=0), p1(t=1), ã¾ãŸã¯
+		// ã‚¯ãƒªãƒƒãƒ”ãƒ³ã‚°å¢ƒç•Œ(tMin, tMax)ã®ã„ãšã‚Œã‹ãŒAABBã«æœ€ã‚‚è¿‘ã„ç‚¹ã«ãªã‚‹
+		float sqDistP0 = SqDistPointAABB(p0, extents);
+		float sqDistP1 = SqDistPointAABB(p1, extents);
+		float sqDistTMin = SqDistPointAABB(p0 + d * std::clamp(tMin, 0.0f, 1.0f), extents);
+		float sqDistTMax = SqDistPointAABB(p0 + d * std::clamp(tMax, 0.0f, 1.0f), extents);
 
-	//int count = 0;
-	//float candidates[8];
-	//candidates[count++] = 0.0f;
-	//candidates[count++] = 1.0f;
+		return std::min({ sqDistP0, sqDistP1, sqDistTMin, sqDistTMax });
+	};
 
-	//for (int i = 0; i < 3; ++i)
-	//{
-	//	//’†Sü‚Æn“_‚Ì—v‘f‚ğ‚»‚ê‚¼‚êæ“¾
-	//	float directionComponent = vecBetCenter[i];
-	//	float originComponent = upToLocal[i];
+	//1. ç«¯ç‚¹ã‚’ãƒ­ãƒ¼ã‚«ãƒ«åº§æ¨™ã«å¤‰æ›ï¼ˆå¿…ãšä¸¡ç«¯ã‚’ä½¿ã†ï¼‰
+	Vector3 l0 = WorldToLocal(*capsuleColl->UpEdge());
+	Vector3 l1 = WorldToLocal(*capsuleColl->DownEdge());
+	Vector3 extents = boxColl->HalfLength();
 
-	//	//’†Sü‚Ì—v‘f‚ª‚ ‚é’ö“x‘å‚«‚¯‚ê‚Î
-	//	if (fabs(directionComponent) > 1e-6f)
-	//	{
-	//		float t1 = (-boxColl->HalfLength()[i] - originComponent) / directionComponent;
-	//		float t2 = (boxColl->HalfLength()[i] - originComponent) / directionComponent;
+	//2. ç·šåˆ†(l0 to l1)ã¨AABB(extents)ã®æœ€çŸ­è·é›¢ã®äºŒä¹—ã‚’æ±‚ã‚ã‚‹
+	float sqDist = SegmentAABBSqDistance(l0, l1, extents);
 
-	//		if (t1 > 0.0f && t1 < 1.0f)
-	//		{
-	//			candidates[count++] = t1;
-	//		}
-	//		if (t2 > 0.0f && t2 < 1.0f)
-	//		{
-	//			candidates[count++] = t2;
-	//		}
-	//	}
-	//}
-
-	//auto SqDistPointAABB = [&](Vector3 p)
-	//{
-	//	float ret = 0.0f;
-	//	if (p.X() < -boxColl->HalfLength()[0]) ret += (-boxColl->HalfLength()[0] - p.X()) * (-boxColl->HalfLength()[0] - p.X());
-	//	if (p.X() > boxColl->HalfLength()[0]) ret += (p.X() - boxColl->HalfLength()[0]) * (p.X() - boxColl->HalfLength()[0]);
-	//	if (p.Y() < -boxColl->HalfLength()[1]) ret += (-boxColl->HalfLength()[1] - p.Y()) * (-boxColl->HalfLength()[1] - p.Y());
-	//	if (p.Y() > boxColl->HalfLength()[1]) ret += (p.Y() - boxColl->HalfLength()[1]) * (p.Y() - boxColl->HalfLength()[1]);
-	//	if (p.Z() < -boxColl->HalfLength()[2]) ret += (-boxColl->HalfLength()[2] - p.Z()) * (-boxColl->HalfLength()[2] - p.Z());
-	//	if (p.Z() > boxColl->HalfLength()[2]) ret += (p.Z() - boxColl->HalfLength()[2]) * (p.Z() - boxColl->HalfLength()[2]);
-	//	return ret;
-	//};
-
-	//float minSqDist = 1e30f;
-	//for (int i = 0; i < count; i++)
-	//{
-	//	Vector3 p = upToLocal + vecBetCenter * candidates[i];
-	//	float sqDistPointAABB = SqDistPointAABB(p);
-
-	//	minSqDist = min(minSqDist, sqDistPointAABB);
-	//}
-
-	//ImGuiManager::Instance().AddLabelAndFloat("MinSqDist", sqrt(minSqDist));
-
-	//return sqrt(minSqDist) >= capsuleColl->Radius();
-	return false;
+	//3. åŠå¾„ã‚’è€ƒæ…®ã—ãŸåˆ¤å®š
+	float r = capsuleColl->Radius();
+	return sqDist <= (r * r);
 }
 
 /// <summary>
-/// “–‚½‚è”»’è‚Éü•ª‚ª“ü‚Á‚Ä‚¢‚é‚©Šm”F‚·‚éŠÖ”
+/// å½“ãŸã‚Šåˆ¤å®šã«ç·šåˆ†ãŒå…¥ã£ã¦ã„ã‚‹ã‹ç¢ºèªã™ã‚‹é–¢æ•°
 /// </summary>
-/// <param name="col">“–‚½‚è”»’è</param>
-/// <param name="startPos">ü•ª‚Ìn“_</param>
-/// <param name="endPos">ü•ª‚ÌI“_</param>
-/// <returns>“ü‚Á‚Ä‚¢‚é‚©‚Ç‚¤‚©</returns>
+/// <param name="col">å½“ãŸã‚Šåˆ¤å®š</param>
+/// <param name="startPos">ç·šåˆ†ã®å§‹ç‚¹</param>
+/// <param name="endPos">ç·šåˆ†ã®çµ‚ç‚¹</param>
+/// <returns>å…¥ã£ã¦ã„ã‚‹ã‹ã©ã†ã‹</returns>
 Vector3
 CollisionDetector::GetDiffBetweenColAndVec(shared_ptr<ICollider> col, const Vector3& startPos, const Vector3& endPos)
 {
-	//ü•ª
+	//ç·šåˆ†
 	Vector3 line = endPos - startPos;
-	//OBB‚Æü•ª‚Ì’†S‚Ì·•ª
+	//OBBã¨ç·šåˆ†ã®ä¸­å¿ƒã®å·®åˆ†
 	Vector3 diffBetCenter = endPos - *col->Center();
-	//OBB‚Æü•ª‚ªŒğ‚í‚éÀ•W
+	//OBBã¨ç·šåˆ†ãŒäº¤ã‚ã‚‹åº§æ¨™
 	Vector3 colPoint = XMVectorZero();
 
 	if (col == dynamic_pointer_cast<BoxCollider>(col))
@@ -283,14 +281,14 @@ CollisionDetector::GetDiffBetweenColAndVec(shared_ptr<ICollider> col, const Vect
 		auto tempBox = dynamic_pointer_cast<BoxCollider>(col);
 
 		float lenOnDiffBetCenter, halfLen, lineLenOnDir;
-		//OBB‚Ì•ûŒüƒxƒNƒgƒ‹‚É‘Î‚µ’†S·•ª‚ğ“Š‰e‚µA”¼•ª’·‚Æü•ª‚Ì“Š‰e‚Ì˜a‚ğ”äŠr‚µ‚ÄÕ“Ë”»’è
+		//OBBã®æ–¹å‘ãƒ™ã‚¯ãƒˆãƒ«ã«å¯¾ã—ä¸­å¿ƒå·®åˆ†ã‚’æŠ•å½±ã—ã€åŠåˆ†é•·ã¨ç·šåˆ†ã®æŠ•å½±ã®å’Œã‚’æ¯”è¼ƒã—ã¦è¡çªåˆ¤å®š
 		for (int i = 0; i < 3; i++)
 		{
-			//’†S·•ª‚Ì“Š‰e
+			//ä¸­å¿ƒå·®åˆ†ã®æŠ•å½±
 			lenOnDiffBetCenter = LenOnOtherVec(diffBetCenter, tempBox->DirectionVectors()[i]);
-			//•ûŒüƒxƒNƒgƒ‹‚Ì”¼•ª’·
+			//æ–¹å‘ãƒ™ã‚¯ãƒˆãƒ«ã®åŠåˆ†é•·
 			halfLen = tempBox->HalfLength()[i];
-			//ü•ª‚Ì•ûŒüƒxƒNƒgƒ‹‚Ö‚Ì“Š‰e
+			//ç·šåˆ†ã®æ–¹å‘ãƒ™ã‚¯ãƒˆãƒ«ã¸ã®æŠ•å½±
 			lineLenOnDir = LenOnOtherVec(line, tempBox->DirectionVectors()[i]);
 
 			if (lenOnDiffBetCenter > halfLen + lineLenOnDir)
@@ -313,18 +311,18 @@ CollisionDetector::GetDiffBetweenColAndVec(shared_ptr<ICollider> col, const Vect
 }
 
 /// <summary>
-/// ƒxƒNƒgƒ‹‚ÆCollider‚ÌÕ“Ë”»’è‚ğs‚¤
-/// ƒXƒ‰ƒu–@‚Ìg—p—á
+/// ãƒ™ã‚¯ãƒˆãƒ«ã¨Colliderã®è¡çªåˆ¤å®šã‚’è¡Œã†
+/// ã‚¹ãƒ©ãƒ–æ³•ã®ä½¿ç”¨ä¾‹
 /// </summary>
 /// <param name="col">Collider</param>
-/// <param name="startPos">ƒxƒNƒgƒ‹‚Ìn“_</param>
-/// <param name="direction">ƒxƒNƒgƒ‹‚ÌŒü‚«</param>
-/// <param name="length">ƒxƒNƒgƒ‹‚Ì’·‚³</param>
-/// <returns>Õ“Ë”»’è</returns>
+/// <param name="startPos">ãƒ™ã‚¯ãƒˆãƒ«ã®å§‹ç‚¹</param>
+/// <param name="direction">ãƒ™ã‚¯ãƒˆãƒ«ã®å‘ã</param>
+/// <param name="length">ãƒ™ã‚¯ãƒˆãƒ«ã®é•·ã•</param>
+/// <returns>è¡çªåˆ¤å®š</returns>
 bool 
 CollisionDetector::CheckColAndVector(shared_ptr<ICollider> col, const Vector3 startPos, const Vector3 direction, float length)
 {
-	//ƒJƒvƒZƒ‹E‹…‚Ì“–‚½‚è”»’è‚ÍœŠO
+	//ã‚«ãƒ—ã‚»ãƒ«ãƒ»çƒã®å½“ãŸã‚Šåˆ¤å®šã¯ã²ã¨ã¾ãšé™¤å¤–
 	if (dynamic_pointer_cast<CapsuleCollider>(col) || dynamic_pointer_cast<SphereCollider>(col))
 	{
 		return false;
@@ -332,33 +330,35 @@ CollisionDetector::CheckColAndVector(shared_ptr<ICollider> col, const Vector3 st
 
 	auto boxCol = dynamic_pointer_cast<BoxCollider>(col);
 
-	//“–‚½‚è”»’è‚Ì’†S‚ÆƒxƒNƒgƒ‹‚Ìn“_‚ğŒ‹‚ÔƒxƒNƒgƒ‹
+	//å½“ãŸã‚Šåˆ¤å®šã®ä¸­å¿ƒã¨ãƒ™ã‚¯ãƒˆãƒ«ã®å§‹ç‚¹ã‚’çµã¶ãƒ™ã‚¯ãƒˆãƒ«
 	Vector3 vecBetCenterAndStart = *boxCol->Center() - startPos;
 
-	//ƒxƒNƒgƒ‹‚ğf=n“_+t*•ûŒü‚Æ‚µ‚ÄAOBB‚É“ü‚Á‚½Ao‚½‚Ìt‚Ì’l
+	//ãƒ™ã‚¯ãƒˆãƒ«ã‚’f=å§‹ç‚¹+t*æ–¹å‘ã¨ã—ã¦ã€OBBã«å…¥ã£ãŸæ™‚ã®tã®å€¤
 	float min = 0.0f;
+	//å‡ºãŸæ™‚ã®å€¤
 	float max = FLT_MAX;
 
 	for (int i = 0; i < 3; i++)
 	{
-		//’†SƒxƒNƒgƒ‹AƒxƒNƒgƒ‹‚ÌŒü‚«‚ÌŠe²‚Ö‚Ì“Š‰e
+		//ä¸­å¿ƒé–“ãƒ™ã‚¯ãƒˆãƒ«ã®å„è»¸ã¸ã®æŠ•å½±
 		float e = XMVector3Dot(boxCol->DirectionVectors()[i],vecBetCenterAndStart).m128_f32[0];
+		//ãƒ™ã‚¯ãƒˆãƒ«ã®å‘ãã®æŠ•å½±
 		float f = XMVector3Dot(boxCol->DirectionVectors()[i], direction * length).m128_f32[0];
 
-		//ƒxƒNƒgƒ‹‚ª²‚É‘Î‚µ•Às‚Å‚È‚¢ê‡
+		//ãƒ™ã‚¯ãƒˆãƒ«ãŒè»¸ã«å¯¾ã—ä¸¦è¡Œã§ãªã„å ´åˆ
 		if (abs(f) > 1e-6f)
 		{
-			//“Á’è‚Ì²‚É’–Ú‚µ‚½‚ÌOBB‚Ì“üŒûAoŒû‚Ìt‚Ì’l
+			//ç‰¹å®šã®è»¸ã«æ³¨ç›®ã—ãŸæ™‚ã®OBBã®å…¥å£ã€å‡ºå£ã®tã®å€¤
 			float val_min = (e - boxCol->HalfLength()[i]) / f;
 			float val_max = (e + boxCol->HalfLength()[i]) / f;
 
-			//˜a‚Ì”ä‚ª·‚Ì”ä‚æ‚è‘å‚«‚©‚Á‚½‚ç“ü‚ê‘Ö‚¦
+			//å…¥å£ãŒå‡ºå£ã‚ˆã‚Šå¥¥ã«ã‚ã£ãŸã‚‰å…¥ã‚Œæ›¿ãˆ
 			if (val_min > val_max)
 			{
 				swap(val_min, val_max);
 			}
 
-			//Å¬’lAÅ‘å’l‚Ì•‚ğ‹·‚ß‚Ä‚¢‚­
+			//å…¥å£ã€å‡ºå£ã®å¹…ã‚’ç‹­ã‚ã¦ã„ã
 			if (val_min > min)
 			{
 				min = val_min;
@@ -368,14 +368,14 @@ CollisionDetector::CheckColAndVector(shared_ptr<ICollider> col, const Vector3 st
 				max = val_max;
 			}
 
-			//oŒû‚æ‚è“ü‚èŒû‚ªŒã‚É‚«‚Ä‚¢‚éê‡OBB‚ğ“Ë‚«”²‚¯‚Ä‚¢‚éc‚ç‚µ‚¢
-			//oŒû‚ª0‚æ‚è‘O‚É‚ ‚éê‡OBB‚ÍƒxƒNƒgƒ‹‚Æ‚Í‹t•ûŒüc‚ç‚µ‚¢
+			//å‡ºå£ãŒå…¥å£ã‚ˆã‚Šæ‰‹å‰ã«ãã¦ã„ã‚‹å ´åˆOBBã‚’çªãæŠœã‘ã¦ã„ã‚‹â€¦ã‚‰ã—ã„
+			//å‡ºå£ãŒ0ã‚ˆã‚Šå‰ã«ã‚ã‚‹å ´åˆOBBã¯ãƒ™ã‚¯ãƒˆãƒ«ã¨ã¯é€†æ–¹å‘ã«å­˜åœ¨ã™ã‚‹
 			if (min > max || max < 0.0f)
 			{
 				return false;
 			}
 		}
-		//²‚É‘Î‚µ•½s‚Èê‡
+		//è»¸ã«å¯¾ã—å¹³è¡Œãªå ´åˆ
 		else
 		{
 			float s = boxCol->HalfLength()[i];
@@ -390,12 +390,12 @@ CollisionDetector::CheckColAndVector(shared_ptr<ICollider> col, const Vector3 st
 }
 
 /// <summary>
-/// ‹éŒ`“¯m‚Ì“–‚½‚è”»’è‚ğŠm”F‚·‚éŠÖ”
-/// •ª—£²’è—‚Ìg—p—á
+/// çŸ©å½¢åŒå£«ã®å½“ãŸã‚Šåˆ¤å®šã‚’ç¢ºèªã™ã‚‹é–¢æ•°
+/// åˆ†é›¢è»¸å®šç†ã®ä½¿ç”¨ä¾‹
 /// </summary>
-/// <param name="col1">“–‚½‚è”»’è‚»‚Ì1</param>
-/// <param name="col2">“–‚½‚è”»’è‚»‚Ì2</param>
-/// <returns>Õ“Ë‚µ‚Ä‚¢‚é‚©</returns>
+/// <param name="col1">å½“ãŸã‚Šåˆ¤å®šãã®1</param>
+/// <param name="col2">å½“ãŸã‚Šåˆ¤å®šãã®2</param>
+/// <returns>è¡çªã—ã¦ã„ã‚‹ã‹</returns>
 bool
 CollisionDetector::CheckBoxAndBox(shared_ptr<ICollider> col1, shared_ptr<ICollider> col2, Vector3 vecBetCenter)
 {
@@ -409,7 +409,7 @@ CollisionDetector::CheckBoxAndBox(shared_ptr<ICollider> col1, shared_ptr<ICollid
 
 	for (int i = 0; i < 3; i++)
 	{
-		//Še•ûŒüƒxƒNƒgƒ‹‚Ì•ª—£²‚Ö‚Ì“Š‰e‚Ì˜a
+		//å„æ–¹å‘ãƒ™ã‚¯ãƒˆãƒ«ã®åˆ†é›¢è»¸ã¸ã®æŠ•å½±ã®å’Œ
 		float r = 0;
 		for (int j = 0; j < 3; j++)
 		{
@@ -417,10 +417,10 @@ CollisionDetector::CheckBoxAndBox(shared_ptr<ICollider> col1, shared_ptr<ICollid
 				tempBox2->DirectionVectors()[j] * tempBox2->HalfLength()[j]);
 		}
 
-		//’†SŠÔƒxƒNƒgƒ‹‚Ì•ª—£²‚Ö‚Ì“Š‰e
+		//ä¸­å¿ƒé–“ãƒ™ã‚¯ãƒˆãƒ«ã®åˆ†é›¢è»¸ã¸ã®æŠ•å½±
 		float s = LenOnOtherVec(vecBetCenter, tempBox1->DirectionVectors()[i]);
 
-		//”äŠr‚µ‚ÄA’†SŠÔƒxƒNƒgƒ‹‚Ì“Š‰e‚Ì•û‚ª‘å‚«‚¯‚ê‚ÎÕ“Ë‚µ‚Ä‚¢‚È‚¢
+		//æ¯”è¼ƒã—ã¦ã€ä¸­å¿ƒé–“ãƒ™ã‚¯ãƒˆãƒ«ã®æŠ•å½±ã®æ–¹ãŒå¤§ãã‘ã‚Œã°è¡çªã—ã¦ã„ãªã„
 		if (s > r + tempBox1->HalfLength()[i])
 		{
 			return false;
@@ -431,11 +431,11 @@ CollisionDetector::CheckBoxAndBox(shared_ptr<ICollider> col1, shared_ptr<ICollid
 }
 
 /// <summary>
-/// ‹…Œ`“¯m‚Ì“–‚½‚è”»’è‚ğŠm”F‚·‚éŠÖ”
+/// çƒå½¢åŒå£«ã®å½“ãŸã‚Šåˆ¤å®šã‚’ç¢ºèªã™ã‚‹é–¢æ•°
 /// </summary>
-/// <param name="col1">“–‚½‚è”»’è‚»‚Ì1</param>
-/// <param name="col2">“–‚½‚è”»’è‚»‚Ì2</param>
-/// <returns>Õ“Ë‚µ‚Ä‚¢‚é‚©</returns>
+/// <param name="col1">å½“ãŸã‚Šåˆ¤å®šãã®1</param>
+/// <param name="col2">å½“ãŸã‚Šåˆ¤å®šãã®2</param>
+/// <returns>è¡çªã—ã¦ã„ã‚‹ã‹</returns>
 bool
 CollisionDetector::CheckSphereAndSphere(shared_ptr<ICollider> col1, shared_ptr<ICollider> col2, Vector3 vecBetCenter)
 {
@@ -444,7 +444,7 @@ CollisionDetector::CheckSphereAndSphere(shared_ptr<ICollider> col1, shared_ptr<I
 		return false;
 	}
 
-	//‹…‚Ì”¼Œa‚Ì˜a‚ğæ“¾‚µA’†SƒxƒNƒgƒ‹‚Ì‹——£‚Æ”äŠr
+	//çƒã®åŠå¾„ã®å’Œã‚’å–å¾—ã—ã€ä¸­å¿ƒãƒ™ã‚¯ãƒˆãƒ«ã®è·é›¢ã¨æ¯”è¼ƒ
 	auto tempSphe1 = dynamic_pointer_cast<SphereCollider>(col1);
 	auto tempSphe2 = dynamic_pointer_cast<SphereCollider>(col2);
 	auto sumOfRadius = tempSphe1->Radius() + tempSphe2->Radius();
@@ -460,11 +460,11 @@ CollisionDetector::CheckSphereAndSphere(shared_ptr<ICollider> col1, shared_ptr<I
 }
 
 /// <summary>
-/// ‹éŒ`‚Æ‹…Œ`‚Ì“–‚½‚è”»’è‚ğŠm”F‚·‚éŠÖ”
+/// çŸ©å½¢ã¨çƒå½¢ã®å½“ãŸã‚Šåˆ¤å®šã‚’ç¢ºèªã™ã‚‹é–¢æ•°
 /// </summary>
-/// <param name="col1">“–‚½‚è”»’è‚»‚Ì1</param>
-/// <param name="col2">“–‚½‚è”»’è‚»‚Ì2</param>
-/// <returns>Õ“Ë‚µ‚Ä‚¢‚é‚©</returns>
+/// <param name="col1">å½“ãŸã‚Šåˆ¤å®šãã®1</param>
+/// <param name="col2">å½“ãŸã‚Šåˆ¤å®šãã®2</param>
+/// <returns>è¡çªã—ã¦ã„ã‚‹ã‹</returns>
 bool
 CollisionDetector::CheckBoxAndSphere(shared_ptr<ICollider> col1, shared_ptr<ICollider> col2, Vector3 vecBetCenter)
 {
@@ -495,15 +495,15 @@ CollisionDetector::CheckBoxAndSphere(shared_ptr<ICollider> col1, shared_ptr<ICol
 }
 
 /// <summary>
-/// •ÊƒxƒNƒgƒ‹‚É“Š‰e‚³‚ê‚½ƒxƒNƒgƒ‹‚Ì’·‚³‚ğæ“¾‚·‚éŠÖ”
+/// åˆ¥ãƒ™ã‚¯ãƒˆãƒ«ã«æŠ•å½±ã•ã‚ŒãŸãƒ™ã‚¯ãƒˆãƒ«ã®é•·ã•ã‚’å–å¾—ã™ã‚‹é–¢æ•°
 /// </summary>
-/// <param name="sep">’·‚³‚ğ‹‚ß‚½‚¢ƒxƒNƒgƒ‹</param>
-/// <param name="dirVec">“Š‰eæ‚ÌƒxƒNƒgƒ‹</param>
-/// <returns>“Š‰eƒxƒNƒgƒ‹ã‚ÌƒxƒNƒgƒ‹‚Ì‘å‚«‚³</returns>
+/// <param name="sep">é•·ã•ã‚’æ±‚ã‚ãŸã„ãƒ™ã‚¯ãƒˆãƒ«</param>
+/// <param name="dirVec">æŠ•å½±å…ˆã®ãƒ™ã‚¯ãƒˆãƒ«</param>
+/// <returns>æŠ•å½±ãƒ™ã‚¯ãƒˆãƒ«ä¸Šã®ãƒ™ã‚¯ãƒˆãƒ«ã®å¤§ãã•</returns>
 float
 CollisionDetector::LenOnOtherVec(const Vector3& sep, const Vector3& dirVec)
 {
-	//•ª—£²‚ÆŠeƒxƒNƒgƒ‹‚Ì“àÏ‚ğæ‚èA‚»‚Ìâ‘Î’l‚ª“Š‰e‚³‚ê‚½‘å‚«‚³‚Æ‚È‚é
+	//åˆ†é›¢è»¸ã¨å„ãƒ™ã‚¯ãƒˆãƒ«ã®å†…ç©ã‚’å–ã‚Šã€ãã®çµ¶å¯¾å€¤ãŒæŠ•å½±ã•ã‚ŒãŸå¤§ãã•ã¨ãªã‚‹
 	float ret = fabs(XMVector3Dot(sep, dirVec).m128_f32[0]);
 
 	return ret;
