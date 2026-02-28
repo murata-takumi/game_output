@@ -23,6 +23,9 @@ public:
 	//モデルを初期化する関数
 	void InitModel(const wchar_t* filePath);
 
+	//名前を紐づける関数
+	void SetName(const string name);
+
 	//当たり判定（矩形）作成関数
 	void CreateBoxCollider(const Vector3& size, const Vector3& pos, IFbx* obj);
 
@@ -142,7 +145,7 @@ private:
 	Vector3 _speed;
 
 	//オブジェクトの名前
-	const string _name;
+	string _name;
 
 	//当たり判定の更新からボーンの座標変換を排除するか
 	bool _rejectBone;	

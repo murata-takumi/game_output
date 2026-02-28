@@ -47,6 +47,16 @@ FbxComposition::InitModel(const wchar_t* filePath)
 }
 
 /// <summary>
+/// 名前を設定する関数
+/// </summary>
+/// <param name="name">名前</param>
+void 
+FbxComposition::SetName(const string name)
+{
+	_name = name;
+}
+
+/// <summary>
 /// メッシュ毎に頂点バッファー・ビューを作成する関数
 /// </summary>
 /// <returns>処理が成功したかどうか</returns>

@@ -25,6 +25,8 @@ FbxObject::Init(const wchar_t* filePath, const string name,
 	//‹¤’Êˆ—‚ğ‰Šú‰»
 	_fbxComp = make_shared<FbxComposition>();
 
+	_fbxComp->SetName(name);
+
 	//ƒ‚ƒfƒ‹ŠÖ˜A‚Ìî•ñ‚ğ‰Šú‰»
 	_fbxComp->InitModel(filePath);
 

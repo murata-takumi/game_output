@@ -64,6 +64,9 @@ FbxActor::Init(const wchar_t* filePath, const string name,
 	//共通処理を初期化
 	_fbxComp = make_shared<FbxComposition>();
 
+	//名前を紐付け
+	_fbxComp->SetName(name);
+
 	//モデル関連の情報を初期化
 	_fbxComp->InitModel(filePath);
 
@@ -112,8 +115,8 @@ FbxActor::Init(const wchar_t* filePath, const string name,
 		AnimEnum nextAnimName;
 		if (animTime > SELECT_NEXT_ANIM_TIME)
 		{
-			if (GetContinuousOnGround(XMVectorSet(0, 1, 0, 0), _fbxComp->CurrentPosition(),
-				-45.0f * GRAVITY_ACCERALATION))
+			if (GetContinuousOnGround(XMVectorSet(0, -1, 0, 0), _fbxComp->CurrentPosition(),
+				45.0f * GRAVITY_ACCERALATION))
 			{
 				//入力されているかどうかで遷移先のアニメーションを決める
 				if (XMVector3Length(_inputVec).m128_f32[0] > 0.0f)
@@ -172,8 +175,8 @@ FbxActor::Init(const wchar_t* filePath, const string name,
 		}
 
 		//着地したらアニメーション切り替え
-		if (GetContinuousOnGround(XMVectorSet(0, 1, 0, 0),_fbxComp->CurrentPosition(),
-			-45.0f * GRAVITY_ACCERALATION))
+		if (GetContinuousOnGround(XMVectorSet(0, -1, 0, 0),_fbxComp->CurrentPosition(),
+			45.0f * GRAVITY_ACCERALATION))
 		{
 			SetCanChangeAnim(true);
 		}
@@ -207,7 +210,6 @@ FbxActor::Init(const wchar_t* filePath, const string name,
 
 		//アクターの近くにあるオブジェクトを取得し当たり判定をチェック
 		auto objsNearby = OcTree::Instance().GetByCollider(_colOnGroundForRun);
-		ImGuiManager::Instance().AddLabelAndInt("Count", objsNearby.size());
 
 		auto ret = false;
 		for (auto& obj : objsNearby)
@@ -352,7 +354,7 @@ bool
 FbxActor::GetContinuousOnGround(const Vector3& dir,	const Vector3& currentPos,
 	const float speed)
 {
-	auto objsNearby = OcTree::Instance().GetByVector(currentPos, -dir, 1000);
+	auto objsNearby = OcTree::Instance().GetByVector(currentPos, dir, 10);
 	auto collision = false;
 
 	for (auto& obj : objsNearby)
@@ -760,8 +762,6 @@ FbxActor::Update()
 
 	//前フレームの時間を更新
 	_befFrameTime = _currFrameTime;
-
-	auto objsByVector = OcTree::Instance().GetByVector(*_fbxComp->Collider()->Center(), _currentFrontVec, 100);
 }
 
 /// <summary>
@@ -795,15 +795,19 @@ FbxActor::OnKeyPressed(const Vector3& input)
 		std::pow(_fbxComp->Speed().Z(), 2));
 
 	//当たり判定をチェックし、正面にオブジェクトが存在しなかったら移動処理
-	auto objsNearby = OcTree::Instance().GetByCollider(_colOnGroundForRun);
+	auto objsNearby = OcTree::Instance().GetByVector(*_fbxComp->Collider()->Center() - Vector3(0,75,0), _currentFrontVec, 45);
 	auto collision = false;
+
+	ImGuiManager::Instance().AddLabelAndInt("Count", objsNearby.size());
 
 	for (auto& obj : objsNearby)
 	{
-		if (CollisionDetector::Instance().CheckCapsuleAndBox(
-			obj->Collider(), _fbxComp->Collider()))
+		if (dynamic_pointer_cast<BoxCollider>(obj->Collider()) && 
+			CollisionDetector::Instance().CheckCapsuleAndBox(
+				obj->Collider(), _fbxComp->Collider()))
 		{
 			collision = true;
+			break;
 		}
 	}	
 	
