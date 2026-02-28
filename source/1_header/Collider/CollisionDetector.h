@@ -43,7 +43,7 @@ public:
 	bool CheckCapsuleAndBox(shared_ptr<ICollider> box, shared_ptr<ICollider> capsule);
 
 	//Colliderとベクトルの当たり判定を確認する関数
-	bool CheckColAndVector(shared_ptr<ICollider> col, const Vector3 startPos, const Vector3 direction, float length);
+	bool CheckColAndVector(shared_ptr<ICollider> col, Vector3 startPos, Vector3 direction, float length);
 
 private:
 	//矩形同士の当たり判定を確認する関数

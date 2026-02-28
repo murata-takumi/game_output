@@ -291,20 +291,20 @@ CollisionDetector::GetDiffBetweenColAndVec(shared_ptr<ICollider> col, const Vect
 			//線分の方向ベクトルへの投影
 			lineLenOnDir = LenOnOtherVec(line, tempBox->DirectionVectors()[i]);
 
-			if (lenOnDiffBetCenter > halfLen + lineLenOnDir)
-			{
-				return XMVectorZero();
-			}
-			else
-			{
-				colPoint[i] = lenOnDiffBetCenter - lineLenOnDir;
-			}
+if (lenOnDiffBetCenter > halfLen + lineLenOnDir)
+{
+	return XMVectorZero();
+}
+else
+{
+	colPoint[i] = lenOnDiffBetCenter - lineLenOnDir;
+}
 
 		}
 	}
-	else if(col == dynamic_pointer_cast<SphereCollider>(col))
+	else if (col == dynamic_pointer_cast<SphereCollider>(col))
 	{
-		return XMVectorZero();
+	return XMVectorZero();
 	}
 
 	return colPoint + *col->Center();
@@ -319,74 +319,70 @@ CollisionDetector::GetDiffBetweenColAndVec(shared_ptr<ICollider> col, const Vect
 /// <param name="direction">ベクトルの向き</param>
 /// <param name="length">ベクトルの長さ</param>
 /// <returns>衝突判定</returns>
-bool 
-CollisionDetector::CheckColAndVector(shared_ptr<ICollider> col, const Vector3 startPos, const Vector3 direction, float length)
+bool
+CollisionDetector::CheckColAndVector(shared_ptr<ICollider> col, Vector3 startPos, Vector3 direction, float length)
 {
-	//カプセル・球の当たり判定はひとまず除外
-	if (dynamic_pointer_cast<CapsuleCollider>(col) || dynamic_pointer_cast<SphereCollider>(col))
+	//カプセルの当たり判定はひとまず除外
+	if (dynamic_pointer_cast<CapsuleCollider>(col))
 	{
 		return false;
 	}
 
-	auto boxCol = dynamic_pointer_cast<BoxCollider>(col);
-
 	//当たり判定の中心とベクトルの始点を結ぶベクトル
-	Vector3 vecBetCenterAndStart = *boxCol->Center() - startPos;
+	Vector3 vecBetCenterAndStart = *col->Center() - startPos;
 
 	//ベクトルをf=始点+t*方向として、OBBに入った時のtの値
 	float min = 0.0f;
 	//出た時の値
 	float max = FLT_MAX;
 
+	// 型判定
+	auto boxCol = dynamic_pointer_cast<BoxCollider>(col);
+	auto sphere = dynamic_pointer_cast<SphereCollider>(col);
+
 	for (int i = 0; i < 3; i++)
 	{
-		//中心間ベクトルの各軸への投影
-		float e = XMVector3Dot(boxCol->DirectionVectors()[i],vecBetCenterAndStart).m128_f32[0];
-		//ベクトルの向きの投影
-		float f = XMVector3Dot(boxCol->DirectionVectors()[i], direction * length).m128_f32[0];
+		float e, f, half;
 
-		//ベクトルが軸に対し並行でない場合
+		if (boxCol)
+		{
+			// OBBの場合：各面の法線ベクトルへ投影
+			e = XMVector3Dot(boxCol->DirectionVectors()[i], vecBetCenterAndStart).m128_f32[0];
+			f = XMVector3Dot(boxCol->DirectionVectors()[i], direction * length).m128_f32[0];
+			half = boxCol->HalfLength()[i];
+		}
+		else if (sphere)
+		{
+			// Sphereの場合：ワールド座標軸(XYZ)へ投影（AABB近似）
+			// ※directionは正規化されている前提、startPosはレイの始点
+			e = (*sphere->Center())[i] - startPos[i];
+			f = direction[i] * length;
+			half = sphere->Radius();
+		}
+		else { return false; }
+
+		// 平行判定
 		if (abs(f) > 1e-6f)
 		{
-			//特定の軸に注目した時のOBBの入口、出口のtの値
-			float val_min = (e - boxCol->HalfLength()[i]) / f;
-			float val_max = (e + boxCol->HalfLength()[i]) / f;
+			float val_min = (e - half) / f;
+			float val_max = (e + half) / f;
 
-			//入口が出口より奥にあったら入れ替え
-			if (val_min > val_max)
-			{
-				swap(val_min, val_max);
-			}
+			if (val_min > val_max) swap(val_min, val_max);
 
-			//入口、出口の幅を狭めていく
-			if (val_min > min)
-			{
-				min = val_min;
-			}
-			if (val_max < max)
-			{
-				max = val_max;
-			}
+			if (val_min > min) min = val_min;
+			if (val_max < max) max = val_max;
 
-			//出口が入口より手前にきている場合OBBを突き抜けている…らしい
-			//出口が0より前にある場合OBBはベクトルとは逆方向に存在する
-			if (min > max || max < 0.0f)
-			{
-				return false;
-			}
+			// 交差していない、またはレイの背後にある
+			if (min > max || max < 0.0f) return false;
 		}
-		//軸に対し平行な場合
 		else
 		{
-			float s = boxCol->HalfLength()[i];
-			if (-e - s > 0.0f || -e + s < 0.0f)
-			{
-				return false;
-			}
+			// 軸に平行な場合、始点が範囲外なら当たっていない
+			if (-e - half > 0.0f || -e + half < 0.0f) return false;
 		}
 	}
 
-	return true;
+	return max > 0;
 }
 
 /// <summary>
@@ -470,10 +466,10 @@ CollisionDetector::CheckBoxAndSphere(shared_ptr<ICollider> col1, shared_ptr<ICol
 {
 	if(!dynamic_pointer_cast<BoxCollider>(col1) || !dynamic_pointer_cast<SphereCollider>(col2))
 	{
-		if (!dynamic_pointer_cast<SphereCollider>(col1) && !dynamic_pointer_cast<SphereCollider>(col2))
-		{
+		//if (!dynamic_pointer_cast<SphereCollider>(col1) && !dynamic_pointer_cast<SphereCollider>(col2))
+		//{
 			return false;
-		}
+		//}
 	}
 
 	auto tempBox = dynamic_pointer_cast<BoxCollider>(col1);
