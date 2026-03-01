@@ -113,55 +113,8 @@ CollisionDetector::CheckColAndCol(shared_ptr<ICollider> col1, shared_ptr<ICollid
 
 	return CheckBoxAndBox(col1, col2, vecBetCenter) || 
 		CheckBoxAndSphere(col2, col1, vecBetCenter) || 
-		CheckSphereAndSphere(col1, col2, vecBetCenter);
-}
-
-/// <summary>
-/// 当たり判定に線分が入っているか確認する関数
-/// </summary>
-/// <param name="col">当たり判定</param>
-/// <param name="startPos">線分の始点</param>
-/// <param name="endPos">線分の終点</param>
-/// <returns>入っているかどうか</returns>
-bool 
-CollisionDetector::CheckColAndVec(
-	shared_ptr<ICollider> col,
-	const Vector3& startPos,
-	const Vector3& endPos)
-{
-	//線分
-	Vector3 line = endPos - startPos;
-	//OBBの中心と線分の終端の差分
-	Vector3 diffBetCenterAndEnd = endPos - *col->Center();
-
-	if (col == dynamic_pointer_cast<BoxCollider>(col))
-	{
-		auto tempBox = dynamic_pointer_cast<BoxCollider>(col);
-
-		float diffBetCenterAndEndLenOnDir, halfLen, lineLenOnDir;
-
-		//OBBの方向ベクトルに対し差分を投影し、半分長と線分の投影の和を比較して衝突判定
-		for (int i = 0; i < 3; i++)
-		{
-			//中心差分の投影
-			diffBetCenterAndEndLenOnDir = LenOnOtherVec(diffBetCenterAndEnd, tempBox->DirectionVectors()[i]);
-			//線分の方向ベクトルへの投影
-			lineLenOnDir = LenOnOtherVec(line, tempBox->DirectionVectors()[i]);
-			//方向ベクトルの半分長
-			halfLen = tempBox->HalfLength()[i];
-
-			if (diffBetCenterAndEndLenOnDir > halfLen + lineLenOnDir)
-			{
-				return false;
-			}
-		}
-	}
-	else if (col == dynamic_pointer_cast<SphereCollider>(col))
-	{
-		return false;
-	}
-
-	return true;
+		CheckSphereAndSphere(col1, col2, vecBetCenter) ||
+		CheckCapsuleAndBox(col1,col2);
 }
 
 /// <summary>
@@ -173,6 +126,11 @@ CollisionDetector::CheckColAndVec(
 bool
 CollisionDetector::CheckCapsuleAndBox(shared_ptr<ICollider> box, shared_ptr<ICollider> capsule)
 {
+	if (!dynamic_pointer_cast<BoxCollider>(box) || !dynamic_pointer_cast<CapsuleCollider>(capsule))
+	{
+		return false;
+	}
+
 	auto boxColl = dynamic_pointer_cast<BoxCollider>(box);
 	auto capsuleColl = dynamic_pointer_cast<CapsuleCollider>(capsule);
 
@@ -291,15 +249,14 @@ CollisionDetector::GetDiffBetweenColAndVec(shared_ptr<ICollider> col, const Vect
 			//線分の方向ベクトルへの投影
 			lineLenOnDir = LenOnOtherVec(line, tempBox->DirectionVectors()[i]);
 
-if (lenOnDiffBetCenter > halfLen + lineLenOnDir)
-{
-	return XMVectorZero();
-}
-else
-{
-	colPoint[i] = lenOnDiffBetCenter - lineLenOnDir;
-}
-
+			if (lenOnDiffBetCenter > halfLen + lineLenOnDir)
+			{
+				return XMVectorZero();
+			}
+			else
+			{
+				colPoint[i] = lenOnDiffBetCenter - lineLenOnDir;
+			}
 		}
 	}
 	else if (col == dynamic_pointer_cast<SphereCollider>(col))
@@ -464,23 +421,26 @@ CollisionDetector::CheckSphereAndSphere(shared_ptr<ICollider> col1, shared_ptr<I
 bool
 CollisionDetector::CheckBoxAndSphere(shared_ptr<ICollider> col1, shared_ptr<ICollider> col2, Vector3 vecBetCenter)
 {
-	if(!dynamic_pointer_cast<BoxCollider>(col1) || !dynamic_pointer_cast<SphereCollider>(col2))
-	{
-		//if (!dynamic_pointer_cast<SphereCollider>(col1) && !dynamic_pointer_cast<SphereCollider>(col2))
-		//{
-			return false;
-		//}
+	auto box = dynamic_pointer_cast<BoxCollider>(col1);
+	auto sphere = dynamic_pointer_cast<SphereCollider>(col2);
+
+	// もし逆の組み合わせ（Sphere, Box）だった場合、入れ替えて取得を試みる
+	if (!box || !sphere) {
+		box = dynamic_pointer_cast<BoxCollider>(col2);
+		sphere = dynamic_pointer_cast<SphereCollider>(col1);
 	}
 
-	auto tempBox = dynamic_pointer_cast<BoxCollider>(col1);
-	auto tempSphere = dynamic_pointer_cast<SphereCollider>(col2);
+	// 最終的に両方の型が揃っていなければ中断
+	if (!box || !sphere) {
+		return false;
+	}
 
 	auto dis = XMVector3Length(vecBetCenter).m128_f32[0];
-	auto radius = tempSphere->Radius();
+	auto radius = sphere->Radius();
 
-	float disInBox = GetLengthBetweenColAndPos(tempBox, *tempSphere->Center());
+	float disInBox = GetLengthBetweenColAndPos(box, *sphere->Center());
 
-	if (fabs(disInBox) - fabs(dis) <= fabs(tempSphere->Radius()))
+	if (fabs(disInBox) - fabs(dis) <= fabs(sphere->Radius()))
 	{
 		return true;
 	}
