@@ -59,6 +59,30 @@ OcTreeNode::AddObject(const shared_ptr<IFbx> obj)
 }
 
 /// <summary>
+/// オブジェクトを削除する関数
+/// </summary>
+/// <param name="obj">削除対象のオブジェクト</param>
+void 
+OcTreeNode::EraseObject(const shared_ptr<IFbx> obj)
+{
+	auto it = std::find(_objs.begin(), _objs.end(),obj);
+
+	if (it != _objs.end())
+	{
+		//見つかった場合の処理
+		std::erase(_objs, obj);
+	}
+	else
+	{
+		//見つからなかった場合、子ノードに対して再帰的処理を実行
+		for (shared_ptr<OcTreeNode> node : _children)
+		{
+			node->EraseObject(obj);
+		}
+	}
+}
+
+/// <summary>
 /// 管理する空間を8つに分割し、生成した子ノードに管理させる関数
 /// </summary>
 void

@@ -19,6 +19,9 @@ public:
 	//オブジェクトを追加する関数
 	bool AddObject(const shared_ptr<IFbx> obj);
 
+	//オブジェクトを削除する関数
+	void EraseObject(const shared_ptr<IFbx> obj);
+
 	//クエリ範囲にあるオブジェクトを取得する関数
 	vector<shared_ptr<IFbx>> GetByCollider(const shared_ptr<ICollider> col)noexcept;
 

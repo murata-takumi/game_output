@@ -19,17 +19,20 @@ public:
 	//オブジェクトを追加する関数
 	bool AddObject(const shared_ptr<IFbx> obj);
 
-	//空間を分割する関数
-	void SubDivide();
-
-	//子ノードに分割する関数
-	void AddToChild(const vector<shared_ptr<IFbx>> objs);
+	//オブジェクトを削除する関数
+	void EraseObject(const shared_ptr<IFbx> obj);
 
 	//クエリ範囲にあるオブジェクトを取得する関数
 	vector<shared_ptr<IFbx>> GetByCollider(const shared_ptr<ICollider> bounds)noexcept;
 
 	//ベクトルに接しているオブジェクトを取得する関数
 	vector<shared_ptr<IFbx>> GetByVector(const Vector3 startPos, const Vector3 direction, float length)noexcept;
+
+	//空間を分割する関数
+	void SubDivide();
+
+	//子ノードに分割する関数
+	void AddToChild(const vector<shared_ptr<IFbx>> objs);
 private:
 	//管理する空間
 	shared_ptr<ICollider> _col;

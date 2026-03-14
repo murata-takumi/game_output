@@ -55,6 +55,16 @@ OcTree::AddObject(const shared_ptr<IFbx> obj)
 }
 
 /// <summary>
+/// オブジェクトを削除する関数
+/// </summary>
+/// <param name="obj">削除対象のオブジェクト</param>
+void
+OcTree::EraseObject(const shared_ptr<IFbx> obj)
+{
+	_rootNode->EraseObject(obj);
+}
+
+/// <summary>
 /// クエリ範囲にあるオブジェクトを取得する関数
 /// </summary>
 /// <param name="bounds">クエリ範囲</param>
