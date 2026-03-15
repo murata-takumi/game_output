@@ -61,5 +61,8 @@ protected:
 	//モデル描画処理
 	void ModelDraw() override;												
 	//画面エフェクト描画処理
-	void EffectAndUIDraw() override;											
+	void EffectAndUIDraw() override;	
+
+	//シーン上からオブジェクトを削除する
+	void EraseObject(string objName);
 };

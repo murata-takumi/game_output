@@ -49,8 +49,8 @@ const Vector3 GROUND_INIT_POS = Vector3(0.0f, -1.0f, 0.0f);
 const Vector3 COIN_INIT_POS = Vector3(0.0f, 0.0f, 100.0f);
 //箱の初期座標
 //const Vector3 BOX_INIT_POS = Vector3(200.0f, 00.0f, 0.0f);
-const Vector3 BOX_INIT_POS = Vector3(500.0f, -500.0f, 0.0f);
-const Vector3 BOX_INIT_POS_1 = Vector3(-200.0f, 00.0f, 0.0f);
+const Vector3 BOX_INIT_POS = Vector3(200.0f, 0.0f, 0.0f);
+const Vector3 BOX_INIT_POS_1 = Vector3(-200.0f, 0.0f, 0.0f);
 const Vector3 BOX_INIT_POS_2 = Vector3(0.0f, -200.0f, 600.0f);
 const Vector3 BOX_INIT_POS_3 = Vector3(0.0f, -200.0f, -600.0f);
 
@@ -88,14 +88,15 @@ PlayScene::SceneStart()
 
 		//スレッドに各オブジェクトの作成処理を追加
 		InstantiateObject<FbxActor>(
-			ACTOR_PATH,ACTOR_NAME,ACTOR_COLL_SIZE,ACTOR_INIT_POS,ColliderType::Box);
+			ACTOR_PATH,ACTOR_NAME,ACTOR_COLL_SIZE,ACTOR_INIT_POS,ColliderType::Capsule);
 		InstantiateObject<FbxObject>(
 			GROUND_PATH,GROUND_NAME,GROUND_COLL_SIZE, GROUND_INIT_POS, ColliderType::Box);
-		//InstantiateObject<FbxObject>(
-		//	COIN_PATH,COIN_NAME,COIN_COLL_SIZE,COIN_INIT_POS, ColliderType::Sphere);
+		InstantiateObject<FbxObject>(
+			COIN_PATH,COIN_NAME,COIN_COLL_SIZE,COIN_INIT_POS, ColliderType::Sphere);
 		InstantiateObject<FbxObject>(
 			BOX_PATH,BOX_NAME,BOX_COLL_SIZE,BOX_INIT_POS,ColliderType::Box);
-		InstantiateObject<FbxObject>(BOX_PATH,BOX_NAME_1,BOX_COLL_SIZE,BOX_INIT_POS_1);
+		//InstantiateObject<FbxObject>(
+		//	BOX_PATH,BOX_NAME_1,BOX_COLL_SIZE,BOX_INIT_POS_1,ColliderType::Box);
 		//InstantiateObject<FbxObject>(BOX_PATH,BOX_NAME_2,BOX_COLL_SIZE,BOX_INIT_POS_2);
 		//InstantiateObject<FbxObject>(BOX_PATH,BOX_NAME_3,BOX_COLL_SIZE,BOX_INIT_POS_3);
 
@@ -212,6 +213,8 @@ PlayScene::Update()
 		//アクターが移動可能かどうか
 		if (ImGuiManager::Instance().CanActorTrans())
 		{
+			EraseObject(COIN_NAME);
+
 			//カメラに対し入力方向にベクトル加算
 			if (InputManager::Instance().KeyState().Left)
 			{
@@ -367,4 +370,18 @@ PlayScene::EffectAndUIDraw()
 		//ImGuiのウィンドウを描画
 		ImGuiManager::Instance().ImGuiDraw();	
 	}
+}
+
+/// <summary>
+/// シーン上からオブジェクトを削除する
+/// </summary>
+/// <param name="objName">削除したいオブジェクトの名前</param>
+void 
+PlayScene::EraseObject(string objName)
+{
+	//オブジェクトを削除
+	OcTree::Instance().EraseObject(_actorAndObjs[objName]);
+
+	//八分木から当たり判定を削除
+	_actorAndObjs.erase(objName);
 }
