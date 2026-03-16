@@ -105,116 +105,26 @@ CollisionDetector::CheckContinuousCollisionDetection(
 /// </summary>
 /// <param name="col1">当たり判定その1</param>
 /// <param name="col2">当たり判定その2</param>
-/// <returns>衝突しているかどうか</returns>
-bool
+/// <returns>衝突しているオブジェクトのポインタ</returns>
+shared_ptr<IFbx>
 CollisionDetector::CheckColAndCol(shared_ptr<ICollider> col1, shared_ptr<ICollider> col2)
 {
 	Vector3 vecBetCenter = *col2->Center() - *col1->Center();
 
-	return CheckBoxAndBox(col1, col2, vecBetCenter) || 
-		CheckBoxAndSphere(col2, col1, vecBetCenter) || 
-		CheckSphereAndSphere(col1, col2, vecBetCenter) ||
-		CheckCapsuleAndBox(col1,col2);
-}
+	shared_ptr<IFbx> ret = nullptr;
 
-/// <summary>
-/// カプセルと箱の当たり判定を確認する関数
-/// </summary>
-/// <param name="box">箱の当たり判定</param>
-/// <param name="capsule">箱の当たり判定</param>
-/// <returns>衝突しているかどうか</returns>
-bool
-CollisionDetector::CheckCapsuleAndBox(shared_ptr<ICollider> box, shared_ptr<ICollider> capsule)
-{
-	if (!dynamic_pointer_cast<BoxCollider>(box) || !dynamic_pointer_cast<CapsuleCollider>(capsule))
+	// 衝突しているか確認する
+	bool isCollision = CheckBoxAndBox(col1, col2, vecBetCenter) ||
+		CheckBoxAndSphere(col2, col1, vecBetCenter) ||
+		CheckBoxAndCapsule(col1, col2) ||
+		CheckSphereAndSphere(col1, col2, vecBetCenter) ||
+		CheckSphereAndCapsule(col1, col2);
+	if (isCollision)
 	{
-		return false;
+		ret = col2->Object();
 	}
 
-	auto boxColl = dynamic_pointer_cast<BoxCollider>(box);
-	auto capsuleColl = dynamic_pointer_cast<CapsuleCollider>(capsule);
-
-	//OBBが属するローカル空間への変換関数
-	auto WorldToLocal = [&](Vector3 worldPos) {
-		Vector3 rel = worldPos - *boxColl->Center();
-		return Vector3{
-			rel.X() * boxColl->DirectionVectors()[0].X() + rel.Y() * boxColl->DirectionVectors()[0].Y() + rel.Z() * boxColl->DirectionVectors()[0].Z(),
-			rel.X() * boxColl->DirectionVectors()[1].X() + rel.Y() * boxColl->DirectionVectors()[1].Y() + rel.Z() * boxColl->DirectionVectors()[1].Z(),
-			rel.X() * boxColl->DirectionVectors()[2].X() + rel.Y() * boxColl->DirectionVectors()[2].Y() + rel.Z() * boxColl->DirectionVectors()[2].Z()
-		};
-	};
-
-	//点とAABBの最短距離の二乗を求めるヘルパー
-	auto SqDistPointAABB = [&](Vector3 p, Vector3 extents) {
-		float sqDist = 0.0f;
-		// X軸
-		if (p.X() < -extents.X()) sqDist += (p.X() + extents.X()) * (p.X() + extents.X());
-		else if (p.X() > extents.X()) sqDist += (p.X() - extents.X()) * (p.X() - extents.X());
-		// Y軸
-		if (p.Y() < -extents.Y()) sqDist += (p.Y() + extents.Y()) * (p.Y() + extents.Y());
-		else if (p.Y() > extents.Y()) sqDist += (p.Y() - extents.Y()) * (p.Y() - extents.Y());
-		// Z軸
-		if (p.Z() < -extents.Z()) sqDist += (p.Z() + extents.Z()) * (p.Z() + extents.Z());
-		else if (p.Z() > extents.Z()) sqDist += (p.Z() - extents.Z()) * (p.Z() - extents.Z());
-
-		return sqDist;
-	};
-
-	//線分とAABBの距離の二乗を求める
-	auto SegmentAABBSqDistance = [&](Vector3 p0, Vector3 p1, Vector3 extents)
-	{
-		Vector3 d = p1 - p0;
-		float tMin = 0.0f;
-		float tMax = 1.0f;
-
-		// 各軸(X, Y, Z)について、線分がAABBの「外側」にある範囲を絞り込む
-		// この処理は、線分をAABBの各面で作られるスラブでクリッピングするのと同義です。
-		auto clip = [&](float p, float delta, float extent) {
-			if (std::abs(delta) < 1e-7f) {
-				// 線分が軸に平行な場合、その軸で外れていれば交差しない
-				return p < -extent || p > extent;
-			}
-			float t0 = (-extent - p) / delta;
-			float t1 = (extent - p) / delta;
-			if (t0 > t1) std::swap(t0, t1);
-
-			tMin = max(tMin, t0);
-			tMax = min(tMax, t1);
-			return tMin > tMax; // 矛盾が生じたら（この軸では外れている）
-		};
-
-		// 3軸すべてでクリッピングを試みる
-		bool separated = clip(p0.X(), d.X(), extents.X()) ||
-			clip(p0.Y(), d.Y(), extents.Y()) ||
-			clip(p0.Z(), d.Z(), extents.Z());
-
-		if (!separated) {
-			// 線分の一部または全部がAABBの内部にある場合、最短距離は0
-			// (厳密にはtMin〜tMaxの範囲で交差している)
-			return 0.0f;
-		}
-
-		// 線分が外側にある場合、p0(t=0), p1(t=1), または
-		// クリッピング境界(tMin, tMax)のいずれかがAABBに最も近い点になる
-		float sqDistP0 = SqDistPointAABB(p0, extents);
-		float sqDistP1 = SqDistPointAABB(p1, extents);
-		float sqDistTMin = SqDistPointAABB(p0 + d * std::clamp(tMin, 0.0f, 1.0f), extents);
-		float sqDistTMax = SqDistPointAABB(p0 + d * std::clamp(tMax, 0.0f, 1.0f), extents);
-
-		return std::min({ sqDistP0, sqDistP1, sqDistTMin, sqDistTMax });
-	};
-
-	//1. 端点をローカル座標に変換（必ず両端を使う）
-	Vector3 l0 = WorldToLocal(*capsuleColl->UpEdge());
-	Vector3 l1 = WorldToLocal(*capsuleColl->DownEdge());
-	Vector3 extents = boxColl->HalfLength();
-
-	//2. 線分(l0 to l1)とAABB(extents)の最短距離の二乗を求める
-	float sqDist = SegmentAABBSqDistance(l0, l1, extents);
-
-	//3. 半径を考慮した判定
-	float r = capsuleColl->Radius();
-	return sqDist <= (r * r);
+	return ret;
 }
 
 /// <summary>
@@ -384,35 +294,6 @@ CollisionDetector::CheckBoxAndBox(shared_ptr<ICollider> col1, shared_ptr<ICollid
 }
 
 /// <summary>
-/// 球形同士の当たり判定を確認する関数
-/// </summary>
-/// <param name="col1">当たり判定その1</param>
-/// <param name="col2">当たり判定その2</param>
-/// <returns>衝突しているか</returns>
-bool
-CollisionDetector::CheckSphereAndSphere(shared_ptr<ICollider> col1, shared_ptr<ICollider> col2, Vector3 vecBetCenter)
-{
-	if (!dynamic_pointer_cast<SphereCollider>(col1) || !dynamic_pointer_cast<SphereCollider>(col2))
-	{
-		return false;
-	}
-
-	//球の半径の和を取得し、中心ベクトルの距離と比較
-	auto tempSphe1 = dynamic_pointer_cast<SphereCollider>(col1);
-	auto tempSphe2 = dynamic_pointer_cast<SphereCollider>(col2);
-	auto sumOfRadius = tempSphe1->Radius() + tempSphe2->Radius();
-
-	if (pow(sumOfRadius,2) >= XMVector3LengthSq(vecBetCenter).m128_f32[0])
-	{
-		return true;
-	}
-	else
-	{
-		return false;
-	}
-}
-
-/// <summary>
 /// 矩形と球形の当たり判定を確認する関数
 /// </summary>
 /// <param name="col1">当たり判定その1</param>
@@ -448,6 +329,184 @@ CollisionDetector::CheckBoxAndSphere(shared_ptr<ICollider> col1, shared_ptr<ICol
 	{
 		return false;
 	}
+}
+
+/// <summary>
+/// カプセルと箱の当たり判定を確認する関数
+/// </summary>
+/// <param name="box">箱の当たり判定</param>
+/// <param name="capsule">箱の当たり判定</param>
+/// <returns>衝突しているかどうか</returns>
+bool
+CollisionDetector::CheckBoxAndCapsule(shared_ptr<ICollider> col1, shared_ptr<ICollider> col2)
+{
+	auto box = dynamic_pointer_cast<BoxCollider>(col1);
+	auto capsule = dynamic_pointer_cast<CapsuleCollider>(col2);
+
+	// もし逆の組み合わせ（Capsule, Box）だった場合、入れ替えて取得を試みる
+	if (!box || !capsule) {
+		box = dynamic_pointer_cast<BoxCollider>(col2);
+		capsule = dynamic_pointer_cast<CapsuleCollider>(col1);
+	}
+
+	// 最終的に両方の型が揃っていなければ中断
+	if (!box || !capsule) {
+		return false;
+	}
+
+	//OBBが属するローカル空間への変換関数
+	auto WorldToLocal = [&](Vector3 worldPos) {
+		Vector3 rel = worldPos - *box->Center();
+		return Vector3{
+			rel.X() * box->DirectionVectors()[0].X() + rel.Y() * box->DirectionVectors()[0].Y() + rel.Z() * box->DirectionVectors()[0].Z(),
+			rel.X() * box->DirectionVectors()[1].X() + rel.Y() * box->DirectionVectors()[1].Y() + rel.Z() * box->DirectionVectors()[1].Z(),
+			rel.X() * box->DirectionVectors()[2].X() + rel.Y() * box->DirectionVectors()[2].Y() + rel.Z() * box->DirectionVectors()[2].Z()
+		};
+	};
+
+	//点とAABBの最短距離の二乗を求めるヘルパー
+	auto SqDistPointAABB = [&](Vector3 p, Vector3 extents) {
+		float sqDist = 0.0f;
+		// X軸
+		if (p.X() < -extents.X()) sqDist += (p.X() + extents.X()) * (p.X() + extents.X());
+		else if (p.X() > extents.X()) sqDist += (p.X() - extents.X()) * (p.X() - extents.X());
+		// Y軸
+		if (p.Y() < -extents.Y()) sqDist += (p.Y() + extents.Y()) * (p.Y() + extents.Y());
+		else if (p.Y() > extents.Y()) sqDist += (p.Y() - extents.Y()) * (p.Y() - extents.Y());
+		// Z軸
+		if (p.Z() < -extents.Z()) sqDist += (p.Z() + extents.Z()) * (p.Z() + extents.Z());
+		else if (p.Z() > extents.Z()) sqDist += (p.Z() - extents.Z()) * (p.Z() - extents.Z());
+
+		return sqDist;
+	};
+
+	//線分とAABBの距離の二乗を求める
+	auto SegmentAABBSqDistance = [&](Vector3 p0, Vector3 p1, Vector3 extents)
+	{
+		Vector3 d = p1 - p0;
+		float tMin = 0.0f;
+		float tMax = 1.0f;
+
+		// 各軸(X, Y, Z)について、線分がAABBの「外側」にある範囲を絞り込む
+		// この処理は、線分をAABBの各面で作られるスラブでクリッピングするのと同義です。
+		auto clip = [&](float p, float delta, float extent) {
+			if (std::abs(delta) < 1e-7f) {
+				// 線分が軸に平行な場合、その軸で外れていれば交差しない
+				return p < -extent || p > extent;
+			}
+			float t0 = (-extent - p) / delta;
+			float t1 = (extent - p) / delta;
+			if (t0 > t1) std::swap(t0, t1);
+
+			tMin = max(tMin, t0);
+			tMax = min(tMax, t1);
+			return tMin > tMax; // 矛盾が生じたら（この軸では外れている）
+		};
+
+		// 3軸すべてでクリッピングを試みる
+		bool separated = clip(p0.X(), d.X(), extents.X()) ||
+			clip(p0.Y(), d.Y(), extents.Y()) ||
+			clip(p0.Z(), d.Z(), extents.Z());
+
+		if (!separated) {
+			// 線分の一部または全部がAABBの内部にある場合、最短距離は0
+			// (厳密にはtMin〜tMaxの範囲で交差している)
+			return 0.0f;
+		}
+
+		// 線分が外側にある場合、p0(t=0), p1(t=1), または
+		// クリッピング境界(tMin, tMax)のいずれかがAABBに最も近い点になる
+		float sqDistP0 = SqDistPointAABB(p0, extents);
+		float sqDistP1 = SqDistPointAABB(p1, extents);
+		float sqDistTMin = SqDistPointAABB(p0 + d * std::clamp(tMin, 0.0f, 1.0f), extents);
+		float sqDistTMax = SqDistPointAABB(p0 + d * std::clamp(tMax, 0.0f, 1.0f), extents);
+
+		return std::min({ sqDistP0, sqDistP1, sqDistTMin, sqDistTMax });
+	};
+
+	//1. 端点をローカル座標に変換（必ず両端を使う）
+	Vector3 l0 = WorldToLocal(*capsule->UpEdge());
+	Vector3 l1 = WorldToLocal(*capsule->DownEdge());
+	Vector3 extents = box->HalfLength();
+
+	//2. 線分(l0 to l1)とAABB(extents)の最短距離の二乗を求める
+	float sqDist = SegmentAABBSqDistance(l0, l1, extents);
+
+	//3. 半径を考慮した判定
+	float r = capsule->Radius();
+	return sqDist <= (r * r);
+}
+
+/// <summary>
+/// 球形同士の当たり判定を確認する関数
+/// </summary>
+/// <param name="col1">当たり判定その1</param>
+/// <param name="col2">当たり判定その2</param>
+/// <returns>衝突しているか</returns>
+bool
+CollisionDetector::CheckSphereAndSphere(shared_ptr<ICollider> col1, shared_ptr<ICollider> col2, Vector3 vecBetCenter)
+{
+	if (!dynamic_pointer_cast<SphereCollider>(col1) || !dynamic_pointer_cast<SphereCollider>(col2))
+	{
+		return false;
+	}
+
+	//球の半径の和を取得し、中心ベクトルの距離と比較
+	auto tempSphe1 = dynamic_pointer_cast<SphereCollider>(col1);
+	auto tempSphe2 = dynamic_pointer_cast<SphereCollider>(col2);
+	auto sumOfRadius = tempSphe1->Radius() + tempSphe2->Radius();
+
+	if (pow(sumOfRadius,2) >= XMVector3LengthSq(vecBetCenter).m128_f32[0])
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+/// <summary>
+/// 球形とカプセルの当たり判定を確認する関数
+/// </summary>
+/// <param name="col1">当たり判定その1</param>
+/// <param name="col2">当たり判定その2</param>
+/// <returns>衝突しているか</returns>
+bool
+CollisionDetector::CheckSphereAndCapsule(shared_ptr<ICollider> col1, shared_ptr<ICollider> col2)
+{
+	auto sphere = dynamic_pointer_cast<SphereCollider>(col1);
+	auto capsule = dynamic_pointer_cast<CapsuleCollider>(col2);
+
+	// もし逆の組み合わせ（Capsule, Box）だった場合、入れ替えて取得を試みる
+	if (!sphere || !capsule) 
+	{
+		sphere = dynamic_pointer_cast<SphereCollider>(col2);
+		capsule = dynamic_pointer_cast<CapsuleCollider>(col1);
+	}
+
+	// 最終的に両方の型が揃っていなければ中断
+	if (!sphere || !capsule) 
+	{
+		return false;
+	}
+
+	XMVECTOR ab = *capsule->UpEdge() - *capsule->DownEdge();
+	XMVECTOR ap = *sphere->Center() - *capsule->DownEdge();
+
+	float lengthSq = XMVectorGetX(XMVector3LengthSq(ab));
+	float t = XMVectorGetX(XMVector3Dot(ap, ab)) / lengthSq;
+
+	t = clamp(t, 0.0f, 1.0f);
+
+	XMVECTOR q = *capsule->DownEdge() + t * ab;
+
+	XMVECTOR diff = *sphere->Center() - q;
+	float distanceSq = XMVectorGetX(XMVector3LengthSq(diff));
+
+	float radiusSum = capsule->Radius() + sphere->Radius();
+
+	return distanceSq <= (radiusSum * radiusSum);
 }
 
 /// <summary>

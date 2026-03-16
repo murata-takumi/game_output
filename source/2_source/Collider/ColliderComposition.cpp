@@ -43,8 +43,8 @@ ColliderComposition::Center()const
 /// 当たり判定を持つオブジェクトを返す
 /// </summary>
 /// <returns>オブジェクト</returns>
-IFbx& 
+shared_ptr<IFbx>
 ColliderComposition::Object()const
 {
-	return *_object;
+	return _object;
 }

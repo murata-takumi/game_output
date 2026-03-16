@@ -22,5 +22,5 @@ public:
 	virtual shared_ptr<Vector3> Center()const = 0;
 
 	//オブジェクトを返す
-	virtual IFbx& Object()const = 0;
+	virtual shared_ptr<IFbx> Object()const = 0;
 };

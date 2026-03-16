@@ -94,7 +94,7 @@ CapsuleCollider::DownEdge()const
 /// 当たり判定を持つオブジェクトを返す
 /// </summary>
 /// <returns>オブジェクト</returns>
-IFbx&
+shared_ptr<IFbx>
 CapsuleCollider::Object()const
 {
 	return _colliderComp->Object();

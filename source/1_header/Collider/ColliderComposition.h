@@ -25,5 +25,5 @@ public:
 	shared_ptr <Vector3> Center()const;
 
 	//オブジェクトを返す
-	IFbx& Object()const;
+	shared_ptr<IFbx> Object()const;
 };

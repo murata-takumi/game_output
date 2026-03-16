@@ -142,7 +142,7 @@ BoxCollider::Center()const
 /// 当たり判定を持つオブジェクトを返す
 /// </summary>
 /// <returns>オブジェクト</returns>
-IFbx&
+shared_ptr<IFbx>
 BoxCollider::Object()const
 {
 	return _colliderComp->Object();
