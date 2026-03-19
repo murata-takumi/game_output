@@ -1,4 +1,5 @@
 #include "Functions.h"
+#include "ObjectName.h"
 #include "Vector3.h"
 
 #include "Collider/BoxCollider.h"
@@ -64,7 +65,7 @@ FbxActor::Init(const wchar_t* filePath, const string name,
 	//共通処理を初期化
 	_fbxComp = make_shared<FbxComposition>();
 
-	//名前を紐付け
+	//名前を設定
 	_fbxComp->SetName(name);
 
 	//モデル関連の情報を初期化
@@ -214,9 +215,9 @@ FbxActor::Init(const wchar_t* filePath, const string name,
 		auto ret = false;
 		for (auto& obj : objsNearby)
 		{
-			if (CollisionDetector::Instance().CheckColAndVec(
-				obj->Collider(),
-				*_fbxComp->Collider()->Center(), _fbxComp->CurrentPosition() - Vector3(0, 75.0f, 0)))
+			if(CollisionDetector::Instance().CheckColAndVector(
+				obj->Collider(), *_fbxComp->Collider()->Center(),Vector3(0,-1,0),75.0f
+			))
 			{
 				auto halfHeight = dynamic_pointer_cast<BoxCollider>(obj->Collider())->HalfLength()[1];
 
@@ -798,14 +799,17 @@ FbxActor::OnKeyPressed(const Vector3& input)
 	auto objsNearby = OcTree::Instance().GetByVector(*_fbxComp->Collider()->Center() - Vector3(0,75,0), _currentFrontVec, 45);
 	auto collision = false;
 
-	ImGuiManager::Instance().AddLabelAndInt("Count", objsNearby.size());
-
 	for (auto& obj : objsNearby)
 	{
-		if (dynamic_pointer_cast<BoxCollider>(obj->Collider()) && 
-			CollisionDetector::Instance().CheckCapsuleAndBox(
-				obj->Collider(), _fbxComp->Collider()))
+		if (auto a = CollisionDetector::Instance().CheckColAndCol(
+				_fbxComp->Collider(), obj->Collider()))
 		{
+			//コインの場合は削除する
+			if (obj->Name() == COIN_NAME)
+			{
+				_isOnCollision(obj->Name());
+			}
+
 			collision = true;
 			break;
 		}
@@ -1062,6 +1066,16 @@ shared_ptr<ICollider>
 FbxActor::GetColForGround()const
 {
 	return _colOnGroundForRun;
+}
+
+/// <summary>
+/// オブジェクトに付けられた名前を返す関数
+/// </summary>
+/// <returns>名前</returns>
+const string
+FbxActor::Name()
+{
+	return _fbxComp->Name();
 }
 
 /// <summary>

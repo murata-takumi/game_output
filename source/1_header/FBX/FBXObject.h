@@ -38,12 +38,15 @@ public:
 	//当たり判定を取得
 	shared_ptr<ICollider>  Collider()override;
 
+	//現在の座標を取得
+	Vector3 CurrentPosition()override;
+
+	//名前を取得
+	const string Name()override;
+
 	//描画処理
 	void Draw()override;
 
 	//更新処理
 	void Update()override;
-
-	//現在の座標を取得
-	Vector3 CurrentPosition()override;
 };

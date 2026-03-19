@@ -41,6 +41,7 @@
     <ClInclude Include="1_header\Manager\InputManager.h" />
     <ClInclude Include="1_header\Manager\SoundManager.h" />
     <ClInclude Include="1_header\Manager\SpriteManager.h" />
+    <ClInclude Include="1_header\ObjectName.h" />
     <ClInclude Include="1_header\OcTree\OcTree.h" />
     <ClInclude Include="1_header\OcTree\OcTreeNode.h" />
     <ClInclude Include="1_header\Package\MemoryMappedFile.h" />

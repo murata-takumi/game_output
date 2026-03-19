@@ -177,6 +177,9 @@
     <ClInclude Include="1_header\Collider\CapsuleCollider.h">
       <Filter>1_header\Collider</Filter>
     </ClInclude>
+    <ClInclude Include="1_header\ObjectName.h">
+      <Filter>1_header</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="2_source\Application.cpp">

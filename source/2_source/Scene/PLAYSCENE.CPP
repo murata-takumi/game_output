@@ -1,6 +1,7 @@
 #pragma once
 #include "Functions.h"
 #include "Includes.h"
+#include "ObjectName.h"
 #include "Vector3.h"
 
 #include "Collider/BoxCollider.h"
@@ -53,15 +54,6 @@ const Vector3 BOX_INIT_POS = Vector3(200.0f, 0.0f, 0.0f);
 const Vector3 BOX_INIT_POS_1 = Vector3(-200.0f, 0.0f, 0.0f);
 const Vector3 BOX_INIT_POS_2 = Vector3(0.0f, -200.0f, 600.0f);
 const Vector3 BOX_INIT_POS_3 = Vector3(0.0f, -200.0f, -600.0f);
-
-//オブジェクトの名前一覧
-const string ACTOR_NAME = "Actor";
-const string GROUND_NAME = "Ground";
-const string COIN_NAME = "Coin";
-const string BOX_NAME = "Box";
-const string BOX_NAME_1 = "Box1";
-const string BOX_NAME_2 = "Box2";
-const string BOX_NAME_3 = "Box3";
 
 /// <summary>
 /// シーン開始時に実行する関数
@@ -131,6 +123,12 @@ PlayScene::SceneStart()
 			{
 				// 成功したら、_actorに代入してループを抜ける
 				_actor = actorPtr;
+
+				//衝突時の処理を登録
+				_actor->_isOnCollision = [this](const string& name)
+				{
+					EraseObject(name);
+				};
 				break;
 			}
 		}
@@ -213,8 +211,6 @@ PlayScene::Update()
 		//アクターが移動可能かどうか
 		if (ImGuiManager::Instance().CanActorTrans())
 		{
-			EraseObject(COIN_NAME);
-
 			//カメラに対し入力方向にベクトル加算
 			if (InputManager::Instance().KeyState().Left)
 			{

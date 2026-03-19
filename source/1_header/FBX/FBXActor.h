@@ -116,6 +116,9 @@ public:
 	//アクターが地面の上にいるか判別するためのコールバック
 	function<bool(const Vector3& vec)> _isOnGround;
 
+	//アクターが何かと衝突したときに呼び出すコールバック
+	function<void(const string& name)> _isOnCollision;
+
 	//コンストラクタ
 	FbxActor() = default;
 	//デストラクタ
@@ -181,6 +184,9 @@ public:
 
 	//接地判定を行うOBBを返す
 	shared_ptr<ICollider> GetColForGround()const;
+
+	//名前を取得
+	const string Name()override;
 
 	//地面に接しているかどうかを返す
 	bool GetOnGround()const;

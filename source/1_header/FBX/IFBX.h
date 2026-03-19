@@ -28,12 +28,15 @@ public:
 	//当たり判定を返す
 	virtual shared_ptr<ICollider>  Collider() = 0;
 
+	//現在の座標を返す
+	virtual Vector3 CurrentPosition() = 0;
+
+	//名前を返す
+	virtual const string Name() = 0;
+
 	//描画関数
 	virtual void Draw() = 0;
 
 	//更新関数
 	virtual void Update() = 0;
-
-	//現在の座標を返す
-	virtual Vector3 CurrentPosition() = 0;
 };

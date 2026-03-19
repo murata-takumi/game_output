@@ -25,6 +25,7 @@ FbxObject::Init(const wchar_t* filePath, const string name,
 	//共通処理を初期化
 	_fbxComp = make_shared<FbxComposition>();
 
+	//名前を設定
 	_fbxComp->SetName(name);
 
 	//モデル関連の情報を初期化
@@ -71,6 +72,26 @@ FbxObject::Collider()
 }
 
 /// <summary>
+/// 現在の座標を取得する関数
+/// </summary>
+/// <returns>座標</returns>
+Vector3
+FbxObject::CurrentPosition()
+{
+	return _fbxComp->CurrentPosition();
+}
+
+/// <summary>
+/// オブジェクトに付けられた名前を返す関数
+/// </summary>
+/// <returns>名前</returns>
+const string
+FbxObject::Name()
+{
+	return _fbxComp->Name();
+}
+
+/// <summary>
 /// 描画処理
 /// </summary>
 void 
@@ -87,14 +108,4 @@ FbxObject::Update()
 {
 	//移動処理
 	_fbxComp->Update();
-}
-
-/// <summary>
-/// 現在の座標を取得する関数
-/// </summary>
-/// <returns>座標</returns>
-Vector3
-FbxObject::CurrentPosition()
-{
-	return _fbxComp->CurrentPosition();
 }
