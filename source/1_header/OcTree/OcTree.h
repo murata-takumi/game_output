@@ -22,6 +22,9 @@ public:
 	//オブジェクトを削除する関数
 	void EraseObject(const shared_ptr<IFbx> obj);
 
+	//追加されたオブジェクトをすべて取得する関数
+	vector<shared_ptr<IFbx>> GetAllObjects();
+
 	//クエリ範囲にあるオブジェクトを取得する関数
 	vector<shared_ptr<IFbx>> GetByCollider(const shared_ptr<ICollider> col)noexcept;
 
@@ -30,6 +33,9 @@ public:
 private:
 	//ノード
 	shared_ptr<OcTreeNode> _rootNode;
+
+	//現在保持しているオブジェクトの一覧
+	vector<shared_ptr<IFbx>> _objs;
 
 	//コンストラクタ、デストラクタ
 	OcTree();

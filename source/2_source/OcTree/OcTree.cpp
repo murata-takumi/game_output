@@ -46,10 +46,13 @@ OcTree::Init(const shared_ptr<ICollider> col, int capacity)
 /// オブジェクトを追加する関数
 /// </summary>
 /// <param name="obj">追加するオブジェクト</param>
-/// <returns>追加で来たかどうか</returns>
+/// <returns>追加出来たかどうか</returns>
 bool 
 OcTree::AddObject(const shared_ptr<IFbx> obj)
 {
+	//OcTree側が持つオブジェクトに追加
+	_objs.push_back(obj);
+
 	//ルートノードに追加処理
 	return _rootNode->AddObject(obj);
 }
@@ -62,6 +65,16 @@ void
 OcTree::EraseObject(const shared_ptr<IFbx> obj)
 {
 	_rootNode->EraseObject(obj);
+}
+
+/// <summary>
+/// 追加されたオブジェクトをすべて取得する関数
+/// </summary>
+/// <returns>全オブジェクト</returns>
+vector<shared_ptr<IFbx>> 
+OcTree::GetAllObjects()
+{
+	return _objs;
 }
 
 /// <summary>
