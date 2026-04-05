@@ -9,6 +9,8 @@ class aiAnimation;
 class aiNode;
 class aiNodeAnim;
 class AnimNode;
+class FallNode;
+class JumpNode;
 class AssimpLoader;
 class BoxCollider;
 class Dx12Wrapper;
@@ -18,6 +20,10 @@ class ImGuiManager;
 class Vector3;
 class FbxActor : public IFbx
 {	
+	// アニメーションはprivateの関数も呼び出せるようにする
+	friend JumpNode;
+	friend FallNode;
+
 	template<typename T>using ComPtr = ComPtr<T>;
 
 private:
@@ -63,7 +69,9 @@ private:
 	//アニメーションをループさせるか決める真理値
 	bool _isInLoop = true;	
 	//アニメーションが変更可能か決める真理値
-	bool _canChangeAnim = true;													
+	bool _canChangeAnim = true;		
+
+	float _currentY = 0.0f;
 
 	//最終的なアクターの回転角（Y軸）
 	float _destRad = 0.0f;
@@ -104,6 +112,9 @@ private:
 	bool GetContinuousOnGround(const Vector3& dir,const Vector3& currentPos,
 		const float speed);
 
+	// 指定されたコライダまたはベクトルに基づき、接地チェックと座標補正を行う内部関数
+	bool CheckGroundAndSnap(const std::vector<std::shared_ptr<IFbx>>& objsNearby);
+
 	//ノード階層を読み込む関数
 	void ReadNodeHeirarchy(float animationTime, const aiNode* pNode, const XMMATRIX& parentTrans);
 
@@ -111,7 +122,7 @@ private:
 	void InitAnimation();													
 
 	//モデルのアニメーション用行列を求める関数
-	void BoneTransform(float timeInTicks);							
+	void BoneTransform(float timeInTicks);	
 public:	
 	//アクターが地面の上にいるか判別するためのコールバック
 	function<bool(const Vector3& vec)> _isOnGround;
@@ -130,6 +141,9 @@ public:
 	//アニメーション名のベクトルを返す関数
 	vector<string> GetAnimstr()const;
 
+	// 入力ベクトルを返す関数
+	Vector3 GetInputVec()const;
+
 	//アニメーションの総時間を返す関数
 	float GetAnimDuration(string animation);	
 	//アニメーションの1秒当たりの処理回数を返す関数
@@ -142,7 +156,9 @@ public:
 	//アニメーションの再生速度を設定する関数
 	void SetAnimationSpeed(float speed);
 	//アニメーションの再生時間を設定する関数
-	void SetAnimationTime(float time);					
+	void SetAnimationTime(float time);
+	// ボーン変換を排除するかどうかを決める
+	void SetRejectBone(bool val);
 	//アクターをTポーズにする関数
 	void InitPose();	
 

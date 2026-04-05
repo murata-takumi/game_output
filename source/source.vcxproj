@@ -29,6 +29,8 @@
     <ClInclude Include="1_header\Collider\SphereCollider.h" />
     <ClInclude Include="1_header\FBX\AnimNodes\Animations.h" />
     <ClInclude Include="1_header\FBX\AnimNodes\AnimNode.h" />
+    <ClInclude Include="1_header\Fbx\AnimNodes\FallNode.h" />
+    <ClInclude Include="1_header\Fbx\AnimNodes\JumpNode.h" />
     <ClInclude Include="1_header\FBX\AssimpLoader.h" />
     <ClInclude Include="1_header\FBX\FbxActor.h" />
     <ClInclude Include="1_header\Fbx\FbxComposition.h" />
@@ -64,7 +66,8 @@
     <ClCompile Include="2_source\Collider\ColliderComposition.cpp" />
     <ClCompile Include="2_source\Collider\CollisionDetector.cpp" />
     <ClCompile Include="2_source\Collider\SphereCollider.cpp" />
-    <ClCompile Include="2_source\FBX\AnimNodes\AnimNode.cpp" />
+    <ClCompile Include="2_source\Fbx\AnimNodes\FallNode.cpp" />
+    <ClCompile Include="2_source\Fbx\AnimNodes\JumpNode.cpp" />
     <ClCompile Include="2_source\FBX\AssimpLoader.cpp" />
     <ClCompile Include="2_source\FBX\FbxActor.cpp" />
     <ClCompile Include="2_source\Fbx\FbxComposition.cpp" />

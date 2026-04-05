@@ -180,6 +180,12 @@
     <ClInclude Include="1_header\ObjectName.h">
       <Filter>1_header</Filter>
     </ClInclude>
+    <ClInclude Include="1_header\Fbx\AnimNodes\JumpNode.h">
+      <Filter>1_header\FBX\AnimNodes</Filter>
+    </ClInclude>
+    <ClInclude Include="1_header\Fbx\AnimNodes\FallNode.h">
+      <Filter>1_header\FBX\AnimNodes</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="2_source\Application.cpp">
@@ -227,9 +233,6 @@
     <ClCompile Include="2_source\FBX\AssimpLoader.cpp">
       <Filter>2_source\Fbx</Filter>
     </ClCompile>
-    <ClCompile Include="2_source\FBX\AnimNodes\AnimNode.cpp">
-      <Filter>2_source\Fbx\AnimNodes</Filter>
-    </ClCompile>
     <ClCompile Include="2_source\Scene\TitleScene.cpp">
       <Filter>2_source\Scene</Filter>
     </ClCompile>
@@ -268,6 +271,12 @@
     </ClCompile>
     <ClCompile Include="2_source\Collider\CapsuleCollider.cpp">
       <Filter>2_source\Collider</Filter>
+    </ClCompile>
+    <ClCompile Include="2_source\Fbx\AnimNodes\JumpNode.cpp">
+      <Filter>2_source\Fbx\AnimNodes</Filter>
+    </ClCompile>
+    <ClCompile Include="2_source\Fbx\AnimNodes\FallNode.cpp">
+      <Filter>2_source\Fbx\AnimNodes</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

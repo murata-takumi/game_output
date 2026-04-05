@@ -157,17 +157,6 @@ ImGuiManager::ImGuiDraw()
 			}
 		}
 
-		auto onGround = dynamic_pointer_cast<FbxActor>(_actor)->GetOnGround();
-		auto x = dynamic_pointer_cast<FbxActor>(_actor)->CurrentPosition().X();
-		auto y = dynamic_pointer_cast<FbxActor>(_actor)->CurrentPosition().Y();
-		auto z = dynamic_pointer_cast<FbxActor>(_actor)->CurrentPosition().Z();
-
-		ImGui::Checkbox("IsOnGround", &onGround);
-
-		ImGui::DragFloat("PlayerX", &x);
-		ImGui::DragFloat("PlayerY", &y);
-		ImGui::DragFloat("PlayerZ", &z);
-
 		//•¶Žš—ñ‚ð•\Ž¦
 		for (auto& pair : _texts)
 		{
