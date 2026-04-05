@@ -13,15 +13,20 @@ int main() {
 int WINAPI WinMain(_In_ HINSTANCE,_In_opt_ HINSTANCE,_In_ LPSTR,_In_ int) {
 #endif
 
-	auto& app = Application::Instance();	//Applicationインスタンス取得
+	// Applicationインスタンス取得
+	auto& app = Application::Instance();	
 
-	if (!app.Init())						//Applicationインスタンスの初期化が成功しなければ異常終了
+	// Applicationインスタンスの初期化が成功しなければ異常終了
+	if (!app.Init())						
 	{
 		return -1;
 	}
 
-	app.Run();								//ゲーム画面を描画
-	app.Terminate();						//終了時の後始末
+	// ゲーム画面を描画
+	app.Run();						
+	// 終了時の後始末
+	app.Terminate();						
 
-	return 0;								//正常終了
+	// 正常終了
+	return 0;								
 }

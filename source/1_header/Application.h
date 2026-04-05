@@ -31,8 +31,10 @@
 /// </summary>
 enum SceneNames
 {
-	Title,		//タイトルシーン
-	Play,		//ゲームシーン
+	// タイトルシーン
+	Title,		
+	// ゲームシーン
+	Play,		
 };
 
 class Dx12Wrapper;
@@ -50,71 +52,78 @@ class TitleScene;
 class Application
 {
 private:
-	//ウィンドウ作成時に必要な情報を格納
+
+	// スコープを抜けるときに自動で解除
+	struct ComDeleter {
+		void operator()(void*) { CoUninitialize(); }
+	};
+	std::unique_ptr<void, ComDeleter> _comInitializer; 
+
+	// ウィンドウ作成時に必要な情報を格納
 	WNDCLASSEX _windowClass;								
-	//ウィンドウの識別に必要な値
+	// ウィンドウの識別に必要な値
 	HWND _hwnd;													
 
-	//EffectManagerインスタンス
+	// EffectManagerインスタンス
 	shared_ptr<EffectManager> _effect;								
 	
-	//現在実行しているシーン
+	// 現在実行しているシーン
 	shared_ptr<IScene> _scene;
-	//TitleSceneインスタンス
+	// TitleSceneインスタンス
 	shared_ptr<IScene> _title;
-	//PlaySceneインスタンス
+	// PlaySceneインスタンス
 	shared_ptr<IScene> _play;
 
-	//ゲーム内で使用する各種データを管理するインスタンス
+	// ゲーム内で使用する各種データを管理するインスタンス
 	shared_ptr<Package> _package;									
 
-	//フレーム間の経過時間
+	// フレーム間の経過時間
 	float _deltaTime;				
-	//1秒あたりのフレーム数
+	// 1秒あたりのフレーム数
 	int _rate;														
-	//フリップ間隔
+	// フリップ間隔
 	int _interval;													
 
-	//ゲーム用ウィンドウを作成する関数
+	// ゲーム用ウィンドウを作成する関数
 	void CreateGameWindow(HWND& hwnd, WNDCLASSEX& windowClass);		
 
-	//コンストラクタ
+	// コンストラクタ
 	Application();													
-	//コンストラクタを外部から呼び出されないよう設定
+	// コンストラクタを外部から呼び出されないよう設定
 	Application(const Application&) = delete;						
 
 public:
 
-	//メッセージ用構造体
+	// メッセージ用構造体
 	MSG _msg = {};									
 
-	//インスタンスの参照を返す？
+	// インスタンスの参照を返す？
 	static Application& Instance();					
 
-	//初期化
+	// 初期化
 	bool Init();									
 
-	//ゲーム画面の描画
+	// ゲーム画面の描画
 	void Run();										
 
-	//ゲーム終了時の後始末
+	// ゲーム終了時の後始末
 	void Terminate();								
 
-	//ウィンドウサイズを返す
+	// ウィンドウサイズを返す
 	SIZE GetWindowSize()const;	
 
-	//シーンを切り替える
+	// シーンを切り替える
 	void SetScene(shared_ptr<IScene> scene);
-	//シーンの設定・終了時の処理・開始時の処理を実行
+	// シーンの設定・終了時の処理・開始時の処理を実行
 	void ChangeScene(SceneNames name);
-	//アプリケーションを終了する
+	// アプリケーションを終了する
 	void ExitApp();									
 
-	//レンダーターゲットのフリップ間隔を返す関数
+	// レンダーターゲットのフリップ間隔を返す関数
 	int GetInterval()const;							
-	//1秒間のフレームレートを返す関数
+	// 1秒間のフレームレートを返す関数
 	int GetRate()const;								
 
-	//デストラクタ
+	// デストラクタ
 	~Application();									
 };
